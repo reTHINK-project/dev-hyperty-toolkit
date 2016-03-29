@@ -1,0 +1,42 @@
+{
+  "FakeDataSchema": {
+    "sourcePackage": {
+      "sourceCode": "ewoJIiRzY2hlbWEiOiAiaHR0cDovL2pzb24tc2NoZW1hLm9yZy9kcmFmdC0wNC9zY2hlbWEjIiwKCSJpZCI6ICJGYWtlT2JqZWN0IiwKCSJ0eXBlIjogIm9iamVjdCIsCgkicmVxdWlyZWQiOiBbInNjaGVtZSJdLAoJImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsCiAgInByb3BlcnRpZXMiOiB7CgkJInNjaGVtZSI6IHsKCQkJImNvbnN0YW50IjogImZha2UiCgkJfSwKCQkiY2hpbGRyZW4iOiB7CgkJCSJjb25zdGFudCI6IFsibWVzc2FnZSJdCgkJfQoJfQp9Cg==",
+      "sourceCodeClassname": "FakeDataSchema",
+      "encoding": "base64",
+      "signature": ""
+    },
+    "cguid": 1,
+    "type": "DataSchemas",
+    "version": "0.1",
+    "description": "Description of FakeDataSchema",
+    "objectName": "FakeDataSchema",
+    "configuration": {},
+    "sourcePackageURL": "/sourcePackage",
+    "language": "JSON-Schema",
+    "signature": "",
+    "messageSchemas": "",
+    "dataObjects": [],
+    "accessControlPolicy": "somePolicy"
+  },
+  "HelloWorldDataSchema": {
+    "sourcePackage": {
+      "sourceCode": "ew0KCSIkc2NoZW1hIjogImh0dHA6Ly9qc29uLXNjaGVtYS5vcmcvZHJhZnQtMDQvc2NoZW1hIyIsDQoJImlkIjogIkhlbGxvT2JqZWN0IiwNCgkidHlwZSI6ICJvYmplY3QiLA0KCSJyZXF1aXJlZCI6IFsiaGVsbG8iXSwNCgkiYWRkaXRpb25hbFByb3BlcnRpZXMiOiBmYWxzZSwNCiAgInByb3BlcnRpZXMiOiB7DQoJCSJzY2hlbWUiOiB7DQoJCQkiY29uc3RhbnQiOiAiaGVsbG8iDQoJCX0sDQoJCSJoZWxsbyI6IHsNCgkJCSJ0eXBlIjogInN0cmluZyINCgkJfQ0KCX0NCn0NCg==",
+      "sourceCodeClassname": "HelloWorldDataSchema",
+      "encoding": "base64",
+      "signature": ""
+    },
+    "cguid": 1,
+    "type": "DataSchemas",
+    "version": "0.1",
+    "description": "Description of HelloWorldDataSchema",
+    "objectName": "HelloWorldDataSchema",
+    "configuration": {},
+    "sourcePackageURL": "/sourcePackage",
+    "language": "JSON-Schema",
+    "signature": "",
+    "messageSchemas": "",
+    "dataObjects": [],
+    "accessControlPolicy": "somePolicy"
+  }
+}

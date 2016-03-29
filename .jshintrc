@@ -1,0 +1,15 @@
+{
+  "esnext": true,
+  "boss": true,
+  "node": true,
+  "evil": true,
+  "eqeqeq": true,
+  "undef": true,
+  "unused": true,
+  "onecase": true,
+  "varstmt": true,
+  "lastsemic": true,
+  "phantom": true,
+  "browserify": true,
+  "mocha": true
+}
