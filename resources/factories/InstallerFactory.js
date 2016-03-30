@@ -27,7 +27,7 @@ class InstallerFactory {
       catalogue.getRuntimeDescriptor(runtimeURL)
       .then(function(descriptor) {
 
-        eval(descriptor.sourcePackage.sourceCode);
+        window.eval(descriptor.sourcePackage.sourceCode);
 
         let runtime = new RuntimeUA(runtimeFactory, domain);
         window.runtime = runtime;

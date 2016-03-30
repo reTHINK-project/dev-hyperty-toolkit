@@ -235,7 +235,7 @@ var InstallerFactory = function () {
 
         catalogue.getRuntimeDescriptor(runtimeURL).then(function (descriptor) {
 
-          eval(descriptor.sourcePackage.sourceCode);
+          window.eval(descriptor.sourcePackage.sourceCode);
 
           var runtime = new RuntimeUA(runtimeFactory, domain);
           window.runtime = runtime;
@@ -400,7 +400,7 @@ var AppSandboxBrowser = function (_Sandbox) {
     _this._sbr = new _sandbox.SandboxRegistry(_this._bus);
     _this._sbr._create = function (url, sourceCode, config) {
       console.log('SandboxRegistry._create ', url, config);
-      eval(sourceCode);
+      window.eval(sourceCode);
       return activate(url, _this._bus, config);
     };
 
@@ -475,7 +475,7 @@ var SandboxBrowser = function (_Sandbox) {
     _this._sbr = new _sandbox.SandboxRegistry(_this._bus);
     _this._sbr._create = function (url, sourceCode, config) {
       console.log('SandboxRegistry._create ', url, config);
-      eval(sourceCode);
+      window.eval(sourceCode);
       return activate(url, _this2._bus, config);
     };
     return _this2;
@@ -515,16 +515,25 @@ var installerFactory = new _InstallerFactory2.default();
 
 window.KJUR = {};
 
-var hyperty = 'https://localhost/.well-known/hyperties/Hello';
 var runtime = 'https://localhost/.well-known/runtimes/RuntimeUA';
 
 var runtimeLoader = new _RuntimeLoader2.default(installerFactory, runtime);
 
-runtimeLoader.install().then(function (result) {
-  console.log(result);
+runtimeLoader.install().then(function () {
+
+  var hyperty = 'https://localhost/.well-known/hyperties/Hello';
+  runtimeLoader.requireHyperty(hyperty).then(hypertyDeployed).catch(hypertyFail);
 }).catch(function (reason) {
   console.error(reason);
 });
+
+function hypertyDeployed(hyperty) {
+  console.log(hyperty);
+}
+
+function hypertyFail(reason) {
+  console.error(reason);
+}
 
 // runtimeCatalogue.getHypertyDescriptor(hyperty).then(function(descriptor) {
 //   console.log(descriptor);

@@ -42,7 +42,7 @@ gulp.task('serve', ['js'], function() {
 
   // add browserSync.reload to the tasks array to make
   // all browsers reload after tasks are complete.
-  gulp.watch(['src/*.js', 'resources/**/*.js'], ['main-watch']);
+  gulp.watch(['src/*.js', 'resources/**/*.js', 'system.config.json'], ['main-watch']);
   gulp.watch(['src/**/*.hy.js'], ['hyperties']);
 
 });
@@ -74,6 +74,7 @@ gulp.task('js', ['hyperties'], function() {
   .on('end', function() {
     console.log('The main file was created like a distribution file on /dist');
     console.log('-----------------------------------------------------------');
+    browserSync.reload();
   });
 
 });
