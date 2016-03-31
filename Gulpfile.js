@@ -43,7 +43,7 @@ gulp.task('serve', ['js'], function() {
   // add browserSync.reload to the tasks array to make
   // all browsers reload after tasks are complete.
   gulp.watch(['src/*.js', 'resources/**/*.js', 'system.config.json'], ['main-watch']);
-  gulp.watch(['src/**/*.hy.js'], ['hyperties']);
+  gulp.watch(['src/**/*.js'], ['hyperties']);
 
 });
 
@@ -52,25 +52,13 @@ gulp.task('hyperties-watch', ['hyperties'], browserSync.reload);
 
 gulp.task('js', ['hyperties'], function() {
 
-  return browserify('./src/main.js', {
-    extension: extensions
-  })
-  .transform('babelify', {
-    compact: false,
-    presets: ['es2015', 'stage-0'],
-    plugins: ['add-module-exports']
-  })
-  .bundle()
-  .on('error', function(err) {
-    console.error('ERROR:', err);
-    this.emit('end');
-  })
+  return gulp.src('./src/main.js')
   .on('end', function() {
+    var fileObject = path.parse('./src/main.js');
     console.log('-----------------------------------------------------------');
-    console.log('Converting main.js from ES6 to ES5');
+    console.log('Converting ' + fileObject.base + ' from ES6 to ES5');
   })
-  .pipe(source('main.js'))
-  .pipe(gulp.dest(__dirname + '/dist'))
+  .pipe(transpile({destination: __dirname + '/dist'}))
   .on('end', function() {
     console.log('The main file was created like a distribution file on /dist');
     console.log('-----------------------------------------------------------');
@@ -106,30 +94,21 @@ gulp.task('hyperties', function() {
 
   var tasks = files.map(function(file) {
 
-    var currentFile = path.parse(file);
-    return browserify({
-      entries: [currentFile.dir + '/' + currentFile.base],
-      standalone: 'activate',
-      extension: extensions,
-      debug: true
-    }).transform(babel, {
-      compact: false,
-      presets: ['es2015'],
-      plugins: ['add-module-exports']
-    })
-    .bundle()
-    .on('error', function(err) {
-      console.error('ERROR:', err);
-      this.emit('end');
-    })
+    var fileObject = path.parse(file);
+
+    return gulp.src(file)
     .on('end', function() {
       console.log('-----------------------------------------------------------');
+      console.log('Converting ' + fileObject.base + ' from ES6 to ES5');
     })
-    .pipe(source(currentFile.base))
-    .pipe(gulp.dest('resources/'))
+    .pipe(transpile({
+      destination: __dirname + '/resources',
+      standalone: 'activate',
+      debug: true
+    }))
     .pipe(resource())
     .on('end', function() {
-      console.log('Hyperty ', currentFile.name, ' was converted and encoded');
+      console.log('Hyperty', fileObject.name, ' was converted and encoded');
       console.log('-----------------------------------------------------------');
     });
 
@@ -214,10 +193,45 @@ gulp.task('encode', function(done) {
 
 });
 
-function resource(opts) {
+function transpile(opts) {
 
   return through.obj(function(file, enc, cb) {
 
+    var fileObject = path.parse(file.path);
+    var args = {};
+
+    args.entries = [file.path];
+    args.extensions = extensions;
+    if (opts.debug) args.debug = opts.debug;
+    if (opts.standalone) args.standalone = opts.standalone;
+
+    return browserify(args)
+    .transform(babel, {
+      compact: false,
+      presets: ['es2015', 'stage-0'],
+      plugins: ['add-module-exports']
+    })
+    .bundle()
+    .on('error', function(err) {
+      console.error('ERROR:', err);
+      this.emit('end');
+    })
+    .pipe(source(fileObject.base))
+    .pipe(gulp.dest(opts.destination))
+    .on('end', function() {
+      file.contents = fs.readFileSync(opts.destination + '/' + fileObject.base);
+      file.path = opts.destination + '/' + fileObject.base;
+      cb(null, file);
+    });
+
+  });
+
+}
+
+function resource(opts) {
+
+  return through.obj(function(file, enc, cb) {
+    console.log('Resource: ', file.path);
     var fileObject = path.parse(file.path);
 
     opts = _.extend({
@@ -247,7 +261,7 @@ function resource(opts) {
 
     opts.descriptor = descriptorName;
 
-    console.log('Encoding file', defaultPath, filename, opts);
+    console.log('Encoding: ', defaultPath, filename, opts);
 
     if (extension === '.js') {
       return gulp.src([file.path])
@@ -288,6 +302,8 @@ function encode(file, opts) {
     if (file.isStream()) {
       return cb(new Error('Streaming not supported'));
     }
+
+    console.log('Encode: ', file.path);
 
     var fileObject = path.parse(file.path);
     var descriptor = fs.readFileSync('resources/descriptors/' + opts.descriptor + '.json', 'utf8');
