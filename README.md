@@ -1,5 +1,13 @@
 # Is not ready to use. Work on progress
 
+### Example Working
+
+- Hyperty Connector
+
+### Not Working
+
+- Hyperty Chat
+
 # Hyperty Development Toolkit
 
 ## Overview

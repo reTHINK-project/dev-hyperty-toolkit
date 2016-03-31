@@ -8,7 +8,6 @@ var path = require('path');
 var browserSync = require('browser-sync').create('Toolkit');
 
 var _ = require('lodash');
-var es = require('event-stream');
 var babel = require('babelify');
 var browserify = require('browserify');
 var buffer = require('vinyl-buffer');
@@ -16,6 +15,7 @@ var source = require('vinyl-source-stream');
 var through = require('through2');
 var Base64 = require('js-base64').Base64;
 var prompt = require('gulp-prompt');
+var gutil = require('gulp-util');
 
 var extensions = ['.js', '.json'];
 
@@ -31,6 +31,7 @@ gulp.task('serve', ['js'], function() {
     open: false,
     port: 443,
     minify: false,
+    ghostMode: false,
     https: {
       key: 'rethink-certificate.key',
       cert: 'rethink-certificate.cert'
@@ -42,8 +43,9 @@ gulp.task('serve', ['js'], function() {
 
   // add browserSync.reload to the tasks array to make
   // all browsers reload after tasks are complete.
-  gulp.watch(['src/*.js', 'resources/**/*.js', 'system.config.json'], ['main-watch']);
+  gulp.watch(['src/*.js', 'system.config.json'], ['main-watch']);
   gulp.watch(['src/**/*.js'], ['hyperties']);
+  gulp.watch(['examples/*.html'], browserSync.reload);
 
 });
 
@@ -55,13 +57,13 @@ gulp.task('js', ['hyperties'], function() {
   return gulp.src('./src/main.js')
   .on('end', function() {
     var fileObject = path.parse('./src/main.js');
-    console.log('-----------------------------------------------------------');
-    console.log('Converting ' + fileObject.base + ' from ES6 to ES5');
+    gutil.log('-----------------------------------------------------------');
+    gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
   })
   .pipe(transpile({destination: __dirname + '/dist'}))
   .on('end', function() {
-    console.log('The main file was created like a distribution file on /dist');
-    console.log('-----------------------------------------------------------');
+    gutil.log('The main file was created like a distribution file on /dist');
+    gutil.log('-----------------------------------------------------------');
     browserSync.reload();
   });
 
@@ -70,36 +72,15 @@ gulp.task('js', ['hyperties'], function() {
 // process JS files and return the stream.
 gulp.task('hyperties', function() {
 
-  var files = [];
-  var sourceDir = fs.readdirSync(__dirname + '/src/');
-  var dirs = sourceDir.filter(function(dir) {
-    var path = __dirname + '/src/' + dir;
-    return fs.lstatSync(path).isDirectory();
-  });
+  return gulp.src('./src/**/*.hy.js')
+  .pipe(through.obj(function(chunk, enc, done) {
 
-  dirs.filter(function(dir) {
-    var path = __dirname + '/src/' + dir;
-    var dirFiles = fs.readdirSync(path);
-    return dirFiles.filter(function(file) {
-      return isFile(path + '/' + file);
-    });
-  });
+    var fileObject = path.parse(chunk.path);
 
-  function isFile(file) {
-    var currentFile = path.parse(file);
-    if (currentFile.base.indexOf('.hy.') !== -1 && fs.lstatSync(file).isFile()) {
-      files.push(file);
-    }
-  }
-
-  var tasks = files.map(function(file) {
-
-    var fileObject = path.parse(file);
-
-    return gulp.src(file)
+    return gulp.src([chunk.path])
     .on('end', function() {
-      console.log('-----------------------------------------------------------');
-      console.log('Converting ' + fileObject.base + ' from ES6 to ES5');
+      gutil.log('-----------------------------------------------------------');
+      gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
     })
     .pipe(transpile({
       destination: __dirname + '/resources',
@@ -107,14 +88,14 @@ gulp.task('hyperties', function() {
       debug: true
     }))
     .pipe(resource())
+    .resume()
     .on('end', function() {
-      console.log('Hyperty', fileObject.name, ' was converted and encoded');
-      console.log('-----------------------------------------------------------');
+      gutil.log('Hyperty', fileObject.name, ' was converted and encoded');
+      gutil.log('-----------------------------------------------------------');
+      done();
     });
 
-  });
-
-  return es.merge.apply(null, tasks);
+  }));
 
 });
 
@@ -152,7 +133,7 @@ gulp.task('encode', function(done) {
           JSON.parse(value);
           return true;
         } catch (e) {
-          console.log('Default value is {}');
+          gutil.log('Default value is {}');
           return true;
         }
       }
@@ -185,7 +166,7 @@ gulp.task('encode', function(done) {
         return gulp.src(res.file)
         .pipe(resource(opts))
         .on('end', function() {
-          console.log('encoded');
+          gutil.log('encoded');
         });
       }
     })
@@ -213,7 +194,7 @@ function transpile(opts) {
     })
     .bundle()
     .on('error', function(err) {
-      console.error('ERROR:', err);
+      gutil.log(gutil.colors.red(err.message));
       this.emit('end');
     })
     .pipe(source(fileObject.base))
@@ -230,8 +211,9 @@ function transpile(opts) {
 
 function resource(opts) {
 
-  return through.obj(function(file, enc, cb) {
-    console.log('Resource: ', file.path);
+  return through.obj(function(file, enc, done) {
+
+    gutil.log('Resource: ', file.path);
     var fileObject = path.parse(file.path);
 
     opts = _.extend({
@@ -261,27 +243,30 @@ function resource(opts) {
 
     opts.descriptor = descriptorName;
 
-    console.log('Encoding: ', defaultPath, filename, opts);
+    gutil.log('Encoding: ', defaultPath, filename, opts);
 
     if (extension === '.js') {
       return gulp.src([file.path])
-      .pipe(encode(file.path, opts))
+      .pipe(encode(opts))
       .pipe(source(opts.descriptor + '.json'))
       .pipe(gulp.dest('resources/descriptors/'))
       .on('end', function() {
-        cb();
+        var path = 'resources/descriptors/' + opts.descriptor + '.json';
+        file.contents = fs.readFileSync(path);
+        file.path = path;
+        done(null, file);
       });
 
     } else if (extension === '.json') {
 
       return gulp.src(['resources/' + filename + '.json'])
       .pipe(gulp.dest('resources/'))
-      .pipe(encode(file, opts))
+      .pipe(encode(opts))
       .pipe(buffer())
       .pipe(source(descriptorName + '.json'))
       .pipe(gulp.dest('resources/descriptors/'))
       .on('end', function() {
-        cb();
+        done();
       });
     }
 
@@ -289,7 +274,7 @@ function resource(opts) {
 
 }
 
-function encode(file, opts) {
+function encode(opts) {
 
   opts = _.extend({}, opts || {});
 
@@ -303,7 +288,7 @@ function encode(file, opts) {
       return cb(new Error('Streaming not supported'));
     }
 
-    console.log('Encode: ', file.path);
+    gutil.log('Encode: ', file.path);
 
     var fileObject = path.parse(file.path);
     var descriptor = fs.readFileSync('resources/descriptors/' + opts.descriptor + '.json', 'utf8');
@@ -339,7 +324,7 @@ function encode(file, opts) {
 
     if (!json[value].hasOwnProperty('configuration') && opts.configuration) {
       json[value].configuration = opts.configuration;
-      console.log('setting configuration: ', opts.configuration);
+      gutil.log('setting configuration: ', opts.configuration);
     }
 
     if (opts.descriptor === 'Runtimes') {
