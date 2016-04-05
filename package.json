@@ -41,6 +41,8 @@
     "lodash": "^4.6.1",
     "mocha": "^2.4.5",
     "vinyl-buffer": "^1.0.0",
+    "through2": "^2.0.1",
+    "webrtc-adapter-test": "^0.2.5",
     "vinyl-source-stream": "^1.1.0"
   }
 }
