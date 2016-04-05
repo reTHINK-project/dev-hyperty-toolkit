@@ -45,7 +45,6 @@ class ChatGroup extends EventEmitter {
     if (!dataObjectReporter) throw new Error('The data object reporter is necessary parameter');
 
     let _this = this;
-    _this._dataObjectReporter = dataObjectReporter;
 
     console.info('Set data object reporter: ', dataObjectReporter);
 
@@ -55,15 +54,20 @@ class ChatGroup extends EventEmitter {
 
       // Set the other subscription like a participant
       participant.hypertyResource = event.url;
+
+      console.info('On Subscription add Participant: ', participant, event);
+
       dataObjectReporter.data.communication.participants.push(participant);
 
-      _this.trigger('participant:added', participant);
+      _this.processParticipant(participant);
     });
 
     dataObjectReporter.onAddChildren(function(children) {
+      console.info('Reporter - Add Children: ', children);
       _this._processChildren(children);
     });
 
+    _this._dataObjectReporter = dataObjectReporter;
   }
 
   get dataObjectReporter() {
@@ -76,14 +80,13 @@ class ChatGroup extends EventEmitter {
 
     _this._dataObjectObserver = dataObjectObserver;
 
-    _this.processPartipants(dataObjectObserver);
-
     dataObjectObserver.onChange('*', function(event) {
       console.info('Change Event: ', event);
-      _this.processPartipants(dataObjectObserver);
+      _this.processPartipants(event.data);
     });
 
     dataObjectObserver.onAddChildren(function(children) {
+      console.info('Observer - Add Children: ', children);
       _this._processChildren(children);
     });
 
@@ -99,19 +102,20 @@ class ChatGroup extends EventEmitter {
     return _this._dataObjectReporter ? _this.dataObjectReporter : _this.dataObjectObserver;
   }
 
-  processPartipants(dataObject) {
+  processPartipants(participants) {
     let _this = this;
-    let participants = dataObject.data.communication.participants;
-
-    console.log('Process Participants: ', participants);
 
     participants.forEach(function(participant) {
-      if (dataObject._owner !== participant.hypertyResource) {
-        console.log('Each Participant will be trigger: ', participant);
-        _this.trigger('participant:added', participant);
+      if (_this._dataObjectObserver._owner !== participant.hypertyResource) {
+        _this.processParticipant(participant);
       }
     });
+  }
 
+  processParticipant(participant) {
+    let _this = this;
+    console.log('Each Participant will be trigger: ', participant);
+    _this.trigger('participant:added', participant);
   }
 
   /**
@@ -132,14 +136,16 @@ class ChatGroup extends EventEmitter {
    * @param  {Message} message text to be send
    */
   send(message) {
-    console.log(message, this);
+
+    console.info('Send Message:', message, this);
+
     let _this = this;
     let dataObject = _this.dataObjectReporter ? _this.dataObjectReporter : _this.dataObjectObserver;
 
     return new Promise(function(resolve, reject) {
 
       dataObject.addChildren('message', {chatMessage: message}).then(function(dataObjectChild) {
-        console.info(dataObjectChild);
+        console.info('Data Object Child: ', dataObjectChild);
         let msg = {
           childId: dataObjectChild._childId,
           from: dataObjectChild._owner,

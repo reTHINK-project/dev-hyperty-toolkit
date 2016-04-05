@@ -6,7 +6,7 @@
   "scripts": {
     "test": "karma start",
     "preinstall": "npm install -g http-server karma-cli gulp-cli",
-    "start": "sudo gulp serve"
+    "start": "gulp serve"
   },
   "repository": {
     "type": "git",

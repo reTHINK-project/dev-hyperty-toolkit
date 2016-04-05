@@ -1,0 +1,43 @@
+<div class="card-panel teal lighten-2 white-text"></div>
+
+<div class="col s12">
+    <button class="btn waves-effect waves-light create-room-btn" type="button"><i class="material-icons left">chat</i>Create Chat</button>
+    <button class="btn waves-effect waves-light join-room-btn" type="submit" name="action">Join<i class="material-icons left">group_add</i></button>
+</div>
+
+<section class="chat-section col s12 hide">
+
+</section>
+
+<!-- Modal Structure -->
+<div class="modal modal-fixed-footer create-chat">
+    <div class="modal-content">
+        <div class="chat-name">
+            <h4>Name of Chat Group</h4>
+            <input class="input-name" placeholder="chat name" id="name" required aria-required="true" type="text">
+        </div>
+        <div class="participants">
+            <form class="participants-form">
+            </form>
+        </div>
+        <div class="row">
+            <button class="btn waves-effect waves-light btn-add" type="submit" name="action">Add Participant<i class="material-icons right">add</i></button>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat btn-cancel">Cancel</a>
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat btn-create">Create</a>
+    </div>
+</div>
+
+<!-- Modal Structure -->
+<div class="modal join-chat">
+    <div class="modal-content">
+        <h4>Name of Chat Group</h4>
+        <input class="input-name" placeholder="chat name" id="name" required aria-required="true" type="text">
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat btn-cancel">Cancel</a>
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat btn-join">Join</a>
+    </div>
+</div>

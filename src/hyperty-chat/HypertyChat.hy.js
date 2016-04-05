@@ -30,7 +30,7 @@ import EventEmitter from '../utils/EventEmitter';
 import {divideURL} from '../utils/utils';
 
 // Internals
-import communication from './communication';
+import communicationObject from './communication';
 import participant from './participant';
 import ChatGroup from './Chat';
 
@@ -95,24 +95,23 @@ class HypertyChat extends EventEmitter {
 
       // Create owner participant
       // TODO: create all information to communication;
-      communication.owner = _this._hypertyURL;
-      communication.id = name;
+      communicationObject.owner = _this._hypertyURL;
+      communicationObject.id = name;
 
       // Set the other subscription like a participant
       participant.hypertyResource = _this._hypertyURL;
-      communication.participants.push(participant);
+      communicationObject.participants.push(participant);
 
       console.info('----------------------- Mapping Particpants -------------------- \n');
       _this._mappingUser(participants)
-      .then((hyperties) => _this.createSyncher(hyperties))
-      .catch((hyperties) => _this.createSyncher(hyperties))
+      .then((hyperties) => _this.createSyncher(hyperties, communicationObject))
+      .catch((hyperties) => _this.createSyncher(hyperties, communicationObject))
       .then(function(dataObjectReporter) {
         console.info('3. Return Create Data Object Reporter', dataObjectReporter);
 
         let chat = new ChatGroup(syncher, hypertyDiscovery, _this._domain);
-        resolve(chat);
-
         chat.dataObjectReporter = dataObjectReporter;
+        resolve(chat);
 
       }).catch(function(reason) {
         reject(reason);
@@ -122,11 +121,12 @@ class HypertyChat extends EventEmitter {
 
   }
 
-  createSyncher(hyperties) {
+  createSyncher(hyperties, communication) {
     let _this = this;
     let syncher = _this._syncher;
 
     console.info(`Have ${hyperties.length} participants;`);
+    console.info('WIth communicationObject: ', communication);
 
     console.info('------------------------ Syncher Create ---------------------- \n');
     return syncher.create(_this._objectDescURL, hyperties, {communication: communication});

@@ -5,7 +5,7 @@ import RuntimeLoader from 'service-framework/dist/RuntimeLoader';
 import InstallerFactory from '../resources/factories/InstallerFactory';
 import config from '../system.config.json';
 
-import {getTemplate} from './utils/utils';
+import {getTemplate, serialize} from './utils/utils';
 
 import hyperties from '../resources/descriptors/Hyperties';
 
@@ -53,8 +53,32 @@ function loadHyperty(event) {
 
 function hypertyDeployed(hyperty) {
 
+  // Add some utils
+  serialize();
+
   let $mainContent = $('.main-content').find('.row');
-  getTemplate('hyperty-connector/HypertyConnector', 'hyperty-connector/demo.js').then(function(template) {
+
+  let template = '';
+  let script = '';
+
+  switch (hyperty.name) {
+    case 'HypertyConnector':
+      template = 'hyperty-connector/HypertyConnector';
+      script =  'hyperty-connector/demo.js';
+      break;
+
+    case 'HypertyChat':
+      template = 'hyperty-chat/HypertyChat';
+      script =  'hyperty-chat/demo.js';
+      break;
+  }
+
+  if (!template) {
+    throw Error('You must need specify the template for your example');
+    return;
+  }
+
+  getTemplate(template, script).then(function(template) {
     let html = template();
     $mainContent.html(html);
 
