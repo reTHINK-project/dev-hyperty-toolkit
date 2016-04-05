@@ -49,6 +49,7 @@ gulp.task('serve', ['js'], function() {
   // all browsers reload after tasks are complete.
   gulp.watch(['src/*.js', 'system.config.json'], ['main-watch']);
   gulp.watch(['src/**/*.js'], ['hyperties-watch']);
+  gulp.watch(['src/**/*.json'], ['schemas']);
   gulp.watch(['examples/*.html', 'examples/**/*.hbs', 'examples/**/*.js'], browserSync.reload);
 
 });
@@ -101,6 +102,29 @@ gulp.task('hyperties', function() {
 
   }));
 
+});
+
+gulp.task('schemas', function() {
+
+  return gulp.src('./src/**/*.ds.json')
+  .pipe(through.obj(function(chunk, enc, done) {
+
+    var fileObject = path.parse(chunk.path);
+
+    return gulp.src([chunk.path])
+    .on('end', function() {
+      gutil.log('-----------------------------------------------------------');
+      gutil.log('Encoding ' + fileObject.base + ' to base64');
+    })
+    .pipe(resource())
+    .resume()
+    .on('end', function() {
+      gutil.log('DataSchema', fileObject.name, ' was encoded');
+      gutil.log('-----------------------------------------------------------');
+      done();
+    });
+
+  }));
 });
 
 gulp.task('encode', function(done) {
@@ -232,7 +256,7 @@ function resource(opts) {
       descriptorName = 'Hyperties';
     } else if (filename.indexOf('ProtoStub') !== -1) {
       descriptorName = 'ProtoStubs';
-    } else if (filename.indexOf('DataSchema') !== -1) {
+    } else if (filename.indexOf('ds') !== -1) {
       descriptorName = 'DataSchemas';
     } else if (filename.indexOf('runtime') !== -1 || filename.indexOf('Runtime') !== -1) {
       descriptorName = 'Runtimes';
@@ -249,31 +273,16 @@ function resource(opts) {
 
     gutil.log('Encoding: ', defaultPath, filename, opts);
 
-    if (extension === '.js') {
-      return gulp.src([file.path])
-      .pipe(encode(opts))
-      .pipe(source(opts.descriptor + '.json'))
-      .pipe(gulp.dest('resources/descriptors/'))
-      .on('end', function() {
-        var path = 'resources/descriptors/' + opts.descriptor + '.json';
-        file.contents = fs.readFileSync(path);
-        file.path = path;
-        done(null, file);
-      });
-
-    } else if (extension === '.json') {
-
-      return gulp.src([file.path])
-      .pipe(encode(opts))
-      .pipe(source(opts.descriptor + '.json'))
-      .pipe(gulp.dest('resources/descriptors/'))
-      .on('end', function() {
-        var path = 'resources/descriptors/' + opts.descriptor + '.json';
-        file.contents = fs.readFileSync(path);
-        file.path = path;
-        done(null, file);
-      });
-    }
+    return gulp.src([file.path])
+    .pipe(encode(opts))
+    .pipe(source(opts.descriptor + '.json'))
+    .pipe(gulp.dest('resources/descriptors/'))
+    .on('end', function() {
+      var path = 'resources/descriptors/' + opts.descriptor + '.json';
+      file.contents = fs.readFileSync(path);
+      file.path = path;
+      done(null, file);
+    });
 
   });
 
@@ -302,7 +311,13 @@ function encode(opts) {
 
     var encoded = Base64.encode(contents);
     var value = 'default';
-    var filename = fileObject.name.replace('.hy', '');
+    var filename = fileObject.name;
+
+    if (fileObject.name.indexOf('.hy') !== -1) {
+      filename = fileObject.name.replace('.hy', '');
+    } else if (fileObject.name.indexOf('.ds') !== -1) {
+      filename = fileObject.name.replace('.ds', '');
+    }
 
     if (opts.isDefault) {
       value = 'default';

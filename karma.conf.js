@@ -9,7 +9,7 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha'],
+    frameworks: ['mocha', 'browserify'],
 
 
     // list of files / patterns to load in the browser
@@ -26,6 +26,19 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      'test/**/*.spec.js': ['browserify']
+    },
+
+    browserify: {
+      debug: true,
+      transform: ['babelify']
+    },
+
+    babelPreprocessor: {
+      options: {
+        presets: ['es2015', 'stage-0'],
+        sourceMap: 'inline'
+      }
     },
 
 
@@ -54,7 +67,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: [],
+    browsers: ['PhantomJS'],
 
 
     // Continuous Integration mode
