@@ -71,6 +71,16 @@ function hypertyDeployed(hyperty) {
       template = 'hyperty-chat/HypertyChat';
       script =  'hyperty-chat/demo.js';
       break;
+
+    case 'HelloWorldObserver':
+      template = 'hello-world/helloWorld';
+      script =  'hello-world/helloObserver.js';
+      break;
+
+    case 'HelloWorldReporter':
+      template = 'hello-world/helloWorld';
+      script =  'hello-world/helloReporter.js';
+      break;
   }
 
   if (!template) {

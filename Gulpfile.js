@@ -37,7 +37,11 @@ gulp.task('serve', ['js'], function() {
       cert: 'rethink-certificate.cert'
     },
     server: {
-      baseDir: './'
+      baseDir: './',
+      middleware: function(req, res, next) {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        next();
+      }
     }
   });
 
@@ -259,14 +263,15 @@ function resource(opts) {
 
     } else if (extension === '.json') {
 
-      return gulp.src(['resources/' + filename + '.json'])
-      .pipe(gulp.dest('resources/'))
+      return gulp.src([file.path])
       .pipe(encode(opts))
-      .pipe(buffer())
-      .pipe(source(descriptorName + '.json'))
+      .pipe(source(opts.descriptor + '.json'))
       .pipe(gulp.dest('resources/descriptors/'))
       .on('end', function() {
-        done();
+        var path = 'resources/descriptors/' + opts.descriptor + '.json';
+        file.contents = fs.readFileSync(path);
+        file.path = path;
+        done(null, file);
       });
     }
 
