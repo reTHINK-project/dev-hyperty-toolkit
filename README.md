@@ -17,6 +17,8 @@ reTHINK Project provides a Javascript framework to build and deliver Real Time C
 * **Protocol on-the-fly** is used by Hyperties to support seamless interoperability without federation or standardisation of network protocols;
 * Hyperties are **Trustful**. Hyperties are decoupled from the User Identity, which can be securely asserted by existing IDPs (Identity Provider), when communicating with other Hyperties.
 
+In case you want want to know more details about reTHINK, have a look [here](docs/tutorials/readme.md)
+
 ### Quick Guide
 
 To start the development of an Hyperty (make sure you have npm globaly available in your environment), perform the following steps:
@@ -26,7 +28,8 @@ To start the development of an Hyperty (make sure you have npm globaly available
 2. run the command `npm install` (this may take some minutes) followed by the command `npm start`;
 
 3. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
- - a ".hy.js" containing your Hyperty classes. For example the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) looks like:
+
+- a ".hy.js" containing your Hyperty classes. For example the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) looks like:
 
  ```
  // This is the Hello World Reporter who owns and reports changes done in the Hello Data Object.
@@ -61,7 +64,7 @@ To start the development of an Hyperty (make sure you have npm globaly available
  // This change  will be received by the Observer:
  ```
 
-Another example is the [HelloWorldObserver.hy.js](/src/hello-world/HelloWorldObserver.hy.js) which is Hyperty observing changes on the Hello Data Object performed by the Observer:
+ Another example is the [HelloWorldObserver.hy.js](/src/hello-world/HelloWorldObserver.hy.js) which is Hyperty observing changes on the Hello Data Object performed by the Observer:
 
  ```
  // This is the Hello World Observer who subscribes the Hello Data Object to be synched with it.
@@ -78,7 +81,7 @@ Another example is the [HelloWorldObserver.hy.js](/src/hello-world/HelloWorldObs
  });
 ```
 
- - a ".ds.json" containing the JSON-Schema describing data objects handled by your Hyperty e.g. HelloWorldDataSchema.ds.json:
+- a ".ds.json" containing the JSON-Schema describing data objects handled by your Hyperty e.g. HelloWorldDataSchema.ds.json:
 
  ```
  {
@@ -98,21 +101,21 @@ Another example is the [HelloWorldObserver.hy.js](/src/hello-world/HelloWorldObs
  }
 ```
 
-This is optional in case you are reusing existing data schemas. **To Do:** explain how to reuse existing data schemas.
+  This is optional in case you are reusing existing data schemas. **To Do:** explain how to reuse existing data schemas.
 
-5. To test your Hyperty, you need to:
+4. To test your Hyperty, you need to:
 
- - edit *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
+ - expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
 
  - In case your Hyperty exposes an API to be used by a Web App, you should move to "examples" folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
 
  - To avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), you can change your hosts file to point to your `localhost` the DNS name of an existing reTHINK domain like `hybroker.rethink.ptinovacao.pt`. **to do:** provide a link for the back-end setup guide
 
- 6. Open `https://localhost/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
+5. Open `https://localhost/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
 
  - Hello World Reporter;
 
- - Hello World Observer;
+ - Hello World Observer that observes changes made by the first Hello World Reporter;
 
  - WebRTC Connector example;
 
