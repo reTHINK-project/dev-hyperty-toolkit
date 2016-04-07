@@ -1,18 +1,15 @@
-# Is not ready to use. Work on progress
 
 ### Example Working
 
-- Hyperty Connector
-
-### Not Working
-
-- Hyperty Chat
+- WebRTC Connector
+- Group Chat
+- Hello World
 
 # Hyperty Development Toolkit
 
 ## Overview
 
-This repository provides required tools to develop Hyperties, at this moment we only support development of hyperties to the Browser;
+This repository provides required tools to develop Hyperties and a few demos. Currently limited to hyperties to be executed in the Browser;
 
 We hope soon have a version to support nodejs;
 
@@ -23,11 +20,14 @@ We hope soon have a version to support nodejs;
 
 ## <a id="development">Development Guide</a>
 
-We have this repository pre-configured with the last version of RuntimeUA, Message Node ProtoStub (vertx) and Service-Framework;
+This repository pre-configured with the last version of RuntimeUA, Message Node ProtoStub (vertx) and Service-Framework;
 
 To start the development of an Hyperty, you you should follow the steps:
+
 1. clone this repository; **NOTE:** this repository is only for read, you should use your own repository;
+
 2. run the command `npm install`;
+
 3. run the command `npm start`;
 
 ### The structure
