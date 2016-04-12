@@ -1,26 +1,21 @@
 // jshint browser:true, jquery: true
 // jshint varstmt: true
-import RuntimeLoader from 'service-framework/dist/RuntimeLoader';
-import InstallerFactory from '../resources/factories/InstallerFactory';
-import configJSON from '../system.config.json';
 
 import {getTemplate, serialize, getConfig} from './utils/utils';
 
+import configJSON from '../system.config.json';
 import hyperties from '../resources/descriptors/Hyperties';
-
-let installerFactory = new InstallerFactory();
 
 window.KJUR = {};
 
 let config = getConfig(configJSON);
 let domain = config.domain;
-let catalogueDomain = config.catalogue;
+let runtimeLoader;
 
-let runtime = 'https://' + catalogueDomain + '/.well-known/runtime/RuntimeUA';
+window.rethink.default.install(domain).then(function(result) {
 
-let runtimeLoader = new RuntimeLoader(installerFactory, runtime);
-
-runtimeLoader.install().then(function() {
+  runtimeLoader = result;
+  console.log(result);
 
   let $dropDown = $('#hyperties-dropdown');
 
