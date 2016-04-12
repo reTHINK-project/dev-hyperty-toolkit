@@ -1,0 +1,22 @@
+
+
+@startuml "msg-node-standalone.png"
+
+
+node "Support Services" as ss {
+
+}
+
+node "Hyperty Runtime" as runtime {
+	node "Protostub" as stub
+}
+
+node "Message Node" as node {
+
+}
+
+stub <-up-> node : deliver support services msg\n&deliver hyperty msg
+
+ss <-down-> node : Support services Protocol
+
+@enduml

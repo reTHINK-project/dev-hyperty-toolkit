@@ -1,0 +1,34 @@
+
+
+@startuml "msg-node-with-gw-and-nodess.png"
+
+
+node "Support Services" as ss {
+
+}
+
+node "Hyperty Runtime" as runtime {
+	node "Protostub" as stub
+}
+
+node "Message Node Core" as core {
+
+}
+
+node "Message Node SS" as nodeSS {
+}
+
+node "Message Node GW" as gw {
+}
+
+stub <-up-> gw : deliver hyperty msg
+
+stub <-up-> nodeSS : deliver support services msg
+
+core <-down-> gw : msg core protocol
+
+ss <-down-> nodeSS : Support Services Protocols
+
+core <-down-> nodeSS : msg core\nmanagement protocol
+
+@enduml
