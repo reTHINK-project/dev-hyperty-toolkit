@@ -1,20 +1,22 @@
 // jshint browser:true, jquery: true
 // jshint varstmt: true
-
 import RuntimeLoader from 'service-framework/dist/RuntimeLoader';
 import InstallerFactory from '../resources/factories/InstallerFactory';
-import config from '../system.config.json';
+import configJSON from '../system.config.json';
 
-import {getTemplate, serialize} from './utils/utils';
+import {getTemplate, serialize, getConfig} from './utils/utils';
 
 import hyperties from '../resources/descriptors/Hyperties';
 
 let installerFactory = new InstallerFactory();
 
 window.KJUR = {};
-let domain = config.domain;
 
-let runtime = 'https://' + domain + '/.well-known/runtimes/RuntimeUA';
+let config = getConfig(configJSON);
+let domain = config.domain;
+let catalogueDomain = config.catalogue;
+
+let runtime = 'https://' + catalogueDomain + '/.well-known/runtime/RuntimeUA';
 
 let runtimeLoader = new RuntimeLoader(installerFactory, runtime);
 
@@ -85,7 +87,6 @@ function hypertyDeployed(hyperty) {
 
   if (!template) {
     throw Error('You must need specify the template for your example');
-    return;
   }
 
   getTemplate(template, script).then(function(template) {

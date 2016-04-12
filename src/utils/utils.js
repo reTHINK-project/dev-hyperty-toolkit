@@ -77,6 +77,16 @@ export function deepClone(obj) {
 }
 
 /**
+ * Get the configuration from an json file;
+ * @param  {JSONObject} jsonFile
+ * @return {object}
+ */
+export function getConfig(JSONObject) {
+  console.log(process.env.environment);
+  return JSONObject[process.env.environment];
+}
+
+/**
  * Get WebRTC API resources
  * @param  {Object}     options Object containing the information that resources will be used (camera, mic, resolution, etc);
  * @return {Promise}

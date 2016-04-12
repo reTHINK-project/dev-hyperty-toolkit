@@ -10,12 +10,12 @@ var browserSync = require('browser-sync').create('Toolkit');
 var _ = require('lodash');
 var babel = require('babelify');
 var browserify = require('browserify');
-var buffer = require('vinyl-buffer');
 var source = require('vinyl-source-stream');
 var through = require('through2');
 var Base64 = require('js-base64').Base64;
 var prompt = require('gulp-prompt');
 var gutil = require('gulp-util');
+var argv = require('yargs').argv;
 
 var extensions = ['.js', '.json'];
 
@@ -209,6 +209,9 @@ function transpile(opts) {
     var fileObject = path.parse(file.path);
     var args = {};
 
+    var environment = argv.production || process.env.NODE_ENV;
+    process.env.environment = environment ? 'production' : 'development';
+
     args.entries = [file.path];
     args.extensions = extensions;
     if (opts.debug) args.debug = opts.debug;
@@ -218,7 +221,7 @@ function transpile(opts) {
     .transform(babel, {
       compact: false,
       presets: ['es2015', 'stage-0'],
-      plugins: ['add-module-exports']
+      plugins: ['add-module-exports', 'transform-inline-environment-variables']
     })
     .bundle()
     .on('error', function(err) {
@@ -250,7 +253,6 @@ function resource(opts) {
     }, opts || {});
 
     var filename = fileObject.name;
-    var extension = fileObject.ext;
     var descriptorName;
     if (filename.indexOf('hy') !== -1) {
       descriptorName = 'Hyperties';
