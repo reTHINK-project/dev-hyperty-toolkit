@@ -1,12 +1,10 @@
 {
   "production": {
     "env": "production",
-    "domain" : "hybroker.rethink.ptinovacao.pt",
-    "catalogue" : "catalogue.hybroker.rethink.ptinovacao.pt"
+    "domain" : "hybroker.rethink.ptinovacao.pt"
   },
   "development" : {
     "env": "development",
-    "domain" : "localhost",
-    "catalogue" : "hybroker.rethink.ptinovacao.pt"
+    "domain" : "localhost"
   }
 }
