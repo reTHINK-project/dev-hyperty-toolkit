@@ -41,6 +41,9 @@ gulp.task('serve', ['js'], function() {
       middleware: function(req, res, next) {
         res.setHeader('Access-Control-Allow-Origin', '*');
         next();
+      },
+      routes: {
+        '/.well-known/runtime': 'node_modules/runtime-browser/bin'
       }
     }
   });
@@ -65,7 +68,7 @@ gulp.task('js', ['hyperties'], function() {
     gutil.log('-----------------------------------------------------------');
     gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
   })
-  .pipe(transpile({destination: __dirname + '/dist'}))
+  .pipe(transpile({destination: __dirname + '/dist', debug: false}))
   .on('end', function() {
     gutil.log('The main file was created like a distribution file on /dist');
     gutil.log('-----------------------------------------------------------');
@@ -90,7 +93,7 @@ gulp.task('hyperties', function() {
     .pipe(transpile({
       destination: __dirname + '/resources',
       standalone: 'activate',
-      debug: true
+      debug: false
     }))
     .pipe(resource())
     .resume()
@@ -219,7 +222,7 @@ function transpile(opts) {
 
     return browserify(args)
     .transform(babel, {
-      compact: false,
+      compact: true,
       presets: ['es2015', 'stage-0'],
       plugins: ['add-module-exports', 'transform-inline-environment-variables']
     })

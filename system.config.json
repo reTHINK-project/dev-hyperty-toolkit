@@ -6,7 +6,7 @@
   },
   "development" : {
     "env": "development",
-    "domain" : "hybroker.rethink.ptinovacao.pt",
+    "domain" : "localhost",
     "catalogue" : "hybroker.rethink.ptinovacao.pt"
   }
 }

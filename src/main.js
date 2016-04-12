@@ -1,6 +1,8 @@
 // jshint browser:true, jquery: true
 // jshint varstmt: true
 
+import rethink from 'runtime-browser/bin/rethink';
+
 import {getTemplate, serialize, getConfig} from './utils/utils';
 
 import configJSON from '../system.config.json';
@@ -12,7 +14,9 @@ let config = getConfig(configJSON);
 let domain = config.domain;
 let runtimeLoader;
 
-window.rethink.default.install(domain).then(function(result) {
+console.log(rethink);
+
+rethink.install(domain).then(function(result) {
 
   runtimeLoader = result;
   console.log(result);
