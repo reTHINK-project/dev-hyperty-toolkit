@@ -347,7 +347,10 @@ function encode(opts) {
     json[value].description = 'Description of ' + filename;
     json[value].objectName = filename;
 
-    if (!json[value].hasOwnProperty('configuration') && opts.configuration) {
+    if (opts.configuration) {
+      if (_.isEmpty(opts.configuration) && json[value].hasOwnProperty('configuration')) {
+        opts.configuration = json[value].configuration;
+      }
       json[value].configuration = opts.configuration;
       gutil.log('setting configuration: ', opts.configuration);
     }
