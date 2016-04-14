@@ -1,6 +1,7 @@
 // jshint varstmt: false
 
 // var pkg = require('./package.json');
+var config = require('./system.config.json');
 var gulp = require('gulp');
 var fs = require('fs');
 var path = require('path');
@@ -16,6 +17,7 @@ var Base64 = require('js-base64').Base64;
 var prompt = require('gulp-prompt');
 var gutil = require('gulp-util');
 var argv = require('yargs').argv;
+var runSequence = require('run-sequence');
 
 var extensions = ['.js', '.json'];
 
@@ -24,11 +26,12 @@ var extensions = ['.js', '.json'];
 // var insert = require('gulp-insert');
 
 // use default task to launch Browsersync and watch JS files
-gulp.task('serve', ['js'], function() {
+gulp.task('server', ['js'], function(done) {
 
   // Serve files from the root of this project
   browserSync.init({
     open: false,
+    online: true,
     port: 443,
     minify: false,
     ghostMode: false,
@@ -46,7 +49,13 @@ gulp.task('serve', ['js'], function() {
         '/.well-known/runtime': 'node_modules/runtime-browser/bin'
       }
     }
-  });
+  }, done);
+
+});
+
+gulp.task('serve', function(done) {
+
+  runSequence('js', 'server', done);
 
   // add browserSync.reload to the tasks array to make
   // all browsers reload after tasks are complete.
@@ -55,7 +64,7 @@ gulp.task('serve', ['js'], function() {
   gulp.watch(['src/**/*.json'], ['schemas']);
   gulp.watch(['examples/*.html', 'examples/**/*.hbs', 'examples/**/*.js'], browserSync.reload);
 
-});
+})
 
 gulp.task('main-watch', ['js'], browserSync.reload);
 gulp.task('hyperties-watch', ['hyperties'], browserSync.reload);
