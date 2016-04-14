@@ -1,8 +1,7 @@
 import configJSON from '../../system.config.json';
 import {getConfig} from '../../src/utils/utils';
 import RuntimeFactory from './RuntimeFactory';
-import RuntimeCatalogue from 'service-framework/dist/RuntimeCatalogue';
-import {RuntimeCatalogueLocal} from 'service-framework/dist/RuntimeCatalogue';
+import {RuntimeCatalogue, RuntimeCatalogueLocal} from 'service-framework/dist/RuntimeCatalogue';
 
 class InstallerFactory {
 

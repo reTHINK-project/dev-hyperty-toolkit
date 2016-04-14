@@ -16,6 +16,7 @@ var Base64 = require('js-base64').Base64;
 var prompt = require('gulp-prompt');
 var gutil = require('gulp-util');
 var argv = require('yargs').argv;
+var runSequence = require('run-sequence');
 
 var extensions = ['.js', '.json'];
 
@@ -24,11 +25,12 @@ var extensions = ['.js', '.json'];
 // var insert = require('gulp-insert');
 
 // use default task to launch Browsersync and watch JS files
-gulp.task('serve', ['js'], function() {
+gulp.task('server', ['js'], function(done) {
 
   // Serve files from the root of this project
   browserSync.init({
     open: false,
+    online: true,
     port: 443,
     minify: false,
     ghostMode: false,
@@ -43,7 +45,13 @@ gulp.task('serve', ['js'], function() {
         next();
       }
     }
-  });
+  }, done);
+
+});
+
+gulp.task('serve', function(done) {
+
+  runSequence('js', 'server', done);
 
   // add browserSync.reload to the tasks array to make
   // all browsers reload after tasks are complete.
@@ -65,7 +73,7 @@ gulp.task('js', ['hyperties'], function() {
     gutil.log('-----------------------------------------------------------');
     gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
   })
-  .pipe(transpile({destination: __dirname + '/dist'}))
+  .pipe(transpile({destination: __dirname + '/dist', debug: false}))
   .on('end', function() {
     gutil.log('The main file was created like a distribution file on /dist');
     gutil.log('-----------------------------------------------------------');
@@ -90,7 +98,7 @@ gulp.task('hyperties', function() {
     .pipe(transpile({
       destination: __dirname + '/resources',
       standalone: 'activate',
-      debug: true
+      debug: false
     }))
     .pipe(resource())
     .resume()
@@ -219,7 +227,7 @@ function transpile(opts) {
 
     return browserify(args)
     .transform(babel, {
-      compact: false,
+      compact: true,
       presets: ['es2015', 'stage-0'],
       plugins: ['add-module-exports', 'transform-inline-environment-variables']
     })
@@ -344,7 +352,10 @@ function encode(opts) {
     json[value].description = 'Description of ' + filename;
     json[value].objectName = filename;
 
-    if (!json[value].hasOwnProperty('configuration') && opts.configuration) {
+    if (opts.configuration) {
+      if (_.isEmpty(opts.configuration) && json[value].hasOwnProperty('configuration')) {
+        opts.configuration = json[value].configuration;
+      }
       json[value].configuration = opts.configuration;
       gutil.log('setting configuration: ', opts.configuration);
     }
