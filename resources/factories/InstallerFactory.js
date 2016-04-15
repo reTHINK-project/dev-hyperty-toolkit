@@ -1,7 +1,6 @@
 import configJSON from '../../system.config.json';
 import {getConfig} from '../../src/utils/utils';
 import RuntimeFactory from './RuntimeFactory';
-import {RuntimeCatalogue, RuntimeCatalogueLocal} from 'service-framework/dist/RuntimeCatalogue';
 
 class InstallerFactory {
 
@@ -20,19 +19,10 @@ class InstallerFactory {
 
       let runtimeFactory = new RuntimeFactory();
 
-      let catalogue;
-      if (process.env.environment === 'production') {
-        catalogue = new RuntimeCatalogue(runtimeFactory);
-      } else {
-        catalogue = new RuntimeCatalogueLocal(runtimeFactory);
-      }
-
       let config = getConfig(configJSON);
       let domain = config.domain;
 
-      window.catalogue = catalogue;
-
-      console.log(catalogue);
+      let catalogue = runtimeFactory.createRuntimeCatalogue();
 
       catalogue.getRuntimeDescriptor(runtimeURL).then(function(descriptor) {
 
@@ -44,8 +34,6 @@ class InstallerFactory {
 
       })
       .then(function(sourcePackage) {
-
-        console.log('Source Package:', sourcePackage);
 
         window.eval(sourcePackage.sourceCode);
 
