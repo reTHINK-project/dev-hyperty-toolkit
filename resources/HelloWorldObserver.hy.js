@@ -129,7 +129,7 @@ if(obj)return JSON.parse(JSON.stringify(obj));} /**
  * Get the configuration from an json file;
  * @param  {JSONObject} jsonFile
  * @return {object}
- */function getConfig(JSONObject){console.log('production');return JSONObject['production'];} /**
+ */function getConfig(JSONObject){console.log('development');return JSONObject['development'];} /**
  * Get WebRTC API resources
  * @param  {Object}     options Object containing the information that resources will be used (camera, mic, resolution, etc);
  * @return {Promise}

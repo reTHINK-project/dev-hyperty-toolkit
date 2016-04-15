@@ -6,7 +6,7 @@ import configJSON from '../system.config.json';
 
 import {getTemplate, serialize, getConfig} from './utils/utils';
 
-import hyperties from '../resources/descriptors/Hyperties';
+// import hyperties from '../resources/descriptors/Hyperties';
 
 let installerFactory = new InstallerFactory();
 
@@ -14,17 +14,20 @@ window.KJUR = {};
 
 let config = getConfig(configJSON);
 let domain = config.domain;
-let catalogueDomain = config.catalogue;
 
-let runtime = 'https://' + catalogueDomain + '/.well-known/runtime/RuntimeUA';
+let runtime = 'https://catalogue.' + domain + '/.well-known/runtime/RuntimeUA';
 
 let runtimeLoader = new RuntimeLoader(installerFactory, runtime);
 
 runtimeLoader.install().then(function() {
 
+  return getListOfHyperties(domain);
+
+}).then(function(hyperties) {
+
   let $dropDown = $('#hyperties-dropdown');
 
-  Object.keys(hyperties).forEach(function(key) {
+  hyperties.forEach(function(key) {
     let $item = $(document.createElement('li'));
     let $link = $(document.createElement('a'));
 
@@ -43,11 +46,41 @@ runtimeLoader.install().then(function() {
   console.error(reason);
 });
 
+function getListOfHyperties(domain) {
+
+  let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty/Hyperties.json';
+  if (config.env === 'production') {
+    hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty/';
+  }
+
+  return new Promise(function(resolve, reject) {
+    $.ajax({
+      url: hypertiesURL,
+      success: function(result) {
+        let response = [];
+        if (typeof result === 'object') {
+          Object.keys(result).forEach(function(key) {
+            response.push(key);
+          });
+        } else if (typeof result === 'string') {
+          response = JSON.parse(result);
+        }
+        resolve(response);
+      },
+      fail: function(reason) {
+        reject(reason);
+      }
+
+    });
+  });
+
+}
+
 function loadHyperty(event) {
   event.preventDefault();
 
   let hypertyName = $(event.currentTarget).attr('data-name');
-  let hypertyPath = 'https://' + domain + '/.well-known/hyperties/' + hypertyName;
+  let hypertyPath = 'https://catalogue.' + domain + '/.well-known/hyperties/' + hypertyName;
 
   runtimeLoader.requireHyperty(hypertyPath).then(hypertyDeployed).catch(hypertyFail);
 

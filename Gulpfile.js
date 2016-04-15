@@ -43,6 +43,9 @@ gulp.task('server', ['js'], function(done) {
       middleware: function(req, res, next) {
         res.setHeader('Access-Control-Allow-Origin', '*');
         next();
+      },
+      routes: {
+        '/.well-known/hyperty': 'resources/descriptors/'
       }
     }
   }, done);
@@ -51,7 +54,7 @@ gulp.task('server', ['js'], function(done) {
 
 gulp.task('serve', function(done) {
 
-  runSequence('js', 'server', done);
+  runSequence('server', done);
 
   // add browserSync.reload to the tasks array to make
   // all browsers reload after tasks are complete.
