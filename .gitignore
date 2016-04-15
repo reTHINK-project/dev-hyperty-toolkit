@@ -13,6 +13,6 @@ vendor
 build
 node_modules
 resources/bundle.js
-
+resources/*.hy.js
 *.komodoproject
 dist
