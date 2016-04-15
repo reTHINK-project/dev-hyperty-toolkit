@@ -48,9 +48,9 @@ runtimeLoader.install().then(function() {
 
 function getListOfHyperties(domain) {
 
-  let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty/Hyperties.json';
+  let hypertiesURL = 'https://' + domain + '/.well-known/hyperty/Hyperties.json';
   if (config.env === 'production') {
-    hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty/';
+    hypertiesURL = 'https://' + domain + '/.well-known/hyperty/';
   }
 
   return new Promise(function(resolve, reject) {
@@ -80,7 +80,7 @@ function loadHyperty(event) {
   event.preventDefault();
 
   let hypertyName = $(event.currentTarget).attr('data-name');
-  let hypertyPath = 'https://catalogue.' + domain + '/.well-known/hyperties/' + hypertyName;
+  let hypertyPath = 'hyperty-catalogue://' + domain + '/.well-known/hyperties/' + hypertyName;
 
   runtimeLoader.requireHyperty(hypertyPath).then(hypertyDeployed).catch(hypertyFail);
 
