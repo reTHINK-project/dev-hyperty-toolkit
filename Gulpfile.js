@@ -178,6 +178,11 @@ gulp.task('encode', function(done) {
       }
     },
     {
+      type: 'input',
+      name: 'name',
+      message: 'Name of hyperty, protostub, dataschema (not specify use the file name):'
+    },
+    {
       type: 'list',
       name: 'defaultFile',
       message: 'This will be a default file to be loaded?',
@@ -200,6 +205,10 @@ gulp.task('encode', function(done) {
         configuration: configuration,
         isDefault: isDefault
       };
+
+      if (res.name) {
+        opts.name = res.name;
+      }
 
       if (res.file) {
         return gulp.src(res.file)
@@ -335,7 +344,7 @@ function encode(opts) {
     if (opts.isDefault) {
       value = 'default';
     } else {
-      value = filename;
+      value = opts.name || filename;
     }
 
     if (!json.hasOwnProperty(value)) {

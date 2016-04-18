@@ -96,6 +96,7 @@ class HypertyChat extends EventEmitter {
       // Create owner participant
       // TODO: create all information to communication;
       communicationObject.owner = _this._hypertyURL;
+      communicationObject.name = name;
       communicationObject.id = name;
 
       // Set the other subscription like a participant
