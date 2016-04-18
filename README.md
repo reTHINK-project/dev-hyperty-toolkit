@@ -4,7 +4,6 @@ Hyperty Development Toolkit
 
 This repository provides required tools to develop Hyperties and a few demos. Currently limited to hyperties to be executed in the Browser. Soon NodeJS support will also be added;
 
-**TODO:** Add a docker file with this pre-configured;
 
 -	[Overview](#rethink-framework-overview)
 -	[Getting Started](#quick-start)
@@ -13,8 +12,17 @@ This repository provides required tools to develop Hyperties and a few demos. Cu
 
 reTHINK Project provides a Javascript framework to build and deliver Real Time Communication Microservices in end-user devices (browsers and standalone mobile apps) and in Network edge servers (NodeJS):
 
-* **Hyperty** is a the so called Javascript Microservice that communicates through P2P Data Synchronisation with mimimum usage of back-end services; A Hyperty must be deployed in a runtime (as mentioned in an end-user device or Network edge server).
-* **Protocol on-the-fly** is used by Hyperties to support seamless interoperability without federation or standardisation of network protocols;
+* **Hyperty** is similar to an Agent or a Bot that performs tasks on user's behalf, by communicating through P2P Data Synchronisation with other Hyperties. Some examples (see demos), are:
+
+  - the Hyperty Connector that uses WebRTC to manage video calls between users;
+
+  - the Group Chat Hyperty (name says it all);
+
+  - the myBracelet Hyperty, is a sensing Hyperty that encapsulates a Bracelet, by collecting and publishing data from it
+
+  - the myContext Hyperty is a Big Data Hyperty that uses data published by different sensing Hyperties (like the myBracelet Hyperty) to infer and calculate more meaningful Contextual data about the user.
+  
+* **Protocol on-the-fly** is used by Hyperties to support interoperability with other Hyperties from other domains, without requiring federation or standardisation of network protocols;
 * Hyperties are **Trustful**. Hyperties are decoupled from the User Identity, which can be securely asserted by existing IDPs (Identity Provider), when communicating with other Hyperties.
 
 In case you want want to know more details about reTHINK, have a look [here](docs/tutorials/readme.md)
@@ -29,7 +37,9 @@ To start the development of an Hyperty (make sure you have npm globaly available
 
 3. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
 
-- a ".hy.js" containing your Hyperty classes. For example the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) looks like:
+- a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldOberver.hy.js](/src/hello-world/HelloWorldObserver.hy.js).
+
+  The HelloWorldReporter.hy.js looks like:
 
  ```
  // This is the Hello World Reporter who owns and reports changes done in the Hello Data Object.
@@ -64,7 +74,7 @@ To start the development of an Hyperty (make sure you have npm globaly available
  // This change  will be received by the Observer:
  ```
 
- Another example is the [HelloWorldObserver.hy.js](/src/hello-world/HelloWorldObserver.hy.js) which is Hyperty observing changes on the Hello Data Object performed by the Observer:
+ The Hello World Observer (which is the Hyperty observing changes on the Hello Data Object performed by the Hello World Reporter) looks like :
 
  ```
  // This is the Hello World Observer who subscribes the Hello Data Object to be synched with it.
