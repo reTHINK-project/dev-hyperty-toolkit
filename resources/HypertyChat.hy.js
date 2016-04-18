@@ -166,7 +166,7 @@ _participant2.default.hypertyResource=_this._hypertyURL;_communication2.default.
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-**/var CommunicationStatus=exports.CommunicationStatus={OPEN:'open',PENDING:'pending',CLOSED:'closed',PAUSED:'paused',FAILED:'failed'};var communication={id:'',host:'',owner:'',startingTime:'',lastModified:'',duration:'',communicationStatus:'',communicationQuality:'',participants:[],chatMessage:{}};exports.default=communication;
+**/var CommunicationStatus=exports.CommunicationStatus={OPEN:'open',PENDING:'pending',CLOSED:'closed',PAUSED:'paused',FAILED:'failed'};var communication={id:'',name:'',host:'',owner:'',startingTime:'',lastModified:'',duration:'',communicationStatus:'',communicationQuality:'',participants:[],chatMessage:{}};exports.default=communication;
 
 },{}],6:[function(require,module,exports){
 'use strict';Object.defineProperty(exports,"__esModule",{value:true}); /**
