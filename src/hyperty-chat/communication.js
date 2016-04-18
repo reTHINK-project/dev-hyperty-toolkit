@@ -31,6 +31,7 @@ export const CommunicationStatus = {
 
 let communication = {
   id: '',
+  name: '',
   host: '',
   owner: '',
   startingTime: '',
