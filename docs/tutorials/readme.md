@@ -1,7 +1,7 @@
 ## Tutorials
 
 
--	[Getting Started](start.md)
+-	[reTHINK Architecture Overview](start.md)
 -	[Hyperty Concept Overview](hyperty.md)
 -	[Hyperty Messaging Framework Overview](hyperty-messaging-framework.md)
 -	[Hyperty Data Synchronisation: Reporter - Observer communication model](p2p-data-sync.md)
