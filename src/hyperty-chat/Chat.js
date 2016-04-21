@@ -37,7 +37,7 @@ class ChatGroup extends EventEmitter {
     _this._syncher = syncher;
     _this._hypertyDiscovery = hypertyDiscovery;
 
-    _this._objectDescURL = 'hyperty-catalogue://' + domain + '/.well-known/dataschemas/FakeDataSchema';
+    _this._objectDescURL = 'hyperty-catalogue://' + domain + '/.well-known/dataschemas/Communication';
   }
 
   set dataObjectReporter(dataObjectReporter) {
@@ -144,7 +144,7 @@ class ChatGroup extends EventEmitter {
 
     return new Promise(function(resolve, reject) {
 
-      dataObject.addChildren('message', {chatMessage: message}).then(function(dataObjectChild) {
+      dataObject.addChildren('chatmessages', {chatMessage: message}).then(function(dataObjectChild) {
         console.info('Data Object Child: ', dataObjectChild);
         let msg = {
           childId: dataObjectChild._childId,

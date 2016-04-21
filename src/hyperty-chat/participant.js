@@ -22,7 +22,7 @@
 **/
 
 let participant = {
-  participantStatus: '',
+  status: '',
   hypertyResource: '',
   identity: ''
 };

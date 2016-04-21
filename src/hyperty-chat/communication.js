@@ -32,15 +32,13 @@ export const CommunicationStatus = {
 let communication = {
   id: '',
   name: '',
-  host: '',
   owner: '',
   startingTime: '',
   lastModified: '',
   duration: '',
-  communicationStatus: '',
-  communicationQuality: '',
-  participants: [],
-  chatMessage: {}
+  status: '',
+  qos: '',
+  participants: []
 };
 
 export default communication;
