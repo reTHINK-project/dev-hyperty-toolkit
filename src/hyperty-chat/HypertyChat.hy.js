@@ -30,7 +30,7 @@ import EventEmitter from '../utils/EventEmitter';
 import {divideURL} from '../utils/utils';
 
 // Internals
-import communicationObject from './communication';
+import { communicationObject, CommunicationStatus } from './communication';
 import participant from './participant';
 import ChatGroup from './Chat';
 
@@ -68,17 +68,6 @@ class HypertyChat extends EventEmitter {
 
   }
 
-  _autoSubscribe(resource) {
-    let _this = this;
-
-    _this.join(resource).then(function(chatGroup) {
-      _this.trigger('chat:subscribe', chatGroup);
-    }).catch(function(reason) {
-      console.error(reason);
-    });
-
-  }
-
   /**
    * This function is used to create a new Group Chat providing the identifier of the Group to be notified.
    * @param  {String} name             chat name
@@ -98,6 +87,9 @@ class HypertyChat extends EventEmitter {
       communicationObject.owner = _this._hypertyURL;
       communicationObject.name = name;
       communicationObject.id = name;
+      communicationObject.status = CommunicationStatus.OPEN;
+      communicationObject.startingTime = new Date().toJSON();
+      communicationObject.lastModified = communicationObject.startingTime;
 
       // Set the other subscription like a participant
       participant.hypertyResource = _this._hypertyURL;
@@ -105,8 +97,8 @@ class HypertyChat extends EventEmitter {
 
       console.info('----------------------- Mapping Particpants -------------------- \n');
       _this._mappingUser(participants)
-      .then((hyperties) => _this.createSyncher(hyperties, communicationObject))
-      .catch((hyperties) => _this.createSyncher(hyperties, communicationObject))
+      .then((hyperties) => _this._createSyncher(hyperties, communicationObject))
+      .catch((hyperties) => _this._createSyncher(hyperties, communicationObject))
       .then(function(dataObjectReporter) {
         console.info('3. Return Create Data Object Reporter', dataObjectReporter);
 
@@ -120,17 +112,6 @@ class HypertyChat extends EventEmitter {
 
     });
 
-  }
-
-  createSyncher(hyperties, communication) {
-    let _this = this;
-    let syncher = _this._syncher;
-
-    console.info(`Have ${hyperties.length} participants;`);
-    console.info('WIth communicationObject: ', communication);
-
-    console.info('------------------------ Syncher Create ---------------------- \n');
-    return syncher.create(_this._objectDescURL, hyperties, {communication: communication});
   }
 
   join(resource) {
@@ -153,6 +134,28 @@ class HypertyChat extends EventEmitter {
       });
     });
 
+  }
+
+  _autoSubscribe(resource) {
+    let _this = this;
+
+    _this.join(resource).then(function(chatGroup) {
+      _this.trigger('chat:subscribe', chatGroup);
+    }).catch(function(reason) {
+      console.error(reason);
+    });
+
+  }
+
+  _createSyncher(hyperties, communication) {
+    let _this = this;
+    let syncher = _this._syncher;
+
+    console.info(`Have ${hyperties.length} participants;`);
+    console.info('WIth communicationObject: ', communication);
+
+    console.info('------------------------ Syncher Create ---------------------- \n');
+    return syncher.create(_this._objectDescURL, hyperties, {communication: communication});
   }
 
   _mappingUser(userList) {

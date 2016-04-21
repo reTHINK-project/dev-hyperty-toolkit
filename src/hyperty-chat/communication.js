@@ -29,7 +29,7 @@ export const CommunicationStatus = {
   FAILED: 'failed'
 };
 
-let communication = {
+export let communicationObject = {
   id: '',
   name: '',
   owner: '',
@@ -40,5 +40,3 @@ let communication = {
   qos: '',
   participants: []
 };
-
-export default communication;

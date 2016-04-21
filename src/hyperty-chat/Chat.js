@@ -64,6 +64,7 @@ class ChatGroup extends EventEmitter {
 
     dataObjectReporter.onAddChildren(function(children) {
       console.info('Reporter - Add Children: ', children);
+      dataObjectReporter.data.communication.lastModified = new Date().toJSON();
       _this._processChildren(children);
     });
 
