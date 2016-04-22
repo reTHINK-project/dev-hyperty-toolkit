@@ -155,7 +155,7 @@ class HypertyChat extends EventEmitter {
     console.info('WIth communicationObject: ', communication);
 
     console.info('------------------------ Syncher Create ---------------------- \n');
-    return syncher.create(_this._objectDescURL, hyperties, {communication: communication});
+    return syncher.create(_this._objectDescURL, hyperties, communication);
   }
 
   _mappingUser(userList) {

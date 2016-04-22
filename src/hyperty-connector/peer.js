@@ -22,6 +22,7 @@
 **/
 
 let peer = {
+  name : '',
   connectionDescription: {},
   iceCandidates: []
 }

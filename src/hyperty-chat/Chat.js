@@ -57,14 +57,14 @@ class ChatGroup extends EventEmitter {
 
       console.info('On Subscription add Participant: ', participant, event);
 
-      dataObjectReporter.data.communication.participants.push(participant);
+      dataObjectReporter.data.participants.push(participant);
 
       _this.processParticipant(participant);
     });
 
     dataObjectReporter.onAddChildren(function(children) {
       console.info('Reporter - Add Children: ', children);
-      dataObjectReporter.data.communication.lastModified = new Date().toJSON();
+      dataObjectReporter.data.lastModified = new Date().toJSON();
       _this._processChildren(children);
     });
 
