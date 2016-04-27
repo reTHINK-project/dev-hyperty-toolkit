@@ -40,6 +40,8 @@ class InstallerFactory {
         let runtime = new Runtime(runtimeFactory, domain);
         window.runtime = runtime;
 
+        console.log(runtime);
+
         minibus.addListener('core:loadHyperty', function(msg) {
           console.log('Load Hyperty: ', msg);
 

@@ -218,7 +218,7 @@ class IdpProxyProtoStub {
    _this.config = config;
 
    _this.messageBus.addListener('*', function(msg) {
-     if (msg.to === 'domain://google.com') {
+     if (msg.to === 'domain-idp://google.com') {
 
        _this.requestToIdp(msg);
      }
