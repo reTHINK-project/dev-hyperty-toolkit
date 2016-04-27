@@ -1,5 +1,5 @@
 {
-  "name": "dev-hyperty-setup",
+  "name": "dev-hyperty-toolkit",
   "version": "0.1.0",
   "description": "Hyperty Developer Setup, contains all the initial configuration to develop hyperties",
   "main": "index.js",
@@ -10,17 +10,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/reTHINK-project/dev-hyperty-setup.git"
+    "url": "git+https://github.com/reTHINK-project/dev-hyperty-toolkit.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/reTHINK-project/dev-hyperty-setup/issues"
+    "url": "https://github.com/reTHINK-project/dev-hyperty-toolkit/issues"
   },
-  "homepage": "https://github.com/reTHINK-project/dev-hyperty-setup#readme",
+  "homepage": "https://github.com/reTHINK-project/dev-hyperty-toolkit#readme",
   "dependencies": {
-    "service-framework": "github:rethink-project/dev-service-framework#develop",
-    "runtime-core": "github:rethink-project/dev-runtime-core#dev-0.5"
+    "service-framework": "github:rethink-project/dev-service-framework#develop-idpproxy",
+    "runtime-core": "github:rethink-project/dev-runtime-core#dev-0.5-idpproxy"
   },
   "devDependencies": {
     "babel-plugin-add-module-exports": "^0.1.2",
@@ -32,6 +32,7 @@
     "browserify": "^13.0.0",
     "chai": "^3.5.0",
     "gulp": "^3.9.1",
+    "gulp-if": "^2.0.0",
     "gulp-insert": "^0.5.0",
     "gulp-prompt": "^0.1.2",
     "gulp-replace": "^0.5.4",

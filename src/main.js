@@ -2,9 +2,9 @@
 // jshint varstmt: true
 import RuntimeLoader from 'service-framework/dist/RuntimeLoader';
 import InstallerFactory from '../resources/factories/InstallerFactory';
-import configJSON from '../system.config.json';
+import config from '../config.json';
 
-import {getTemplate, serialize, getConfig} from './utils/utils';
+import {getTemplate, serialize} from './utils/utils';
 
 // import hyperties from '../resources/descriptors/Hyperties';
 
@@ -12,10 +12,9 @@ let installerFactory = new InstallerFactory();
 
 window.KJUR = {};
 
-let config = getConfig(configJSON);
 let domain = config.domain;
 
-let runtime = 'https://catalogue.' + domain + '/.well-known/runtime/RuntimeUA';
+let runtime = 'https://catalogue.' + domain + '/.well-known/runtime/Runtime';
 
 let runtimeLoader = new RuntimeLoader(installerFactory, runtime);
 

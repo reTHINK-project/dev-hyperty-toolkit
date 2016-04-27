@@ -16,3 +16,4 @@ resources/bundle.js
 resources/*.hy.js
 *.komodoproject
 dist
+resources/tmp

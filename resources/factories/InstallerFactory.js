@@ -37,7 +37,7 @@ class InstallerFactory {
 
         window.eval(sourcePackage.sourceCode);
 
-        let runtime = new RuntimeUA(runtimeFactory, domain);
+        let runtime = new Runtime(runtimeFactory, domain);
         window.runtime = runtime;
 
         minibus.addListener('core:loadHyperty', function(msg) {
