@@ -21,7 +21,7 @@ In case you want want to know more details about reTHINK, have a look [here](doc
 
 ### Quick Guide
 
-To start the development of an Hyperty (make sure you have npm globaly available in your environment), perform the following steps:
+To start the development of an Hyperty (make sure you have node 5.4 and npm 3.3 globaly available in your environment), perform the following steps:
 
 1. clone this repository; **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else;
 
