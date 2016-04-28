@@ -254,12 +254,12 @@ This task will:
   3. reload your browser, with last changes;
 
 ```shell
-# working with production environment
-# this will use the catalogue specified system.config.json
-npm start --production
-
 # working with develop environment
 # this will use the local catalogue
+npm start --dev
+
+# working with production environment
+# this will use the catalogue specified for production on system.config.json
 npm start
 ```
 The [system.config.json](system.config.json) file contains some configuration, just could be changed for each environment;
