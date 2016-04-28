@@ -20,8 +20,8 @@
   },
   "homepage": "https://github.com/reTHINK-project/dev-hyperty-toolkit#readme",
   "dependencies": {
-    "service-framework": "github:rethink-project/dev-service-framework#develop-idpproxy",
-    "runtime-core": "github:rethink-project/dev-runtime-core#dev-0.5-idpproxy"
+    "service-framework": "github:rethink-project/dev-service-framework#develop",
+    "runtime-core": "github:rethink-project/dev-runtime-core#dev-0.5"
   },
   "devDependencies": {
     "babel-plugin-add-module-exports": "^0.1.2",
