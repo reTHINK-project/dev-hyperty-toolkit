@@ -25,7 +25,7 @@ To start the development of an Hyperty (make sure you have node 5.4 and npm 3.3 
 
 1. clone this repository; **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else;
 
-2. run the command `npm install` (this may take some minutes) followed by the command `npm start`;
+2. run the command `npm install` (this may take some minutes) followed by the command `npm start` for production mode or `npm run start:dev` for develop mode;
 
 3. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
 
@@ -244,7 +244,7 @@ With this template system you can:
 
 The following Gulp Tasks are provided:
 
-#### <a id="serve">gulp serve</a> or <a id="serve">npm start</a>
+#### <a id="serve">gulp serve</a> or <a id="serve">npm run start:dev</a>
 
 This task will:
 
@@ -256,7 +256,7 @@ This task will:
 ```shell
 # working with develop environment
 # this will use the local catalogue
-npm start --dev
+npm run start:dev
 
 # working with production environment
 # this will use the catalogue specified for production on system.config.json

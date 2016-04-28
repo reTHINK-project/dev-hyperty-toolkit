@@ -29,8 +29,13 @@ var environment = 'production';
 
 gulp.task('serve', function(done) {
 
-  var develop = argv.dev || process.env.NODE_ENV;
+  var develop = argv.dev || process.env.MODE;
   environment = develop ? 'development' : 'production';
+
+  console.log(argv);
+
+  console.log(process.env.MODE);
+
   process.env.environment = environment;
 
   var sequence = ['environment', 'js', 'server'];
@@ -72,7 +77,7 @@ gulp.task('server', function(done) {
 
 gulp.task('environment', function() {
 
-  var develop = argv.dev || process.env.NODE_ENV;
+  var develop = argv.dev || process.env.MODE;
   environment = develop ? 'development' : 'production';
   process.env.environment = environment;
 
@@ -273,7 +278,7 @@ function transpile(opts) {
     var fileObject = path.parse(file.path);
     var args = {};
 
-    var develop = argv.dev || process.env.NODE_ENV;
+    var develop = argv.dev || process.env.MODE;
     environment = develop ? 'development' : 'production';
     process.env.environment = environment;
 
