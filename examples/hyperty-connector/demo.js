@@ -202,20 +202,20 @@ function notificationHandler(controller, event) {
   var parseInformation = '<div class="col s12">' +
         '<div class="row valign-wrapper">' +
           '<div class="col s2">' +
-            '<img src="' + calleeInfo.picture + '" alt="" class="circle responsive-img">' +
+            '<img src="' + calleeInfo.infoToken.picture + '" alt="" class="circle responsive-img">' +
           '</div>' +
           '<span class="col s10">' +
             '<div class="row">' +
               '<span class="col s3 text-right">Name: </span>' +
-              '<span class="col s9 black-text">' + calleeInfo.name + '</span>' +
+              '<span class="col s9 black-text">' + calleeInfo.infoToken.name + '</span>' +
             '</span>' +
             '<span class="row">' +
               '<span class="col s3 text-right">Email: </span>' +
-              '<span class="col s9 black-text">' + calleeInfo.email + '</span>' +
+              '<span class="col s9 black-text">' + calleeInfo.infoToken.email + '</span>' +
             '</span>' +
             '<span class="row">' +
               '<span class="col s3 text-right">locale: </span>' +
-              '<span class="col s9 black-text">' + calleeInfo.locale + '</span>' +
+              '<span class="col s9 black-text">' + calleeInfo.infoToken.locale + '</span>' +
             '</span>' +
           '</div>' +
         '</div>';
