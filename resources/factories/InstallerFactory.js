@@ -1,5 +1,4 @@
-import configJSON from '../../system.config.json';
-import {getConfig} from '../../src/utils/utils';
+import config from '../../config.json';
 import RuntimeFactory from './RuntimeFactory';
 
 class InstallerFactory {
@@ -19,7 +18,6 @@ class InstallerFactory {
 
       let runtimeFactory = new RuntimeFactory();
 
-      let config = getConfig(configJSON);
       let domain = config.domain;
 
       let catalogue = runtimeFactory.createRuntimeCatalogue();
