@@ -18,8 +18,10 @@ var gutil = require('gulp-util');
 var argv = require('yargs').argv;
 var runSequence = require('run-sequence');
 var gulpif = require('gulp-if');
+var systemConfig = require('./system.config.json');
 
 var extensions = ['.js', '.json'];
+var environment = 'production';
 
 // var uglify = require('gulp-uglify');
 // var replace = require('gulp-replace');
@@ -27,11 +29,12 @@ var extensions = ['.js', '.json'];
 
 gulp.task('serve', function(done) {
 
-  var environment = argv.production || process.env.NODE_ENV;
-  process.env.environment = environment ? 'production' : 'development';
+  var develop = argv.dev || process.env.NODE_ENV;
+  environment = develop ? 'development' : 'production';
+  process.env.environment = environment;
 
   var sequence = ['environment', 'js', 'server'];
-  if (process.env.environment !== 'production') {
+  if (environment !== 'production') {
     sequence.push('watch');
   }
 
@@ -69,19 +72,17 @@ gulp.task('server', function(done) {
 
 gulp.task('environment', function() {
 
-  var environment = argv.production || process.env.NODE_ENV;
-  process.env.environment = environment ? 'production' : 'development';
+  var develop = argv.dev || process.env.NODE_ENV;
+  environment = develop ? 'development' : 'production';
+  process.env.environment = environment;
 
-  var configuration = {
-    development: true,
-    domain: 'localhost'
-  };
+  var configuration = systemConfig[environment];
 
   return gulp.src('./')
   .pipe(createFile('config.json', new Buffer(JSON.stringify(configuration, null, 2))))
   .pipe(gulp.dest('./'))
   .on('end', function() {
-    gutil.log('You are in the ' + process.env.environment + ' mode');
+    gutil.log('You are in the ' + environment + ' mode');
   });
 
 });
@@ -272,11 +273,12 @@ function transpile(opts) {
     var fileObject = path.parse(file.path);
     var args = {};
 
-    var environment = argv.production || process.env.NODE_ENV;
-    process.env.environment = environment ? 'production' : 'development';
+    var develop = argv.dev || process.env.NODE_ENV;
+    environment = develop ? 'development' : 'production';
+    process.env.environment = environment;
 
     var compact = false;
-    if (process.env.environment === 'production') {
+    if (environment === 'production') {
       compact = true;
     }
 
@@ -289,7 +291,7 @@ function transpile(opts) {
 
     return browserify(args)
     .transform(babel, {
-      compact: true,
+      compact: compact,
       presets: ['es2015', 'stage-0'],
       plugins: ['add-module-exports', 'transform-inline-environment-variables']
     })

@@ -1,0 +1,10 @@
+{
+  "development" : {
+    "development": true,
+    "domain": "localhost"
+  },
+  "production" : {
+    "development": false,
+    "domain": "hybroker.rethink.ptinovacao.pt"
+  }
+}
