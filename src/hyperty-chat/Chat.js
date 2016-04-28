@@ -37,7 +37,7 @@ class ChatGroup extends EventEmitter {
     _this._syncher = syncher;
     _this._hypertyDiscovery = hypertyDiscovery;
 
-    _this._objectDescURL = 'hyperty-catalogue://' + domain + '/.well-known/dataschemas/FakeDataSchema';
+    _this._objectDescURL = 'hyperty-catalogue://' + domain + '/.well-known/dataschemas/Communication';
   }
 
   set dataObjectReporter(dataObjectReporter) {
@@ -57,14 +57,15 @@ class ChatGroup extends EventEmitter {
 
       console.info('On Subscription add Participant: ', participant, event);
 
-      dataObjectReporter.data.communication.participants.push(participant);
+      dataObjectReporter.data.participants.push(participant);
 
       _this.processParticipant(participant);
     });
 
-    dataObjectReporter.onAddChildren(function(children) {
-      console.info('Reporter - Add Children: ', children);
-      _this._processChildren(children);
+    dataObjectReporter.onAddChild(function(child) {
+      console.info('Reporter - Add Child: ', child);
+      dataObjectReporter.data.lastModified = new Date().toJSON();
+      _this._processChild(child);
     });
 
     _this._dataObjectReporter = dataObjectReporter;
@@ -80,14 +81,14 @@ class ChatGroup extends EventEmitter {
 
     _this._dataObjectObserver = dataObjectObserver;
 
-    dataObjectObserver.onChange('*', function(event) {
+    dataObjectObserver.onChange('participants.*', function(event) {
       console.info('Change Event: ', event);
       _this.processPartipants(event.data);
     });
 
-    dataObjectObserver.onAddChildren(function(children) {
-      console.info('Observer - Add Children: ', children);
-      _this._processChildren(children);
+    dataObjectObserver.onAddChild(function(child) {
+      console.info('Observer - Add Child: ', child);
+      _this._processChild(child);
     });
 
   }
@@ -119,16 +120,16 @@ class ChatGroup extends EventEmitter {
   }
 
   /**
-   * Process children messages
-   * @param  {[type]} children [description]
+   * Process child messages
+   * @param  {[type]} child [description]
    * @return {[type]}          [description]
    */
-  _processChildren(children) {
+  _processChild(child) {
     let _this = this;
 
-    console.info('Process Message:', children);
+    console.info('Process Message:', child);
 
-    _this.trigger('new:message:recived', children);
+    _this.trigger('new:message:recived', child);
   }
 
   /**
@@ -144,7 +145,7 @@ class ChatGroup extends EventEmitter {
 
     return new Promise(function(resolve, reject) {
 
-      dataObject.addChildren('message', {chatMessage: message}).then(function(dataObjectChild) {
+      dataObject.addChild('chatmessages', {chatMessage: message}).then(function(dataObjectChild) {
         console.info('Data Object Child: ', dataObjectChild);
         let msg = {
           childId: dataObjectChild._childId,
@@ -152,7 +153,7 @@ class ChatGroup extends EventEmitter {
           value: dataObjectChild.data
         };
 
-        _this._processChildren(msg);
+        _this._processChild(msg);
         resolve(dataObjectChild);
       }).catch(function(reason) {
         console.error('Reason:', reason);

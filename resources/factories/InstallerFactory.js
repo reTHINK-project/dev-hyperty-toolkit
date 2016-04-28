@@ -1,5 +1,4 @@
-import configJSON from '../../system.config.json';
-import {getConfig} from '../../src/utils/utils';
+import config from '../../config.json';
 import RuntimeFactory from './RuntimeFactory';
 
 class InstallerFactory {
@@ -19,7 +18,6 @@ class InstallerFactory {
 
       let runtimeFactory = new RuntimeFactory();
 
-      let config = getConfig(configJSON);
       let domain = config.domain;
 
       let catalogue = runtimeFactory.createRuntimeCatalogue();
@@ -37,8 +35,10 @@ class InstallerFactory {
 
         window.eval(sourcePackage.sourceCode);
 
-        let runtime = new RuntimeUA(runtimeFactory, domain);
+        let runtime = new Runtime(runtimeFactory, domain);
         window.runtime = runtime;
+
+        console.log(runtime);
 
         minibus.addListener('core:loadHyperty', function(msg) {
           console.log('Load Hyperty: ', msg);

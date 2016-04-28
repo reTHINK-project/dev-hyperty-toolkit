@@ -27,7 +27,7 @@ function hypertyLoaded(result) {
 
     let invitationPanel = $('.invitation-panel');
 
-    let invitation = `<p> Invitation received from:\n ` + identity.name + '</p>';
+    let invitation = `<p> Invitation received from:\n ` + identity.infoToken.name + '</p>';
 
     invitationPanel.append(invitation);
 

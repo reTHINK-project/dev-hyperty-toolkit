@@ -1,7 +1,8 @@
 
 
 let hello = {
-   hello : "Hello World!!"
+  name: "hello",
+  hello: "Hello World!!"
 };
 
 export default hello;

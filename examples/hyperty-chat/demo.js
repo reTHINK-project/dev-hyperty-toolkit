@@ -158,7 +158,7 @@ function prepareChat(chatGroup) {
 
     chatManagerReady(chatGroup);
 
-    var communication = chatGroup.dataObject.data.communication;
+    var communication = chatGroup.dataObject.data;
     var participants = communication.participants;
     var owner = chatGroup.dataObject._owner;
     console.log('owner: ', owner);
@@ -184,7 +184,7 @@ function chatManagerReady(chatGroup) {
   let textArea = messageForm.find('.materialize-textarea');
 
   Handlebars.getTemplate('hyperty-chat/chat-header').then(function(template) {
-    let name = chatGroup.dataObject.data.communication.id;
+    let name = chatGroup.dataObject.data.name;
     let resource = chatGroup.dataObject._url;
 
     let html = template({name: name, resource: resource});
@@ -193,7 +193,7 @@ function chatManagerReady(chatGroup) {
 
   let roomsSections = $('.rooms');
   let collection = roomsSections.find('.collection');
-  let item = '<li class="collection-item active">' + chatGroup.dataObject.data.communication.id + '</li>';
+  let item = '<li class="collection-item active">' + chatGroup.dataObject.data.name + '</li>';
   collection.append(item);
 
   let badge = collection.find('.collection-header .badge');

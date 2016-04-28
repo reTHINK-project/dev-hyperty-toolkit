@@ -29,11 +29,11 @@ In case you want want to know more details about reTHINK, have a look [here](doc
 
 ### Quick Guide
 
-To start the development of an Hyperty (make sure you have npm globaly available in your environment), perform the following steps:
+To start the development of an Hyperty (make sure you have node 5.4 and npm 3.3 globaly available in your environment), perform the following steps:
 
 1. clone this repository; **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else;
 
-2. run the command `npm install` (this may take some minutes) followed by the command `npm start`;
+2. run the command `npm install` (this may take some minutes) followed by the command `npm start` for production mode or `npm run start:dev` for develop mode;
 
 3. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
 
@@ -254,7 +254,7 @@ With this template system you can:
 
 The following Gulp Tasks are provided:
 
-#### <a id="serve">gulp serve</a> or <a id="serve">npm start</a>
+#### <a id="serve">gulp serve</a> or <a id="serve">npm run start:dev</a>
 
 This task will:
 
@@ -264,12 +264,12 @@ This task will:
   3. reload your browser, with last changes;
 
 ```shell
-# working with production environment
-# this will use the catalogue specified system.config.json
-npm start --production
-
 # working with develop environment
 # this will use the local catalogue
+npm run start:dev
+
+# working with production environment
+# this will use the catalogue specified for production on system.config.json
 npm start
 ```
 The [system.config.json](system.config.json) file contains some configuration, just could be changed for each environment;
