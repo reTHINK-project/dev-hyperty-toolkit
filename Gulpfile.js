@@ -18,15 +18,34 @@ var prompt = require('gulp-prompt');
 var gutil = require('gulp-util');
 var argv = require('yargs').argv;
 var runSequence = require('run-sequence');
+var gulpif = require('gulp-if');
+var systemConfig = require('./system.config.json');
 
 var extensions = ['.js', '.json'];
+var environment = 'production';
 
 // var uglify = require('gulp-uglify');
 // var replace = require('gulp-replace');
 // var insert = require('gulp-insert');
 
+gulp.task('serve', function(done) {
+
+  var develop = argv.dev || process.env.MODE;
+  environment = develop ? 'development' : 'production';
+
+  process.env.environment = environment;
+
+  var sequence = ['environment', 'js', 'server'];
+  if (environment !== 'production') {
+    sequence.push('watch');
+  }
+
+  runSequence.apply(runSequence, sequence, done);
+
+});
+
 // use default task to launch Browsersync and watch JS files
-gulp.task('server', ['js'], function(done) {
+gulp.task('server', function(done) {
 
   // Serve files from the root of this project
   browserSync.init({
@@ -46,16 +65,32 @@ gulp.task('server', ['js'], function(done) {
         next();
       },
       routes: {
-        '/.well-known/runtime': 'node_modules/runtime-browser/bin'
+        '/.well-known/runtime': 'node_modules/runtime-browser/bin',
+        '/.well-known/hyperty': 'resources/descriptors/'
       }
     }
   }, done);
 
 });
 
-gulp.task('serve', function(done) {
+gulp.task('environment', function() {
 
-  runSequence('js', 'server', done);
+  var develop = argv.dev || process.env.MODE;
+  environment = develop ? 'development' : 'production';
+  process.env.environment = environment;
+
+  var configuration = systemConfig[environment];
+
+  return gulp.src('./')
+  .pipe(createFile('config.json', new Buffer(JSON.stringify(configuration, null, 2))))
+  .pipe(gulp.dest('./'))
+  .on('end', function() {
+    gutil.log('You are in the ' + environment + ' mode');
+  });
+
+});
+
+gulp.task('watch', function(done) {
 
   // add browserSync.reload to the tasks array to make
   // all browsers reload after tasks are complete.
@@ -165,18 +200,20 @@ gulp.task('encode', function(done) {
       choices: files
     },
     {
+      type: 'list',
+      name: 'esVersion',
+      message: 'This file are in ES5 or ES6',
+      choices: ['ES5', 'ES6']
+    },
+    {
       type: 'input',
       name: 'configuration',
-      message: 'ProtoStub Configuration, use something like:\n{"url": "wss://msg-node.localhost:9090/ws"}\nConfiguration:',
-      validate: function(value) {
-        try {
-          JSON.parse(value);
-          return true;
-        } catch (e) {
-          gutil.log('Default value is {}');
-          return true;
-        }
-      }
+      message: 'Resource configuration, use something like {"url": "wss://msg-node.localhost:9090/ws"}:'
+    },
+    {
+      type: 'input',
+      name: 'name',
+      message: 'Name of hyperty, protostub, dataschema (not specify use the file name):'
     },
     {
       type: 'list',
@@ -202,8 +239,26 @@ gulp.task('encode', function(done) {
         isDefault: isDefault
       };
 
+      var transpileOpts = {
+        configuration: {},
+        debug: false,
+        standalone: path.parse(res.file).basename,
+        destination: __dirname + '/resources/tmp'
+      };
+
+      if (res.name) {
+        opts.name = res.name;
+      }
+
+      var isES6 = false;
+      if (res.esVersion === 'ES6') {
+        isES6 = true;
+        transpileOpts.standalone = 'activate';
+      }
+
       if (res.file) {
         return gulp.src(res.file)
+        .pipe(gulpif(isES6, transpile(transpileOpts)))
         .pipe(resource(opts))
         .on('end', function() {
           gutil.log('encoded');
@@ -221,17 +276,25 @@ function transpile(opts) {
     var fileObject = path.parse(file.path);
     var args = {};
 
-    var environment = argv.production || process.env.NODE_ENV;
-    process.env.environment = environment ? 'production' : 'development';
+    var develop = argv.dev || process.env.MODE;
+    environment = develop ? 'development' : 'production';
+    process.env.environment = environment;
+
+    var compact = false;
+    if (environment === 'production') {
+      compact = true;
+    }
 
     args.entries = [file.path];
     args.extensions = extensions;
     if (opts.debug) args.debug = opts.debug;
     if (opts.standalone) args.standalone = opts.standalone;
 
+    var filename = opts.filename || fileObject.base;
+
     return browserify(args)
     .transform(babel, {
-      compact: true,
+      compact: compact,
       presets: ['es2015', 'stage-0'],
       plugins: ['add-module-exports', 'transform-inline-environment-variables']
     })
@@ -240,7 +303,7 @@ function transpile(opts) {
       gutil.log(gutil.colors.red(err.message));
       this.emit('end');
     })
-    .pipe(source(fileObject.base))
+    .pipe(source(filename))
     .pipe(gulp.dest(opts.destination))
     .on('end', function() {
       file.contents = fs.readFileSync(opts.destination + '/' + fileObject.base);
@@ -285,7 +348,7 @@ function resource(opts) {
 
     opts.descriptor = descriptorName;
 
-    gutil.log('Encoding: ', defaultPath, filename, opts);
+    gutil.log('Encoding: ', defaultPath, filename, JSON.stringify(opts));
 
     return gulp.src([file.path])
     .pipe(encode(opts))
@@ -336,7 +399,7 @@ function encode(opts) {
     if (opts.isDefault) {
       value = 'default';
     } else {
-      value = filename;
+      value = opts.name || filename;
     }
 
     if (!json.hasOwnProperty(value)) {
@@ -350,7 +413,30 @@ function encode(opts) {
       language = 'JSON-Schema';
     }
 
-    json[value].cguid = Math.floor(Math.random() + 1);
+    var cguid = 0;
+    switch (opts.descriptor) {
+      case 'Hyperties':
+        cguid = 10001;
+        break;
+      case 'DataSchemas':
+        cguid = 20001;
+        break;
+      case 'Runtimes':
+        cguid = 30001;
+        break;
+      case 'ProtoStubs':
+        cguid = 40001;
+        break;
+      case 'IDPProxys':
+        cguid = 50001;
+        break;
+    }
+
+    Object.keys(json).map(function(key, index) {
+      json[key].cguid = cguid + index;
+    });
+
+    // json[value].cguid = cguid;
     json[value].type = opts.descriptor;
     json[value].version = '0.1';
     json[value].description = 'Description of ' + filename;
@@ -370,7 +456,7 @@ function encode(opts) {
       json[value].protocolCapabilities = {http: true };
     }
 
-    if (opts.descriptor === 'ProtoStubs') {
+    if (opts.descriptor === 'ProtoStubs' || opts.descriptor === 'IDPProxys') {
       json[value].constraints = '';
     }
 
@@ -389,4 +475,13 @@ function encode(opts) {
     cb(null, newDescriptor);
 
   });
+}
+
+function createFile(path, contents) {
+
+  return through({ objectMode: true}, function(chunk, enc, cb) {
+    var file = new gutil.File({cwd: '', base: '', path: path, contents: contents});
+    cb(null, file);
+  });
+
 }

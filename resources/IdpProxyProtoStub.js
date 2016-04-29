@@ -11,12 +11,13 @@ exports['default'] = activate;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var openIDConfiguration = undefined;
+var identities = {};
+var nIdentity = 0;
 
 var googleInfo = {
   clientSecret: 'Xx4rKucb5ZYTaXlcZX9HLfZW',
   clientID: '808329566012-tqr8qoh111942gd2kg007t0s8f277roi.apps.googleusercontent.com',
-  redirectURI: location.href,
+  redirectURI: location.origin,
   issuer: 'https://accounts.google.com',
   tokenEndpoint: 'https://www.googleapis.com/oauth2/v4/token?',
   jwksUri: 'https://www.googleapis.com/oauth2/v3/certs?',
@@ -98,33 +99,6 @@ var exchangeCode = function exchangeCode(code) {
 var IdpProxy = {
 
   /**
-  * Function to generate an identity Assertion
-  * TODO add details of the implementation, and improve implementation
-  *
-  * @param  {contents} The contents includes information about the identity received
-  * @param  {origin} Origin parameter that identifies the origin of the RTCPeerConnection
-  * @param  {usernameHint} optional usernameHint parameter
-  * @return {Promise} returns a promise with an identity assertion
-  */
-  generateAssertion: function generateAssertion(contents, origin, hint) {
-    var i = googleInfo;
-    var tokenID = contents;
-    return new Promise(function (resolve, reject) {
-      if (origin !== undefined) {
-        sendHTTPRequest('GET', i.tokenInfo + tokenID).then(function (value) {
-          var tokenIDJSON = value;
-          var encodedContent = btoa(JSON.stringify({ tokenID: tokenID, tokenIDJSON: tokenIDJSON }));
-          resolve(encodedContent);
-        }, function (error) {
-          reject(error);
-        });
-      } else {
-        reject('err');
-      }
-    });
-  },
-
-  /**
   * Function to validate an identity Assertion received
   * TODO add details of the implementation, and improve the implementation
   *
@@ -141,7 +115,7 @@ var IdpProxy = {
       sendHTTPRequest('GET', i.tokenInfo + content.tokenID).then(function (result) {
 
         if (JSON.stringify(result) === JSON.stringify(content.tokenIDJSON)) {
-          resolve('valid');
+          resolve({ identity: content.tokenIDJSON.email, contents: content.tokenIDJSON });
         } else {
           reject('invalid');
         }
@@ -153,13 +127,15 @@ var IdpProxy = {
   },
 
   /**
-  * Function to obtain an user identity
-  * TODO add details of the implementation
-  * @return {Promise} returns a promise an URL so the Identity Module can use to obtain an identity
+  * Function to generate an identity Assertion
+  * TODO add details of the implementation, and improve implementation
   *
-  * @param  {scope}     Scope
+  * @param  {contents} The contents includes information about the identity received
+  * @param  {origin} Origin parameter that identifies the origin of the RTCPeerConnection
+  * @param  {usernameHint} optional usernameHint parameter
+  * @return {Promise} returns a promise with an identity assertion
   */
-  getIdentityAssertion: function getIdentityAssertion(contents) {
+  generateAssertion: function generateAssertion(contents, origin, hint) {
     var i = googleInfo;
 
     //start the login phase
@@ -174,7 +150,7 @@ var IdpProxy = {
 
         var requestUrl = i.authorisationEndpoint + 'scope=' + i.scope + '&client_id=' + i.clientID + '&redirect_uri=' + i.redirectURI + '&response_type=' + i.type + '&state=' + i.state + '&access_type=' + i.accessType;
 
-        reject(requestUrl);
+        reject({ name: 'IdPLoginError', loginUrl: requestUrl });
 
         //  }
       } else {
@@ -184,28 +160,42 @@ var IdpProxy = {
           var code = urlParser(contents, 'code');
 
           exchangeCode(code).then(function (value) {
-            var identityBundle = { accessToken: value.access_token, idToken: value.id_token, refreshToken: value.refresh_token, tokenType: value.token_type };
 
             //obtain information about the user
             var infoTokenURL = i.userinfo + value.access_token;
             sendHTTPRequest('GET', infoTokenURL).then(function (infoToken) {
 
-              //TODO delete later, and delete the need in the example
-              identityBundle.token = infoToken;
-              identityBundle.infoToken = infoToken;
+              var identityBundle = { accessToken: value.access_token, idToken: value.id_token, refreshToken: value.refresh_token, tokenType: value.token_type, infoToken: infoToken };
+
               var idTokenURL = i.tokenInfo + value.id_token;
 
               //obtain information about the user idToken
               sendHTTPRequest('GET', idTokenURL).then(function (idToken) {
-                identityBundle.idTokenJSON = idToken;
-                resolve(identityBundle);
+
+                identityBundle.tokenIDJSON = idToken;
+                identityBundle.expires = idToken.exp;
+                identityBundle.email = idToken.email;
+
+                var assertion = btoa(JSON.stringify({ tokenID: value.id_token, tokenIDJSON: idToken }));
+                var idpBundle = { domain: 'google.com', protocol: 'OIDC' };
+
+                //TODO delete later the field infoToken, and delete the need in the example
+                var returnValue = { assertion: assertion, idp: idpBundle, info: identityBundle, infoToken: infoToken };
+
+                identities[nIdentity] = returnValue;
+                ++nIdentity;
+
+                resolve(returnValue);
               }, function (e) {
+
                 reject(e);
               });
             }, function (error) {
+
               reject(error);
             });
           }, function (err) {
+
             reject(err);
           });
         }
@@ -237,11 +227,8 @@ var IdpProxyProtoStub = (function () {
     _this.config = config;
 
     _this.messageBus.addListener('*', function (msg) {
-      if (msg.to == 'domain://google.com') {
-        /*let newValue = IdpProxy.generateAssertion();
-        let message = {id: msg.id, type: 'response', to: msg.from, from: msg.to,
-                       body: {code: 200, value: newValue, bus: bus, runtimeProtoStubURL: runtimeProtoStubURL}};
-         _this.messageBus.postMessage(message);*/
+      if (msg.to === 'domain://google.com') {
+
         _this.requestToIdp(msg);
       }
     });
@@ -268,82 +255,25 @@ var IdpProxyProtoStub = (function () {
     value: function requestToIdp(msg) {
       var _this = this;
       var params = msg.body.params;
+
       switch (msg.body.method) {
-        case 'login':
-          _this.login(params).then(function (value) {
-            _this.replyMessage(msg, value);
-          });
-          break;
         case 'generateAssertion':
-          _this.generate(params).then(function (value) {
+          IdpProxy.generateAssertion(params.contents, params.origin, params.usernameHint).then(function (value) {
             _this.replyMessage(msg, value);
+          }, function (error) {
+            _this.replyMessage(msg, error);
           });
           break;
         case 'validateAssertion':
-          _this.validate(params).then(function (value) {
+          IdpProxy.validateAssertion(params.assertion, params.origin).then(function (value) {
             _this.replyMessage(msg, value);
+          }, function (error) {
+            _this.replyMessage(msg, error);
           });
           break;
         default:
           break;
       }
-    }
-
-    /**
-    * function that makes a request for an identity assertion to the web worker running the idpProxy
-    *
-    * @param  {params}  parameters received in the message. In this case contains the content, origin and usernamehint
-    * @return {Promise} returns a promise with an identity assertion generate by the idpProxy
-    */
-  }, {
-    key: 'generate',
-    value: function generate(params) {
-      var _this = this;
-
-      return new Promise(function (resolve, reject) {
-        IdpProxy.generateAssertion(params.contents, params.origin, params.usernameHint).then(function (result) {
-          resolve(result);
-        });
-      });
-    }
-
-    /**
-    * function that makes a request to validate an identity assertion to the web worker running the idpProxy
-    *
-    * @param  {params}  parameters received in the message. In this case contains the identity assertion and origin
-    * @return {Promise} returns a promise with the identity assertion validation result, received by the idpProxy
-    */
-  }, {
-    key: 'validate',
-    value: function validate(params) {
-      var _this = this;
-
-      return new Promise(function (resolve, reject) {
-        IdpProxy.validateAssertion(params.assertion, params.origin).then(function (result) {
-          resolve(result);
-        });
-      });
-    }
-
-    /**
-    * function that makes a request for a user identity to the web worker running the idpProxy
-    *
-    * @param  {params}  parameters received in the message. In this case contains the login scope
-    * @return {Promise} returns a promise an URL so the Identity Module can use to obtain an identity
-    */
-  }, {
-    key: 'login',
-    value: function login(params) {
-      var _this = this;
-
-      return new Promise(function (resolve, reject) {
-        IdpProxy.getIdentityAssertion(params).then(function (result) {
-          resolve(result);
-        }, function (result) {
-
-          resolve(result);
-        });
-      });
     }
 
     /**

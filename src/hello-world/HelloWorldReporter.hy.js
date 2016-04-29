@@ -49,9 +49,9 @@ class HelloWorldReporter {
       syncher.create(_this._objectDescURL, [hypertyURL], hello).then(function(helloObjtReporter) {
         console.info('1. Return Created Hello World Data Object Reporter', helloObjtReporter);
 
-      _this.helloObjtReporter = helloObjtReporter;
+        _this.helloObjtReporter = helloObjtReporter;
 
-          helloObjtReporter.onSubscription(function(event) {
+        helloObjtReporter.onSubscription(function(event) {
           console.info('-------- Hello World Reporter received subscription request --------- \n');
 
           // All subscription requested are accepted

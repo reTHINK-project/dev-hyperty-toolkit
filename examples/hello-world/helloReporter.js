@@ -59,7 +59,6 @@ console.log(toHyperty);
     $('.bye-panel').on('click', sayBye);
   }).catch(function(reason) {
     console.error(reason);
-    reject(reason);
   });
 
 }

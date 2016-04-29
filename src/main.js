@@ -3,27 +3,27 @@
 
 import rethink from 'runtime-browser/bin/rethink';
 
-import {getTemplate, serialize, getConfig} from './utils/utils';
+import {getTemplate, serialize} from './utils/utils';
 
-import configJSON from '../system.config.json';
-import hyperties from '../resources/descriptors/Hyperties';
+import config from '../config.json';
 
 window.KJUR = {};
 
-let config = getConfig(configJSON);
 let domain = config.domain;
 let runtimeLoader;
 
-console.log(rethink);
-
-rethink.install(domain).then(function(result) {
+rethink.install(config).then(function(result) {
 
   runtimeLoader = result;
   console.log(result);
 
+  return getListOfHyperties(domain);
+
+}).then(function(hyperties) {
+
   let $dropDown = $('#hyperties-dropdown');
 
-  Object.keys(hyperties).forEach(function(key) {
+  hyperties.forEach(function(key) {
     let $item = $(document.createElement('li'));
     let $link = $(document.createElement('a'));
 
@@ -42,11 +42,41 @@ rethink.install(domain).then(function(result) {
   console.error(reason);
 });
 
+function getListOfHyperties(domain) {
+
+  let hypertiesURL = 'https://' + domain + '/.well-known/hyperty/Hyperties.json';
+  if (config.env === 'production') {
+    hypertiesURL = 'https://' + domain + '/.well-known/hyperty/';
+  }
+
+  return new Promise(function(resolve, reject) {
+    $.ajax({
+      url: hypertiesURL,
+      success: function(result) {
+        let response = [];
+        if (typeof result === 'object') {
+          Object.keys(result).forEach(function(key) {
+            response.push(key);
+          });
+        } else if (typeof result === 'string') {
+          response = JSON.parse(result);
+        }
+        resolve(response);
+      },
+      fail: function(reason) {
+        reject(reason);
+      }
+
+    });
+  });
+
+}
+
 function loadHyperty(event) {
   event.preventDefault();
 
   let hypertyName = $(event.currentTarget).attr('data-name');
-  let hypertyPath = 'https://' + domain + '/.well-known/hyperties/' + hypertyName;
+  let hypertyPath = 'hyperty-catalogue://' + domain + '/.well-known/hyperties/' + hypertyName;
 
   runtimeLoader.requireHyperty(hypertyPath).then(hypertyDeployed).catch(hypertyFail);
 
