@@ -21,7 +21,7 @@ reTHINK Project provides a Javascript framework to build and deliver Real Time C
   - the myBracelet Hyperty, is a sensing Hyperty that encapsulates a Bracelet, by collecting and publishing data from it
 
   - the myContext Hyperty is a Big Data Hyperty that uses data published by different sensing Hyperties (like the myBracelet Hyperty) to infer and calculate more meaningful Contextual data about the user.
-  
+
 * **Protocol on-the-fly** is used by Hyperties to support interoperability with other Hyperties from other domains, without requiring federation or standardisation of network protocols;
 * Hyperties are **Trustful**. Hyperties are decoupled from the User Identity, which can be securely asserted by existing IDPs (Identity Provider), when communicating with other Hyperties.
 
@@ -150,6 +150,7 @@ The toolkit is pre-configured to use **hybroker.rethink.ptinovacao.pt** cloud de
 
  ```
  127.0.0.1   hybroker.rethink.ptinovacao.pt
+ 127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
  ```
 
 #### Local Development Environment
