@@ -32,10 +32,6 @@ gulp.task('serve', function(done) {
   var develop = argv.dev || process.env.MODE;
   environment = develop ? 'development' : 'production';
 
-  console.log(argv);
-
-  console.log(process.env.MODE);
-
   process.env.environment = environment;
 
   var sequence = ['environment', 'js', 'server'];
