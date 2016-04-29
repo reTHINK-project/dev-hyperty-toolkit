@@ -33,7 +33,7 @@ To start the development of an Hyperty (make sure you have node 5.4 and npm 3.3 
 
 1. clone this repository; **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else;
 
-2. run the command `npm install` (this may take some minutes) followed by the command `npm start` for production mode or `npm run start:dev` for develop mode;
+2. run the command `npm install` (this may take some minutes) followed by the command `npm run start:dev` for develop mode;
 
 3. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
 
