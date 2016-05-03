@@ -4,7 +4,6 @@ Hyperty Development Toolkit
 
 This repository provides required tools to develop Hyperties and a few demos. Currently limited to hyperties to be executed in the Browser. Soon NodeJS support will also be added;
 
-
 -	[Overview](#rethink-framework-overview)
 -	[Getting Started](#quick-start)
 
@@ -27,15 +26,37 @@ reTHINK Project provides a Javascript framework to build and deliver Real Time C
 
 In case you want want to know more details about reTHINK, have a look [here](docs/tutorials/readme.md)
 
-### Quick Guide
+### Quick Guide Setup
 
-To start the development of an Hyperty (make sure you have node 5.4 and npm 3.3 globaly available in your environment), perform the following steps:
+To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the following steps:
 
 1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else;
 
-2. run the command `npm install` (this may take some minutes) followed by the command `npm run start:dev` for develop mode;
+2. run the command `npm install` (this may take some minutes)
 
-3. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
+3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
+ ```
+ 127.0.0.1   hybroker.rethink.ptinovacao.pt
+ 127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
+ ```
+ 
+ * In Linux is normally available at: ```/etc/hosts```
+ * In windows is normally available at:  ```C:\Windows\System32\drivers\etc\hosts```
+ 
+4. run the local http-server and catalogue with ```npm run start:dev```. Check the following url's to allow the certificates:
+```https://hybroker.rethink.ptinovacao.pt/```
+```https://catalogue.hybroker.rethink.ptinovacao.pt/```
+
+5. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
+
+ - Hello World Reporter;
+ - Hello World Observer that observes changes made by the first Hello World Reporter;
+ - WebRTC Connector example;
+ - Group Chat;
+
+### First Hyperty Development
+
+1. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
 
 - a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldOberver.hy.js](/src/hello-world/HelloWorldObserver.hy.js).
 
@@ -113,23 +134,12 @@ To start the development of an Hyperty (make sure you have node 5.4 and npm 3.3 
 
   This is optional in case you are reusing existing data schemas. **To Do:** explain how to reuse existing data schemas.
 
-4. To test your Hyperty, you need to:
+2. To test your Hyperty, you need to:
 
  - expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
 
  - In case your Hyperty exposes an API to be used by a Web App, you should move to "examples" folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
 
- - To avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), you can change your hosts file to point to your `localhost` the DNS name of an existing reTHINK domain like `hybroker.rethink.ptinovacao.pt`. **to do:** provide a link for the back-end setup guide
-
-5. Open `https://localhost/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
-
- - Hello World Reporter;
-
- - Hello World Observer that observes changes made by the first Hello World Reporter;
-
- - WebRTC Connector example;
-
- - Group Chat;
 
 ### Cloud and Local development environment
 
