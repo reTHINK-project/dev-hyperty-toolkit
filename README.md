@@ -297,3 +297,7 @@ This task will:
 ```shell
 gulp encode
 ```
+
+### Troubleshooting
+1. On the select box, when selecting an Hyperty, there is no popup from google (to login, or verify access) ?
+ R: Check if there is any pop up blocker. Allow the popup and refresh.
