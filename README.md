@@ -58,9 +58,9 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 1. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
 
-- a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldOberver.hy.js](/src/hello-world/HelloWorldObserver.hy.js).
+ - a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldOberver.hy.js](/src/hello-world/HelloWorldObserver.hy.js).
 
-  The HelloWorldReporter.hy.js looks like:
+ The HelloWorldReporter.hy.js looks like:
 
  ```
  // This is the Hello World Reporter who owns and reports changes done in the Hello Data Object.
@@ -95,7 +95,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  // This change  will be received by the Observer:
  ```
 
- The Hello World Observer (which is the Hyperty observing changes on the Hello Data Object performed by the Hello World Reporter) looks like :
+  The Hello World Observer (which is the Hyperty observing changes on the Hello Data Object performed by the Hello World Reporter) looks like :
 
  ```
  // This is the Hello World Observer who subscribes the Hello Data Object to be synched with it.
@@ -112,7 +112,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  });
 ```
 
-- a ".ds.json" containing the JSON-Schema describing data objects handled by your Hyperty e.g. HelloWorldDataSchema.ds.json:
+ - a ".ds.json" containing the JSON-Schema describing data objects handled by your Hyperty e.g. HelloWorldDataSchema.ds.json:
 
  ```
  {
@@ -132,14 +132,13 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  }
 ```
 
-  This is optional in case you are reusing existing data schemas. **To Do:** explain how to reuse existing data schemas.
+ This is optional in case you are reusing existing data schemas. **To Do:** explain how to reuse existing data schemas.
 
 2. To test your Hyperty, you need to:
 
  - expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
 
  - In case your Hyperty exposes an API to be used by a Web App, you should move to "examples" folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
-
 
 ### Cloud and Local development environment
 
