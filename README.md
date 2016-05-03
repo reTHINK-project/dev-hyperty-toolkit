@@ -44,8 +44,8 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  * In windows is normally available at:  ```C:\Windows\System32\drivers\etc\hosts```
  
 4. run the local http-server and catalogue with ```npm run start:dev```. Check the following url's to allow the certificates:
-```https://hybroker.rethink.ptinovacao.pt/```
-```https://catalogue.hybroker.rethink.ptinovacao.pt/```
+ * https://hybroker.rethink.ptinovacao.pt
+ * https://catalogue.hybroker.rethink.ptinovacao.pt
 
 5. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
 
