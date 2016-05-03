@@ -31,7 +31,7 @@ In case you want want to know more details about reTHINK, have a look [here](doc
 
 To start the development of an Hyperty (make sure you have node 5.4 and npm 3.3 globaly available in your environment), perform the following steps:
 
-1. download [this repository](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else;
+1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else;
 
 2. run the command `npm install` (this may take some minutes) followed by the command `npm run start:dev` for develop mode;
 
