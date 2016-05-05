@@ -21,7 +21,6 @@ var gulpif = require('gulp-if');
 var systemConfig = require('./system.config.json');
 
 var extensions = ['.js', '.json'];
-var environment = 'production';
 
 // var uglify = require('gulp-uglify');
 // var replace = require('gulp-replace');
@@ -29,11 +28,7 @@ var environment = 'production';
 
 gulp.task('serve', function(done) {
 
-  var develop = argv.dev || process.env.MODE;
-  environment = develop ? 'development' : 'production';
-
-  process.env.environment = environment;
-
+  var environment = getEnvironment();
   var sequence = ['environment', 'js', 'server'];
   if (environment !== 'production') {
     sequence.push('watch');
@@ -46,17 +41,39 @@ gulp.task('serve', function(done) {
 // use default task to launch Browsersync and watch JS files
 gulp.task('server', function(done) {
 
+  var environment = getEnvironment();
+  var timestamps = true;
+
+  var codeSync = true;
+  var minify = false;
+  var logLevel = 'debug';
+  var notify = true;
+  var logConnections = true;
+
+  if (environment === 'production') {
+    codeSync = false;
+    minify = true;
+    logLevel = 'info';
+    notify = false;
+    logConnections = false;
+  }
+
   // Serve files from the root of this project
   browserSync.init({
     open: false,
     online: true,
+    timestamps: timestamps,
+    logLevel: logLevel,
     port: 443,
-    minify: false,
+    minify: minify,
+    notify: notify,
     ghostMode: false,
     https: {
       key: 'rethink-certificate.key',
       cert: 'rethink-certificate.cert'
     },
+    logConnections: logConnections,
+    codeSync: codeSync,
     server: {
       baseDir: './',
       middleware: function(req, res, next) {
@@ -73,10 +90,7 @@ gulp.task('server', function(done) {
 
 gulp.task('environment', function() {
 
-  var develop = argv.dev || process.env.MODE;
-  environment = develop ? 'development' : 'production';
-  process.env.environment = environment;
-
+  var environment = getEnvironment();
   var configuration = systemConfig[environment];
 
   return gulp.src('./')
@@ -272,11 +286,8 @@ function transpile(opts) {
   return through.obj(function(file, enc, cb) {
 
     var fileObject = path.parse(file.path);
+    var environment = getEnvironment();
     var args = {};
-
-    var develop = argv.dev || process.env.MODE;
-    environment = develop ? 'development' : 'production';
-    process.env.environment = environment;
 
     var compact = false;
     if (environment === 'production') {
@@ -482,4 +493,18 @@ function createFile(path, contents) {
     cb(null, file);
   });
 
+}
+
+function getEnvironment() {
+
+  var environment = 'production';
+
+  if (argv.dev) {
+    environment = argv.dev ? 'develop' : 'production';
+  } else if (process.env.MODE) {
+    environment = process.env.MODE;
+  }
+
+  process.env.environment = environment;
+  return environment;
 }

@@ -21,8 +21,11 @@ class InstallerFactory {
       let domain = config.domain;
 
       let catalogue = runtimeFactory.createRuntimeCatalogue();
+      let _descriptor;
 
       catalogue.getRuntimeDescriptor(runtimeURL).then(function(descriptor) {
+
+        _descriptor = descriptor;
 
         if (descriptor.sourcePackageURL === '/sourcePackage') {
           return descriptor.sourcePackage;
@@ -30,10 +33,21 @@ class InstallerFactory {
           return catalogue.getSourcePackageFromURL(descriptor.sourcePackageURL);
         }
 
-      })
-      .then(function(sourcePackage) {
+      }).catch(function(reason) {
+        console.log('Fail to get the sourcePackageURL. Trying to get the sourceCode from descriptor');
 
-        window.eval(sourcePackage.sourceCode);
+        return catalogue.getSourceCodeFromDescriptor(_descriptor);
+      }).then(function(result) {
+
+        if (result.hasOwnProperty('sourceCode') || result.hasOwnProperty('_sourceCode')) {
+          return result.sourceCode;
+        } else {
+          return result;
+        }
+
+      })
+      .then(function(sourceCode) {
+        window.eval(sourceCode);
 
         let runtime = new Runtime(runtimeFactory, domain);
         window.runtime = runtime;
