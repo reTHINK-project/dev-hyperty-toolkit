@@ -46,9 +46,12 @@ gulp.task('server', function(done) {
 
   var codeSync = true;
   var minify = false;
-  var logLevel = 'debug';
+  var logLevel = 'info';
   var notify = true;
   var logConnections = true;
+  var injectChanges = true;
+  var ui = {};
+  var logFileChanges = true;
 
   if (environment === 'production') {
     codeSync = false;
@@ -56,17 +59,23 @@ gulp.task('server', function(done) {
     logLevel = 'info';
     notify = false;
     logConnections = false;
+    injectChanges = false;
+    ui = false;
+    logFileChanges = false;
   }
 
   // Serve files from the root of this project
   browserSync.init({
     open: false,
-    online: true,
+    online: false,
     timestamps: timestamps,
     logLevel: logLevel,
+    logFileChanges: logFileChanges,
     port: 443,
     minify: minify,
     notify: notify,
+    ui: ui,
+    injectChanges: injectChanges,
     ghostMode: false,
     https: {
       key: 'rethink-certificate.key',

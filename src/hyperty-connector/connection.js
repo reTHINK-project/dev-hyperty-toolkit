@@ -8,7 +8,7 @@
 * Copyright 2016 Apizee
 * Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
 *
-* Licensed under the Apache License, Version 2.0 (the "License");
+* Licensed under the Apache License, Version 2.0 (the ''License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
@@ -48,14 +48,14 @@
 //  }
 
 let connection = {
-   name : '',
-   status : "connected",
-   owner : "hyperty://example.com/alicehy",
-   peer : "connection://example.com/alice/bob27012016",
-   ownerPeer : {
-     connectionDescription: {},
-     iceCandidates: []
-   }
+  name: '',
+  status: '',
+  owner: '',
+  peer: '',
+  ownerPeer: {
+    connectionDescription: {},
+    iceCandidates: []
+  }
 };
 
 export default connection;

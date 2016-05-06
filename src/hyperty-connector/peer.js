@@ -22,9 +22,9 @@
 **/
 
 let peer = {
-  name : '',
+  name: '',
   connectionDescription: {},
   iceCandidates: []
-}
+};
 
 export default peer;

@@ -23,9 +23,10 @@ class HelloWorldReporter {
 
 
     let _this = this;
-    _this._domain = divideURL(hypertyURL).domain;
 
-    _this._objectDescURL = 'hyperty-catalogue://' + _this._domain + '/.well-known/dataschemas/HelloWorldDataSchema';
+    let domain = divideURL(hypertyURL).domain;
+    _this._domain = domain;
+    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/dataschema/HelloWorldDataSchema';
 
     let syncher = new Syncher(hypertyURL, bus, configuration);
 
