@@ -39,10 +39,10 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  127.0.0.1   hybroker.rethink.ptinovacao.pt
  127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
  ```
- 
+
  * In Linux is normally available at: ```/etc/hosts```
  * In windows is normally available at:  ```C:\Windows\System32\drivers\etc\hosts```
- 
+
 4. run the local http-server and catalogue with ```npm run start:dev```. Check the following url's to allow the certificates:
  * https://hybroker.rethink.ptinovacao.pt
  * https://catalogue.hybroker.rethink.ptinovacao.pt
@@ -298,6 +298,4 @@ This task will:
 gulp encode
 ```
 
-### Troubleshooting
-1. On the select box, when selecting an Hyperty, there is no popup from google (to login, or verify access) ?
- R: Check if there is any pop up blocker. Allow the popup and refresh.
+### [Troubleshooting](troubleshouting.md)
