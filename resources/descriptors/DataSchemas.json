@@ -1,12 +1,12 @@
 {
   "HelloWorldDataSchema": {
     "sourcePackage": {
-      "sourceCode": "ew0KCSIkc2NoZW1hIjogImh0dHA6Ly9qc29uLXNjaGVtYS5vcmcvZHJhZnQtMDQvc2NoZW1hIyIsDQoJImlkIjogIkhlbGxvT2JqZWN0IiwNCgkidHlwZSI6ICJvYmplY3QiLA0KCSJyZXF1aXJlZCI6IFsiaGVsbG8iXSwNCgkiYWRkaXRpb25hbFByb3BlcnRpZXMiOiBmYWxzZSwNCiAgInByb3BlcnRpZXMiOiB7DQoJCSJzY2hlbWUiOiB7DQoJCQkiY29uc3RhbnQiOiAiaGVsbG8iDQoJCX0sDQoJCSJoZWxsbyI6IHsNCgkJCSJ0eXBlIjogInN0cmluZyINCgkJfQ0KCX0NCn0NCg==",
+      "sourceCode": "ewoJIiRzY2hlbWEiOiAiaHR0cDovL2pzb24tc2NoZW1hLm9yZy9kcmFmdC0wNC9zY2hlbWEjIiwKCSJpZCI6ICJIZWxsb09iamVjdCIsCgkidHlwZSI6ICJvYmplY3QiLAoJInJlcXVpcmVkIjogWyJoZWxsbyJdLAoJImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsCiAgInByb3BlcnRpZXMiOiB7CgkJInNjaGVtZSI6IHsKCQkJImNvbnN0YW50IjogImhlbGxvIgoJCX0sCgkJImhlbGxvIjogewoJCQkidHlwZSI6ICJzdHJpbmciCgkJfQoJfQp9Cg==",
       "sourceCodeClassname": "HelloWorldDataSchema",
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": 1,
+    "cguid": 20001,
     "type": "DataSchemas",
     "version": "0.1",
     "description": "Description of HelloWorldDataSchema",
@@ -21,12 +21,12 @@
   },
   "Communication": {
     "sourcePackage": {
-      "sourceCode": "ew0KCSIkc2NoZW1hIjogImh0dHA6Ly9qc29uLXNjaGVtYS5vcmcvZHJhZnQtMDQvc2NoZW1hIyIsDQoJImlkIjogIkNvbW11bmljYXRpb24iLA0KCSJ0eXBlIjogIm9iamVjdCIsDQogICJwcm9wZXJ0aWVzIjogew0KCQkic2NoZW1lIjogew0KCQkJImNvbnN0YW50IjogImNvbW0iDQoJCX0sDQoJCSJjaGlsZHJlbiI6IHsNCgkJCSJjb25zdGFudCI6IFsiY2hhdG1lc3NhZ2VzIl0NCgkJfQ0KCX0NCn0NCg==",
+      "sourceCode": "ewoJIiRzY2hlbWEiOiAiaHR0cDovL2pzb24tc2NoZW1hLm9yZy9kcmFmdC0wNC9zY2hlbWEjIiwKCgkiaWQiOiAiQ29tbXVuaWNhdGlvbiIsCgkidHlwZSI6ICJvYmplY3QiLAoJInJlcXVpcmVkIjogWyJzdGFydGluZ1RpbWUiLCAibGFzdE1vZGlmaWVkIiwgInN0YXR1cyIsICJyZXNvdXJjZXMiLCAiY2hpbGRyZW4iXSwKCSJwcm9wZXJ0aWVzIjogewoJCSJzdGFydGluZ1RpbWUiOiB7CgkJCSJ0eXBlIjogInN0cmluZyIsCgkJCSJmb3JtYXQiOiAiZGF0ZS10aW1lIgoJCX0sCgkJImxhc3RNb2RpZmllZCI6IHsKCQkJInR5cGUiOiAic3RyaW5nIiwKCQkJImZvcm1hdCI6ICJkYXRlLXRpbWUiCgkJfSwKCQkiZHVyYXRpb24iOiB7CgkJCSJ0eXBlIjogInN0cmluZyIsCgkJCSJmb3JtYXQiOiAiZGF0ZS10aW1lIgoJCX0sCgkJInN0YXR1cyI6IHsKCQkJImVudW0iOiBbCgkJCQkib3BlbiIsCgkJCQkicGVuZGluZyIsCgkJCQkiY2xvc2VkIiwKCQkJCSJwYXVzZWQiLAoJCQkJImZhaWxlZCIKCQkJXQoJCX0sCgkJInBhcnRpY2lwYW50cyI6IHsKCQkJInR5cGUiOiAiYXJyYXkiLAoJCQkiaXRlbXMiOiB7CgkJCQkiJHJlZiI6ICIjL1BhcnRpY2lwYW50IgoJCQl9CgkJfSwKCQkicW9zIjogewoJCQkiJHJlZiI6ICIjL0NvbW11bmljYXRpb25RdWFsaXR5IgoJCX0sCgkJInJlc291cmNlcyI6IHsKCQkJInR5cGUiOiAiYXJyYXkiLAoJCQkiaXRlbXMiOiB7CgkJCQkiJHJlZiI6ICJIeXBlcnR5UmVzb3VyY2UuanNvbiMvSHlwZXJ0eVJlc291cmNlIgoJCQl9CgkJfSwKCQkiY2hpbGRyZW4iOiB7CgkJCSJjb25zdGFudCI6IFsiY2hhdG1lc3NhZ2VzIl0KCQl9Cgl9LCAKCSJDaGF0TWVzc2FnZXMiOiB7CgkJInR5cGUiOiAib2JqZWN0IiwKCQkicmVxdWlyZWQiOiBbInBhcmVudCIsICJsaXN0ZW5lciIsICJ0eXBlIl0sCgkJInByb3BlcnRpZXMiOiB7CgkJCSJwYXJlbnQiOiB7CgkJCQkiY29uc3RhbnQiOiAiY29tbXVuaWNhdGlvbiIKCQkJfSwKCQkJImxpc3RlbmVyIjogewoJCQkJImNvbnN0YW50IjogImNoYXRtZXNzYWdlcyIKCQkJfSwKCQkJInR5cGUiOiB7CgkJCQkidHlwZSI6ICJzdHJpbmciCgkJCX0KCQl9Cgl9LCAKCSJQYXJ0aWNpcGFudCI6IHsKCQkidHlwZSI6ICJvYmplY3QiLAoJCSJwcm9wZXJ0aWVzIjogewoJCQkic3RhdHVzIjogewoJCQkJImVudW0iOiBbCgkJCQldCgkJCX0KCQl9Cgl9LCAKCSJDb21tdW5pY2F0aW9uUXVhbGl0eSI6IHsKCQkidHlwZSI6ICJvYmplY3QiLAoJCSJwcm9wZXJ0aWVzIjogewoJCX0KCX0KfQo=",
       "sourceCodeClassname": "Communication",
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": 1,
+    "cguid": 20002,
     "type": "DataSchemas",
     "version": "0.1",
     "description": "Description of Communication",
@@ -46,11 +46,91 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": 1,
+    "cguid": 20003,
     "type": "DataSchemas",
     "version": "0.1",
     "description": "Description of FakeDataSchema",
     "objectName": "FakeDataSchema",
+    "configuration": {},
+    "sourcePackageURL": "/sourcePackage",
+    "language": "JSON-Schema",
+    "signature": "",
+    "messageSchemas": "",
+    "dataObjects": [],
+    "accessControlPolicy": "somePolicy"
+  },
+  "Connection": {
+    "sourcePackage": {
+      "sourceCode": "ewoJIiRzY2hlbWEiOiAiaHR0cDovL2pzb24tc2NoZW1hLm9yZy9kcmFmdC0wNC9zY2hlbWEjIiwKCgkiaWQiOiAiQ29ubmVjdGlvbiIsCgkidHlwZSI6ICJvYmplY3QiLAoJInJlcXVpcmVkIjogWyJzdGF0dXMiLCAib3duZXIiLCAicGVlciJdLAoJInByb3BlcnRpZXMiOiB7CgkJInN0YXR1cyI6IHsKCQkJInR5cGUiOiAic3RyaW5nIgoJCX0sCgkJIm93bmVyIjogewoJCQkidHlwZSI6ICJzdHJpbmciCgkJfSwKCQkicGVlciI6IHsKCQkJInR5cGUiOiAic3RyaW5nIgoJCX0KCX0sIAoJIk93bmVyUGVlciI6IHsKCQkidHlwZSI6ICJvYmplY3QiLAoJCSJwcm9wZXJ0aWVzIjogewoJCX0KCX0sIAoJIlBlZXIiOiB7CgkJInR5cGUiOiAib2JqZWN0IiwKCQkicHJvcGVydGllcyI6IHsKCQl9Cgl9LCAKCSJJY2VDYW5kaWRhdGUiOiB7CgkJInR5cGUiOiAib2JqZWN0IiwKCQkicmVxdWlyZWQiOiBbImNhbmRpZGF0ZSIsICJzZHBNTGluZUluZGV4IiwgInNkcE1pZCJdLAoJCSJwcm9wZXJ0aWVzIjogewoJCQkiY2FuZGlkYXRlIjogewoJCQkJInR5cGUiOiAic3RyaW5nIgoJCQl9LAoJCQkic2RwTUxpbmVJbmRleCI6IHsKCQkJCSJ0eXBlIjogImludGVnZXIiCgkJCX0sCgkJCSJzZHBNaWQiOiB7CgkJCQkidHlwZSI6ICJzdHJpbmciCgkJCX0KCQl9Cgl9LCAKCSJJY2VDYW5kaWRhdGVzIjogewoJCSJ0eXBlIjogIm9iamVjdCIsCgkJInJlcXVpcmVkIjogWyJzdGF0dXMiXSwKCQkicHJvcGVydGllcyI6IHsKCQkJInN0YXR1cyI6IHsKCQkJCSJlbnVtIjogWwoJCQkJCSJuZXciLAoJCQkJCSJjaGVja2luZyIsCgkJCQkJImNvbm5lY3RlZCIsCgkJCQkJImNvbXBsZXRlZCIsCgkJCQkJImZhaWxlZCIsCgkJCQkJImRpc2Nvbm5lY3RlZCIsCgkJCQkJImNsb3NlZCIKCQkJCV0KCQkJfQoJCX0KCX0sIAoJIkNvbm5lY3Rpb25EZXNjcmlwdGlvbiI6IHsKCQkidHlwZSI6ICJvYmplY3QiLAoJCSJyZXF1aXJlZCI6IFsic2RwIl0sCgkJInByb3BlcnRpZXMiOiB7CgkJCSJzZHAiOiB7CgkJCQkidHlwZSI6ICJzdHJpbmciCgkJCX0KCQl9Cgl9LCAKCSJSdHBUcmFuc3BvcnRQYXJhbWV0ZXJzIjogewoJCSJ0eXBlIjogIm9iamVjdCIsCgkJInJlcXVpcmVkIjogWyJzdGF0dXMiXSwKCQkicHJvcGVydGllcyI6IHsKCQkJInN0YXR1cyI6IHsKCQkJCSJ0eXBlIjogIm51bGwiCgkJCX0KCQl9Cgl9Cn0K",
+      "sourceCodeClassname": "Connection",
+      "encoding": "base64",
+      "signature": ""
+    },
+    "cguid": 20004,
+    "type": "DataSchemas",
+    "version": "0.1",
+    "description": "Description of Connection",
+    "objectName": "Connection",
+    "configuration": {},
+    "sourcePackageURL": "/sourcePackage",
+    "language": "JSON-Schema",
+    "signature": "",
+    "messageSchemas": "",
+    "dataObjects": [],
+    "accessControlPolicy": "somePolicy"
+  },
+  "Context": {
+    "sourcePackage": {
+      "sourceCode": "ewoJIiRzY2hlbWEiOiAiaHR0cDovL2pzb24tc2NoZW1hLm9yZy9kcmFmdC0wNC9zY2hlbWEjIiwKCgkiaWQiOiAiQ29udGV4dCIsCgkidHlwZSI6ICJvYmplY3QiLAoJInJlcXVpcmVkIjogWyJpZCIsICJ0eXBlIiwgInZhbHVlIl0sCgkicHJvcGVydGllcyI6IHsKCQkiaWQiOiB7CgkJCSJ0eXBlIjogInN0cmluZyIKCQl9LAoJCSJ0eXBlIjogewoJCQkiJHJlZiI6ICJIeXBlcnR5UmVzb3VyY2UuanNvbiMvSHlwZXJ0eVJlc291cmNlVHlwZSIKCQl9LAoJCSJkZXNjcmlwdGlvbiI6IHsKCQkJInR5cGUiOiAic3RyaW5nIgoJCX0sCgkJInRpbWUiOiB7CgkJCSJ0eXBlIjogInN0cmluZyIsCgkJCSJmb3JtYXQiOiAiZGF0ZS10aW1lIgoJCX0sCgkJInVuaXRzIjogewoJCQkiJHJlZiI6ICIjL0NvbnRleHRVbml0IgoJCX0sCgkJInZlcnNpb24iOiB7CgkJCSJ0eXBlIjogImludGVnZXIiCgkJfSwKCQkidmFsdWUiOiB7CgkJCSIkcmVmIjogIiMvQ29udGV4dFZhbHVlTGlzdCIKCQl9LAoJCSJ0YWciOiB7CgkJCSJ0eXBlIjogInN0cmluZyIKCQl9Cgl9LCAKCSJDb250ZXh0VW5pdCI6IHsKCQkidHlwZSI6ICJvYmplY3QiLAoJCSJwcm9wZXJ0aWVzIjogewoJCX0KCX0sIAoJIkNvbnRleHRWYWx1ZUxpc3QiOiB7CgkJInR5cGUiOiAib2JqZWN0IiwKCQkicHJvcGVydGllcyI6IHsKCQl9Cgl9LCAKCSJDb250ZXh0VmFsdWUiOiB7CgkJInR5cGUiOiAib2JqZWN0IiwKCQkicmVxdWlyZWQiOiBbIm5hbWUiLCAidW5pdHMiLCAidmFsdWUiLCAic3VtIl0sCgkJImFueU9mIjogWwoJCQl7ICIkcmVmIjogIiMvUmF3Q29udGV4dFZhbHVlIiB9LAoJCQl7ICIkcmVmIjogIiMvUHJvY2Vzc2VkQ29udGV4dFZhbHVlIiB9CgkJXQoJCSwKCQkicHJvcGVydGllcyI6IHsKCQkJIm5hbWUiOiB7CgkJCQkidHlwZSI6ICJzdHJpbmciCgkJCX0sCgkJCSJ1bml0cyI6IHsKCQkJCSIkcmVmIjogIiMvQ29udGV4dFVuaXQiCgkJCX0sCgkJCSJ2YWx1ZSI6IHsKCQkJCSJ0eXBlIjogIm9iamVjdCIKCQkJfSwKCQkJInN1bSI6IHsKCQkJCSJ0eXBlIjogIm51bGwiCgkJCX0sCgkJCSJ0aW1lIjogewoJCQkJInR5cGUiOiAic3RyaW5nIiwKCQkJCSJmb3JtYXQiOiAiZGF0ZS10aW1lIgoJCQl9LAoJCQkidXBkYXRlVGltZSI6IHsKCQkJCSJ0eXBlIjogInN0cmluZyIsCgkJCQkiZm9ybWF0IjogImRhdGUtdGltZSIKCQkJfSwKCQkJImV4cGlyZXMiOiB7CgkJCQkidHlwZSI6ICJzdHJpbmciLAoJCQkJImZvcm1hdCI6ICJkYXRlLXRpbWUiCgkJCX0sCgkJCSJhZGRyZXNzIjogewoJCQkJInR5cGUiOiAic3RyaW5nIgoJCQl9CgkJfQoJfSwgCgkiUmF3Q29udGV4dFZhbHVlIjogewoJCSJ0eXBlIjogIm9iamVjdCIsCgkJInByb3BlcnRpZXMiOiB7CgkJfQoJfSwgCgkiUHJvY2Vzc2VkQ29udGV4dFZhbHVlIjogewoJCSJ0eXBlIjogIm9iamVjdCIsCgkJInByb3BlcnRpZXMiOiB7CgkJfQoJfQp9Cg==",
+      "sourceCodeClassname": "Context",
+      "encoding": "base64",
+      "signature": ""
+    },
+    "cguid": 20005,
+    "type": "DataSchemas",
+    "version": "0.1",
+    "description": "Description of Context",
+    "objectName": "Context",
+    "configuration": {},
+    "sourcePackageURL": "/sourcePackage",
+    "language": "JSON-Schema",
+    "signature": "",
+    "messageSchemas": "",
+    "dataObjects": [],
+    "accessControlPolicy": "somePolicy"
+  },
+  "HypertyResource": {
+    "sourcePackage": {
+      "sourceCode": "ewoJIiRzY2hlbWEiOiAiaHR0cDovL2pzb24tc2NoZW1hLm9yZy9kcmFmdC0wNC9zY2hlbWEjIiwKCgkiaWQiOiAiSHlwZXJ0eVJlc291cmNlIiwKCSJ0eXBlIjogIm9iamVjdCIsCgkicmVxdWlyZWQiOiBbInR5cGUiXSwKCSJwcm9wZXJ0aWVzIjogewoJCSJ0eXBlIjogewoJCQkiJHJlZiI6ICIjL0h5cGVydHlSZXNvdXJjZVR5cGUiCgkJfSwKCQkiZGlyZWN0aW9uIjogewoJCQkiZW51bSI6IFsKCQkJCSJpbiIsCgkJCQkib3V0IiwKCQkJCSJpbm91dCIKCQkJXQoJCX0KCX0sIAoJIkh5cGVydHlSZXNvdXJjZVR5cGUiOiB7CgkJInR5cGUiOiAib2JqZWN0IiwKCQkicmVxdWlyZWQiOiBbIkNIQVQiLCAiQVVESU8iLCAiVklERU8iLCAiQVYiLCAiU0NSRUVOIiwgIkZJTEUiLCAiTUlESSJdLAoJCSJwcm9wZXJ0aWVzIjogewoJCQkiQ0hBVCI6IHsKCQkJCSJ0eXBlIjogIm51bGwiCgkJCX0sCgkJCSJBVURJTyI6IHsKCQkJCSJ0eXBlIjogIm51bGwiCgkJCX0sCgkJCSJWSURFTyI6IHsKCQkJCSJ0eXBlIjogIm51bGwiCgkJCX0sCgkJCSJBViI6IHsKCQkJCSJ0eXBlIjogIm51bGwiCgkJCX0sCgkJCSJTQ1JFRU4iOiB7CgkJCQkidHlwZSI6ICJudWxsIgoJCQl9LAoJCQkiRklMRSI6IHsKCQkJCSJ0eXBlIjogIm51bGwiCgkJCX0sCgkJCSJNSURJIjogewoJCQkJInR5cGUiOiAibnVsbCIKCQkJfQoJCX0KCX0KfQo=",
+      "sourceCodeClassname": "HypertyResource",
+      "encoding": "base64",
+      "signature": ""
+    },
+    "cguid": 20006,
+    "type": "DataSchemas",
+    "version": "0.1",
+    "description": "Description of HypertyResource",
+    "objectName": "HypertyResource",
+    "configuration": {},
+    "sourcePackageURL": "/sourcePackage",
+    "language": "JSON-Schema",
+    "signature": "",
+    "messageSchemas": "",
+    "dataObjects": [],
+    "accessControlPolicy": "somePolicy"
+  },
+  "SyncDataObject": {
+    "sourcePackage": {
+      "sourceCode": "ewoJIiRzY2hlbWEiOiAiaHR0cDovL2pzb24tc2NoZW1hLm9yZy9kcmFmdC0wNC9zY2hlbWEjIiwKCgkiU3luY09iamVjdCI6IHsKCQkidHlwZSI6ICJvYmplY3QiLAoJCSJyZXF1aXJlZCI6IFsidXJsIiwgInJlcG9ydGVyIiwgInNjaGVtYSIsICJuYW1lIl0sCgkJImFueU9mIjogWwoJCQl7ICIkcmVmIjogIiMvU3luY09iamVjdFBhcmVudCIgfSwKCQkJeyAiJHJlZiI6ICIjL1N5bmNPYmplY3RDaGlsZCIgfQoJCV0KCQksCgkJInByb3BlcnRpZXMiOiB7CgkJCSJ1cmwiOiB7CgkJCQkidHlwZSI6ICJzdHJpbmciCgkJCX0sCgkJCSJyZXBvcnRlciI6IHsKCQkJCSJ0eXBlIjogInN0cmluZyIKCQkJfSwKCQkJInNjaGVtYSI6IHsKCQkJCSJ0eXBlIjogInN0cmluZyIKCQkJfSwKCQkJIm5hbWUiOiB7CgkJCQkidHlwZSI6ICJzdHJpbmciCgkJCX0sCgkJCSJkZXNjcmlwdGlvbiI6IHsKCQkJCSJ0eXBlIjogInN0cmluZyIKCQkJfSwKCQkJInRhZ3MiOiB7CgkJCQkidHlwZSI6ICJhcnJheSIsCgkJCQkiaXRlbXMiOiB7CgkJCQkJInR5cGUiOiAic3RyaW5nIgoJCQkJfQoJCQl9CgkJfQoJfSwgCgkiU3luY09iamVjdFBhcmVudCI6IHsKCQkidHlwZSI6ICJvYmplY3QiLAoJCSJyZXF1aXJlZCI6IFsiY2hpbGRyZW4iXSwKCQkicHJvcGVydGllcyI6IHsKCQkJImNoaWxkcmVuIjogewoJCQkJInR5cGUiOiAiYXJyYXkiLAoJCQkJIml0ZW1zIjogewoJCQkJCSJ0eXBlIjogInN0cmluZyIKCQkJCX0KCQkJfQoJCX0KCX0sIAoJIlN5bmNPYmplY3RDaGlsZHJlbiI6IHsKCQkidHlwZSI6ICJvYmplY3QiLAoJCSJyZXF1aXJlZCI6IFsicGFyZW50IiwgImxpc3RlbmVyIiwgInR5cGUiXSwKCQkicHJvcGVydGllcyI6IHsKCQkJInBhcmVudCI6IHsKCQkJCSJ0eXBlIjogInN0cmluZyIKCQkJfSwKCQkJImxpc3RlbmVyIjogewoJCQkJInR5cGUiOiAic3RyaW5nIgoJCQl9LAoJCQkidHlwZSI6IHsKCQkJCSIkcmVmIjogIiMvU3luY09iamVjdENoaWxkIgoJCQl9LAoJCQkiY2hpbGRyZW5VcmxzIjogewoJCQkJInR5cGUiOiAiYXJyYXkiLAoJCQkJIml0ZW1zIjogewoJCQkJCSJ0eXBlIjogInN0cmluZyIKCQkJCX0KCQkJfQoJCX0KCX0sIAoJIlN5bmNPYmplY3RDaGlsZCI6IHsKCQkidHlwZSI6ICJvYmplY3QiLAoJCSJwcm9wZXJ0aWVzIjogewoJCX0KCX0KfQo=",
+      "sourceCodeClassname": "SyncDataObject",
+      "encoding": "base64",
+      "signature": ""
+    },
+    "cguid": 20007,
+    "type": "DataSchemas",
+    "version": "0.1",
+    "description": "Description of SyncDataObject",
+    "objectName": "SyncDataObject",
     "configuration": {},
     "sourcePackageURL": "/sourcePackage",
     "language": "JSON-Schema",

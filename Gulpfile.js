@@ -29,7 +29,7 @@ var extensions = ['.js', '.json'];
 gulp.task('serve', function(done) {
 
   var environment = getEnvironment();
-  var sequence = ['environment', 'js', 'server'];
+  var sequence = ['environment', 'schemas', 'js', 'hyperties', 'server'];
   if (environment !== 'production') {
     sequence.push('watch');
   }
@@ -90,6 +90,7 @@ gulp.task('server', function(done) {
         next();
       },
       routes: {
+        '/.well-known/runtime': 'node_modules/runtime-browser/bin',
         '/.well-known/hyperty': 'resources/descriptors/'
       }
     }
@@ -116,8 +117,17 @@ gulp.task('watch', function(done) {
   // add browserSync.reload to the tasks array to make
   // all browsers reload after tasks are complete.
   gulp.watch(['src/*.js', 'system.config.json'], ['main-watch']);
-  gulp.watch(['src/**/*.js'], ['hyperties-watch']);
-  gulp.watch(['src/**/*.json'], ['schemas']);
+
+  gulp.watch(['src/**/*.js'], function(event) {
+    var fileObject = path.parse(event.path);
+    return gulp.src(fileObject.dir + '/*.hy.js')
+    .pipe(convertHyperty())
+    .on('end', function() {
+      browserSync.reload();
+    });
+  });
+
+  gulp.watch(['src/**/*.json', 'resources/schemas/**/*.ds.json'], ['schemas']);
   gulp.watch(['examples/*.html', 'examples/**/*.hbs', 'examples/**/*.js'], browserSync.reload);
 
 });
@@ -125,7 +135,7 @@ gulp.task('watch', function(done) {
 gulp.task('main-watch', ['js'], browserSync.reload);
 gulp.task('hyperties-watch', ['hyperties'], browserSync.reload);
 
-gulp.task('js', ['hyperties'], function() {
+gulp.task('js', function() {
 
   return gulp.src('./src/main.js')
   .on('end', function() {
@@ -146,35 +156,13 @@ gulp.task('js', ['hyperties'], function() {
 gulp.task('hyperties', function() {
 
   return gulp.src('./src/**/*.hy.js')
-  .pipe(through.obj(function(chunk, enc, done) {
-
-    var fileObject = path.parse(chunk.path);
-
-    return gulp.src([chunk.path])
-    .on('end', function() {
-      gutil.log('-----------------------------------------------------------');
-      gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
-    })
-    .pipe(transpile({
-      destination: __dirname + '/resources',
-      standalone: 'activate',
-      debug: false
-    }))
-    .pipe(resource())
-    .resume()
-    .on('end', function() {
-      gutil.log('Hyperty', fileObject.name, ' was converted and encoded');
-      gutil.log('-----------------------------------------------------------');
-      done();
-    });
-
-  }));
+  .pipe(convertHyperty());
 
 });
 
 gulp.task('schemas', function() {
 
-  return gulp.src('./src/**/*.ds.json')
+  return gulp.src(['./src/**/*.ds.json', './resources/schemas/**/*.ds.json'])
   .pipe(through.obj(function(chunk, enc, done) {
 
     var fileObject = path.parse(chunk.path);
@@ -289,6 +277,34 @@ gulp.task('encode', function(done) {
   );
 
 });
+
+function convertHyperty() {
+
+  return through.obj(function(chunk, enc, done) {
+
+    var fileObject = path.parse(chunk.path);
+
+    return gulp.src([chunk.path])
+    .on('end', function() {
+      gutil.log('-----------------------------------------------------------');
+      gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
+    })
+    .pipe(transpile({
+      destination: __dirname + '/resources',
+      standalone: 'activate',
+      debug: false
+    }))
+    .pipe(resource())
+    .resume()
+    .on('end', function() {
+      gutil.log('Hyperty', fileObject.name, ' was converted and encoded');
+      gutil.log('-----------------------------------------------------------');
+      done();
+    });
+
+  });
+
+}
 
 function transpile(opts) {
 
