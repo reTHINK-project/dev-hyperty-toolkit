@@ -59,7 +59,7 @@ class HypertyConnector extends EventEmitter {
     _this._configuration = configuration;
     _this._domain = divideURL(hypertyURL).domain;
 
-    _this._objectDescURL = 'hyperty-catalogue://' + _this._domain + '/.well-known/dataschemas/FakeDataSchema';
+    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + _this._domain + '/.well-known/dataschema/Communication';
 
     _this._controllers = {};
 

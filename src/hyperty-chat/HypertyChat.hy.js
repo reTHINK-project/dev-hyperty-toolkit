@@ -54,7 +54,7 @@ class HypertyChat extends EventEmitter {
     let domain = divideURL(hypertyURL).domain;
     let hypertyDiscovery = new HypertyDiscovery(hypertyURL, bus);
 
-    _this._objectDescURL = 'hyperty-catalogue://' + domain + '/.well-known/dataschemas/Communication';
+    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/dataschema/Communication';
 
     _this._hypertyURL = hypertyURL;
     _this._syncher = syncher;

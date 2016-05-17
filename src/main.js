@@ -38,15 +38,19 @@ rethink.install(config).then(function(result) {
     $dropDown.append($item);
   });
 
+  $('.preloader-wrapper').remove();
+  $('.card .card-action').removeClass('center');
+  $('.hyperties-list-holder').removeClass('hide');
+
 }).catch(function(reason) {
   console.error(reason);
 });
 
 function getListOfHyperties(domain) {
 
-  let hypertiesURL = 'https://' + domain + '/.well-known/hyperty/Hyperties.json';
-  if (config.env === 'production') {
-    hypertiesURL = 'https://' + domain + '/.well-known/hyperty/';
+  let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty/';
+  if (config.development) {
+    hypertiesURL = 'https://' + domain + '/.well-known/hyperty/Hyperties.json';
   }
 
   return new Promise(function(resolve, reject) {
@@ -65,6 +69,7 @@ function getListOfHyperties(domain) {
       },
       fail: function(reason) {
         reject(reason);
+        notification(reason, 'warn');
       }
 
     });
@@ -76,13 +81,19 @@ function loadHyperty(event) {
   event.preventDefault();
 
   let hypertyName = $(event.currentTarget).attr('data-name');
-  let hypertyPath = 'hyperty-catalogue://' + domain + '/.well-known/hyperties/' + hypertyName;
+  let hypertyPath = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/hyperty/' + hypertyName;
+
+  let $el = $('.main-content .notification');
+  addLoader($el);
 
   runtimeLoader.requireHyperty(hypertyPath).then(hypertyDeployed).catch(hypertyFail);
 
 }
 
 function hypertyDeployed(hyperty) {
+
+  let $el = $('.main-content .notification');
+  removeLoader($el);
 
   // Add some utils
   serialize();
@@ -125,7 +136,9 @@ function hypertyDeployed(hyperty) {
     if (typeof hypertyLoaded === 'function') {
       hypertyLoaded(hyperty);
     } else {
-      console.info('If you need pass the hyperty to your template, create a function called hypertyLoaded');
+      let msg = 'If you need pass the hyperty to your template, create a function called hypertyLoaded';
+      console.info(msg);
+      notification(msg, 'warn');
     }
   });
 
@@ -133,6 +146,34 @@ function hypertyDeployed(hyperty) {
 
 function hypertyFail(reason) {
   console.error(reason);
+  notification(reason, 'error');
+}
+
+function addLoader(el) {
+
+  let html = '<div class="preloader preloader-wrapper small active">' +
+  '<div class="spinner-layer spinner-blue-only">' +
+  '<div class="circle-clipper left">' +
+  '<div class="circle"></div></div><div class="gap-patch"><div class="circle"></div>' +
+  '</div><div class="circle-clipper right">' +
+  '<div class="circle"></div></div></div></div>';
+
+  el.addClass('center');
+  el.append(html);
+}
+
+function removeLoader(el) {
+  el.find('.preloader').remove();
+  el.removeClass('center');
+}
+
+function notification(msg, type) {
+
+  let $el = $('.main-content .notification');
+  let color = type === 'error' ? 'red' : 'black';
+
+  removeLoader($el);
+  $el.append('<span class="' + color + '-text">' + msg  + '</span>');
 }
 
 // runtimeCatalogue.getHypertyDescriptor(hyperty).then(function(descriptor) {

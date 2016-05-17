@@ -1,0 +1,92 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+
+	"id": "Context",
+	"type": "object",
+	"required": ["id", "type", "value"],
+	"properties": {
+		"id": {
+			"type": "string"
+		},
+		"type": {
+			"$ref": "HypertyResource.json#/HypertyResourceType"
+		},
+		"description": {
+			"type": "string"
+		},
+		"time": {
+			"type": "string",
+			"format": "date-time"
+		},
+		"units": {
+			"$ref": "#/ContextUnit"
+		},
+		"version": {
+			"type": "integer"
+		},
+		"value": {
+			"$ref": "#/ContextValueList"
+		},
+		"tag": {
+			"type": "string"
+		}
+	}, 
+	"ContextUnit": {
+		"type": "object",
+		"properties": {
+		}
+	}, 
+	"ContextValueList": {
+		"type": "object",
+		"properties": {
+		}
+	}, 
+	"ContextValue": {
+		"type": "object",
+		"required": ["name", "units", "value", "sum"],
+		"anyOf": [
+			{ "$ref": "#/RawContextValue" },
+			{ "$ref": "#/ProcessedContextValue" }
+		]
+		,
+		"properties": {
+			"name": {
+				"type": "string"
+			},
+			"units": {
+				"$ref": "#/ContextUnit"
+			},
+			"value": {
+				"type": "object"
+			},
+			"sum": {
+				"type": "null"
+			},
+			"time": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updateTime": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"expires": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"address": {
+				"type": "string"
+			}
+		}
+	}, 
+	"RawContextValue": {
+		"type": "object",
+		"properties": {
+		}
+	}, 
+	"ProcessedContextValue": {
+		"type": "object",
+		"properties": {
+		}
+	}
+}

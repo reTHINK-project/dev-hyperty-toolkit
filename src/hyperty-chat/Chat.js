@@ -37,7 +37,7 @@ class ChatGroup extends EventEmitter {
     _this._syncher = syncher;
     _this._hypertyDiscovery = hypertyDiscovery;
 
-    _this._objectDescURL = 'hyperty-catalogue://' + domain + '/.well-known/dataschemas/Communication';
+    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/dataschema/Communication';
   }
 
   set dataObjectReporter(dataObjectReporter) {

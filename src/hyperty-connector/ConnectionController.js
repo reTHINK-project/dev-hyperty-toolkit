@@ -47,8 +47,7 @@ class ConnectionController extends EventEmitter {
     _this.syncher = syncher;
     _this.mode = 'offer';
 
-    _this._objectDescURL = 'hyperty-catalogue://' + domain + '/.well-known/dataschemas/FakeDataSchema';
-
+    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + _this._domain + '/.well-known/dataschema/Connection';
 
     console.info(configuration);
     console.info(configuration);

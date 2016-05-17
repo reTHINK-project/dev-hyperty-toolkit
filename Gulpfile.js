@@ -1,7 +1,6 @@
 // jshint varstmt: false
 
 // var pkg = require('./package.json');
-var config = require('./system.config.json');
 var gulp = require('gulp');
 var fs = require('fs');
 var path = require('path');
@@ -22,7 +21,6 @@ var gulpif = require('gulp-if');
 var systemConfig = require('./system.config.json');
 
 var extensions = ['.js', '.json'];
-var environment = 'production';
 
 // var uglify = require('gulp-uglify');
 // var replace = require('gulp-replace');
@@ -30,12 +28,8 @@ var environment = 'production';
 
 gulp.task('serve', function(done) {
 
-  var develop = argv.dev || process.env.MODE;
-  environment = develop ? 'development' : 'production';
-
-  process.env.environment = environment;
-
-  var sequence = ['environment', 'js', 'server'];
+  var environment = getEnvironment();
+  var sequence = ['environment', 'schemas', 'js', 'hyperties', 'server'];
   if (environment !== 'production') {
     sequence.push('watch');
   }
@@ -47,17 +41,48 @@ gulp.task('serve', function(done) {
 // use default task to launch Browsersync and watch JS files
 gulp.task('server', function(done) {
 
+  var environment = getEnvironment();
+  var timestamps = true;
+
+  var codeSync = true;
+  var minify = false;
+  var logLevel = 'info';
+  var notify = true;
+  var logConnections = true;
+  var injectChanges = true;
+  var ui = {};
+  var logFileChanges = true;
+
+  if (environment === 'production') {
+    codeSync = false;
+    minify = true;
+    logLevel = 'info';
+    notify = false;
+    logConnections = false;
+    injectChanges = false;
+    ui = false;
+    logFileChanges = false;
+  }
+
   // Serve files from the root of this project
   browserSync.init({
     open: false,
-    online: true,
+    online: false,
+    timestamps: timestamps,
+    logLevel: logLevel,
+    logFileChanges: logFileChanges,
     port: 443,
-    minify: false,
+    minify: minify,
+    notify: notify,
+    ui: ui,
+    injectChanges: injectChanges,
     ghostMode: false,
     https: {
       key: 'rethink-certificate.key',
       cert: 'rethink-certificate.cert'
     },
+    logConnections: logConnections,
+    codeSync: codeSync,
     server: {
       baseDir: './',
       middleware: function(req, res, next) {
@@ -75,10 +100,7 @@ gulp.task('server', function(done) {
 
 gulp.task('environment', function() {
 
-  var develop = argv.dev || process.env.MODE;
-  environment = develop ? 'development' : 'production';
-  process.env.environment = environment;
-
+  var environment = getEnvironment();
   var configuration = systemConfig[environment];
 
   return gulp.src('./')
@@ -95,16 +117,25 @@ gulp.task('watch', function(done) {
   // add browserSync.reload to the tasks array to make
   // all browsers reload after tasks are complete.
   gulp.watch(['src/*.js', 'system.config.json'], ['main-watch']);
-  gulp.watch(['src/**/*.js'], ['hyperties-watch']);
-  gulp.watch(['src/**/*.json'], ['schemas']);
+
+  gulp.watch(['src/**/*.js'], function(event) {
+    var fileObject = path.parse(event.path);
+    return gulp.src(fileObject.dir + '/*.hy.js')
+    .pipe(convertHyperty())
+    .on('end', function() {
+      browserSync.reload();
+    });
+  });
+
+  gulp.watch(['src/**/*.json', 'resources/schemas/**/*.ds.json'], ['schemas']);
   gulp.watch(['examples/*.html', 'examples/**/*.hbs', 'examples/**/*.js'], browserSync.reload);
 
-})
+});
 
 gulp.task('main-watch', ['js'], browserSync.reload);
 gulp.task('hyperties-watch', ['hyperties'], browserSync.reload);
 
-gulp.task('js', ['hyperties'], function() {
+gulp.task('js', function() {
 
   return gulp.src('./src/main.js')
   .on('end', function() {
@@ -125,35 +156,13 @@ gulp.task('js', ['hyperties'], function() {
 gulp.task('hyperties', function() {
 
   return gulp.src('./src/**/*.hy.js')
-  .pipe(through.obj(function(chunk, enc, done) {
-
-    var fileObject = path.parse(chunk.path);
-
-    return gulp.src([chunk.path])
-    .on('end', function() {
-      gutil.log('-----------------------------------------------------------');
-      gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
-    })
-    .pipe(transpile({
-      destination: __dirname + '/resources',
-      standalone: 'activate',
-      debug: false
-    }))
-    .pipe(resource())
-    .resume()
-    .on('end', function() {
-      gutil.log('Hyperty', fileObject.name, ' was converted and encoded');
-      gutil.log('-----------------------------------------------------------');
-      done();
-    });
-
-  }));
+  .pipe(convertHyperty());
 
 });
 
 gulp.task('schemas', function() {
 
-  return gulp.src('./src/**/*.ds.json')
+  return gulp.src(['./src/**/*.ds.json', './resources/schemas/**/*.ds.json'])
   .pipe(through.obj(function(chunk, enc, done) {
 
     var fileObject = path.parse(chunk.path);
@@ -269,16 +278,41 @@ gulp.task('encode', function(done) {
 
 });
 
+function convertHyperty() {
+
+  return through.obj(function(chunk, enc, done) {
+
+    var fileObject = path.parse(chunk.path);
+
+    return gulp.src([chunk.path])
+    .on('end', function() {
+      gutil.log('-----------------------------------------------------------');
+      gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
+    })
+    .pipe(transpile({
+      destination: __dirname + '/resources',
+      standalone: 'activate',
+      debug: false
+    }))
+    .pipe(resource())
+    .resume()
+    .on('end', function() {
+      gutil.log('Hyperty', fileObject.name, ' was converted and encoded');
+      gutil.log('-----------------------------------------------------------');
+      done();
+    });
+
+  });
+
+}
+
 function transpile(opts) {
 
   return through.obj(function(file, enc, cb) {
 
     var fileObject = path.parse(file.path);
+    var environment = getEnvironment();
     var args = {};
-
-    var develop = argv.dev || process.env.MODE;
-    environment = develop ? 'development' : 'production';
-    process.env.environment = environment;
 
     var compact = false;
     if (environment === 'production') {
@@ -484,4 +518,18 @@ function createFile(path, contents) {
     cb(null, file);
   });
 
+}
+
+function getEnvironment() {
+
+  var environment = 'production';
+
+  if (argv.dev) {
+    environment = argv.dev ? 'develop' : 'production';
+  } else if (process.env.MODE) {
+    environment = process.env.MODE;
+  }
+
+  process.env.environment = environment;
+  return environment;
 }
