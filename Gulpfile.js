@@ -90,7 +90,6 @@ gulp.task('server', function(done) {
         next();
       },
       routes: {
-        '/.well-known/runtime': 'node_modules/runtime-browser/bin',
         '/.well-known/hyperty': 'resources/descriptors/'
       }
     }
@@ -494,11 +493,17 @@ function encode(opts) {
       json[value].constraints = '';
     }
 
-    json[value].sourcePackageURL = '/sourcePackage';
-    json[value].sourcePackage.sourceCode = encoded;
-    json[value].sourcePackage.sourceCodeClassname = filename;
-    json[value].sourcePackage.encoding = 'base64';
-    json[value].sourcePackage.signature = '';
+    if (json[value].sourcePackageURL === '/sourcePackage') {
+      json[value].sourcePackageURL = '/sourcePackage';
+    }
+
+    if (json[value].sourcePackage) {
+      json[value].sourcePackage.sourceCode = encoded;
+      json[value].sourcePackage.sourceCodeClassname = filename;
+      json[value].sourcePackage.encoding = 'base64';
+      json[value].sourcePackage.signature = '';
+    }
+
     json[value].language = language;
     json[value].signature = '';
     json[value].messageSchemas = '';

@@ -86,6 +86,9 @@ function loadHyperty(event) {
 
   let hypertyName = $(event.currentTarget).attr('data-name');
   let hypertyPath = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/hyperty/' + hypertyName;
+  if (config.development) {
+    hypertyPath = 'https://' + domain + '/.well-known/hyperty/' + hypertyName;
+  }
 
   let $el = $('.main-content .notification');
   addLoader($el);
