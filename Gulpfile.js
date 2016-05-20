@@ -119,6 +119,10 @@ gulp.task('environment', function() {
       configuration.doamin = process.env.DOMAIN;
     }
 
+  } else {
+    gutil.log(gutil.colors.yellow('To use the environment variables you need use'));
+    console.log('export DEVELOPMENT=true|false\nexport DOMAIN=<your domain>\nexport RUNTIME_URL=<runtime location> (optional)');
+    gutil.log(gutil.colors.yellow('For default the settings applied are in the system.config.json file'));
   }
 
   return gulp.src('./')
@@ -126,6 +130,7 @@ gulp.task('environment', function() {
   .pipe(gulp.dest('./'))
   .on('end', function() {
     gutil.log('You are in the ' + environment + ' mode');
+    gutil.log('Your configuration \n', JSON.stringify(configuration, null, 2));
   });
 
 });

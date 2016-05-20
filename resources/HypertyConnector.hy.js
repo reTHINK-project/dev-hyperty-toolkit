@@ -1837,749 +1837,114 @@ if (typeof module !== 'undefined') {
 }
 
 },{}],4:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-require('webrtc-adapter-test');
-
-var _EventEmitter2 = require('../utils/EventEmitter');
-
-var _EventEmitter3 = _interopRequireDefault(_EventEmitter2);
-
-var _connection = require('./connection');
-
-var _connection2 = _interopRequireDefault(_connection);
-
-var _peer = require('./peer');
-
-var _peer2 = _interopRequireDefault(_peer);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 PT Inovação e Sistemas SA
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 INESC-ID
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 QUOBIS NETWORKS SL
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 ORANGE SA
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 Deutsche Telekom AG
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 Apizee
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Licensed under the Apache License, Version 2.0 (the "License");
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * you may not use this file except in compliance with the License.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * You may obtain a copy of the License at
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               *   http://www.apache.org/licenses/LICENSE-2.0
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Unless required by applicable law or agreed to in writing, software
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * distributed under the License is distributed on an "AS IS" BASIS,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * See the License for the specific language governing permissions and
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * limitations under the License.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               **/
-
-/* jshint undef: true */
-/* globals RTCPeerConnection */
-/* globals RTCSessionDescription */
-/* globals RTCIceCandidate */
-
-var ConnectionController = function (_EventEmitter) {
-  _inherits(ConnectionController, _EventEmitter);
-
-  function ConnectionController(syncher, domain, configuration) {
-    _classCallCheck(this, ConnectionController);
-
-    if (!syncher) throw new Error('The syncher is a needed parameter');
-    if (!domain) throw new Error('The domain is a needed parameter');
-    if (!configuration) throw new Error('The configuration is a needed parameter');
-
-    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(ConnectionController).call(this));
-
-    var _this = _this2;
-
-    _this.syncher = syncher;
-    _this.mode = 'offer';
-
-    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + _this._domain + '/.well-known/dataschema/Connection';
-
-    console.info(configuration);
-    console.info(configuration);
-
-    _this.mediaConstraints = configuration.mediaConstraints;
-    _this.configuration = configuration.webrtc;
-
-    // Prepare the PeerConnection
-    var peerConnection = new RTCPeerConnection(_this.configuration);
-
-    peerConnection.addEventListener('signalingstatechange', function (event) {
-
-      console.info('signalingstatechange', event.currentTarget.signalingState);
-
-      if (event.currentTarget.signalingState === 'have-local-offer') {
-        _this.trigger('controller:state:change', _this.mode);
-      }
-
-      if (event.currentTarget.signalingState === 'have-remote-offer') {
-        _this.mode = 'answer';
-        _this.trigger('controller:state:change', _this.mode);
-      }
-    });
-
-    peerConnection.addEventListener('iceconnectionstatechange', function (event) {
-      console.info('iceconnectionstatechange', event.currentTarget.iceConnectionState);
-      var data = _this._dataObjectReporter.data;
-      if (data.hasOwnProperty('connection')) {
-        data.connection.status = event.currentTarget.iceConnectionState;
-      }
-    });
-
-    peerConnection.addEventListener('icecandidate', function (event) {
-
-      if (!event.candidate) return;
-
-      var icecandidate = {
-        type: 'candidate',
-        candidate: event.candidate.candidate,
-        sdpMid: event.candidate.sdpMid,
-        sdpMLineIndex: event.candidate.sdpMLineIndex
-      };
-
-      var data = _this._dataObjectReporter.data;
-
-      if (_this.mode === 'offer') {
-        data.connection.ownerPeer.iceCandidates.push(icecandidate);
-      } else {
-        data.peer.iceCandidates.push(icecandidate);
-      }
-    });
-
-    // Add stream to PeerConnection
-    peerConnection.addEventListener('addstream', function (event) {
-      console.info('Add Stream: ', event);
-      _this.trigger('stream:added', event);
-    });
-
-    _this.peerConnection = peerConnection;
-
-    return _this2;
-  }
-
-  _createClass(ConnectionController, [{
-    key: 'changePeerInformation',
-    value: function changePeerInformation(dataObjectObserver) {
-      var _this = this;
-      var data = dataObjectObserver.data;
-      var isOwner = data.hasOwnProperty('connection');
-
-      var peerData = isOwner ? data.connection.ownerPeer : data.peer;
-
-      console.info('Peer Data:', JSON.stringify(peerData));
-
-      if (peerData.hasOwnProperty('connectionDescription')) {
-        _this.processPeerInformation(peerData.connectionDescription);
-      }
-
-      if (peerData.hasOwnProperty('iceCandidates')) {
-        peerData.iceCandidates.forEach(function (ice) {
-          _this.processPeerInformation(ice);
-        });
-      }
-
-      dataObjectObserver.onChange('*', function (event) {
-        console.info('Observer on change message: ', event);
-        _this.processPeerInformation(event.data);
-      });
-    }
-  }, {
-    key: 'processPeerInformation',
-    value: function processPeerInformation(data) {
-      var _this = this;
-
-      console.info(JSON.stringify(data));
-
-      if (data.type === 'offer' || data.type === 'answer') {
-        console.info('Process Connection Description: ', data.sdp);
-        _this.peerConnection.setRemoteDescription(new RTCSessionDescription(data), _this.remoteDescriptionSuccess, _this.remoteDescriptionError);
-      }
-
-      if (data.type === 'candidate') {
-        console.info('Process Ice Candidate: ', data);
-        _this.peerConnection.addIceCandidate(new RTCIceCandidate({ candidate: data.candidate }), _this.remoteDescriptionSuccess, _this.remoteDescriptionError);
-      }
-    }
-  }, {
-    key: 'remoteDescriptionSuccess',
-    value: function remoteDescriptionSuccess() {
-      console.info('remote success');
-    }
-  }, {
-    key: 'remoteDescriptionError',
-    value: function remoteDescriptionError(error) {
-      console.error('error: ', error);
-    }
-  }, {
-    key: 'createOffer',
-    value: function createOffer() {
-      var _this = this;
-
-      _this.peerConnection.createOffer(function (description) {
-        _this.onLocalSessionCreated(description);
-      }, _this.infoError, _this.mediaConstraints);
-    }
-  }, {
-    key: 'createAnswer',
-    value: function createAnswer() {
-      var _this = this;
-
-      _this.peerConnection.createAnswer(function (description) {
-        _this.onLocalSessionCreated(description);
-      }, _this.infoError);
-    }
-  }, {
-    key: 'onLocalSessionCreated',
-    value: function onLocalSessionCreated(description) {
-
-      var _this = this;
-
-      _this.peerConnection.setLocalDescription(description, function () {
-
-        var data = _this._dataObjectReporter.data;
-        var sdpConnection = {
-          sdp: description.sdp,
-          type: description.type
-        };
-
-        if (_this.mode === 'offer') {
-          data.connection.ownerPeer.connectionDescription = sdpConnection;
-        } else {
-          data.peer.connectionDescription = sdpConnection;
-        }
-      }, _this.infoError);
-    }
-  }, {
-    key: 'infoError',
-    value: function infoError(err) {
-      console.error(err.toString(), err);
-    }
-
-    /**
-     * Used to accept an incoming connection request.
-     * @method accept
-     * @return {Promise}
-     */
-
-  }, {
-    key: 'accept',
-    value: function accept(stream) {
-      // TODO: Pass argument options as a stream, because is specific of implementation;
-
-      var _this = this;
-      var syncher = _this.syncher;
-
-      console.log('Remote Peer Information: ', _this._remotePeerInformation);
-      var remotePeer = _this._remotePeerInformation.from;
-
-      return new Promise(function (resolve, reject) {
-
-        try {
-
-          console.info('------------------------ Syncher Create ---------------------- \n');
-          syncher.create(_this._objectDescURL, [remotePeer], {}).then(function (dataObjectReporter) {
-            console.info('2. Return the Data Object Reporter ', dataObjectReporter);
-
-            _this.stream = stream;
-            _this.dataObjectReporter = dataObjectReporter;
-            resolve('accepted');
-          }).catch(function (reason) {
-            reject(reason);
-          });
-        } catch (e) {
-          reject('error accepting connection');
-        }
-      });
-    }
-
-    /**
-    * Used to decline an incoming connection request.
-    * @method decline
-    * @return {Promise}
-    */
-
-  }, {
-    key: 'decline',
-    value: function decline() {
-
-      var _this = this;
-      var syncher = _this.syncher;
-
-      return new Promise(function (resolve, reject) {
-
-        try {
-          console.log('syncher: ', syncher);
-          resolve('Declined');
-        } catch (e) {
-          reject(e);
-        }
-      });
-    }
-
-    /**
-     * Used to close an existing connection instance.
-     * @method disconnect
-     * @return {Promise}
-     */
-
-  }, {
-    key: 'disconnect',
-    value: function disconnect() {
-
-      // TODO: optimize the disconnect function
-
-      var _this = this;
-
-      return new Promise(function (resolve, reject) {
-
-        try {
-
-          _this.peerConnection.close();
-
-          resolve(true);
-        } catch (e) {
-          reject('error disconnecting connection');
-        }
-      });
-    }
-
-    /**
-     * Used to add/invite new peers on an existing connection instance (for multiparty connections).
-     * @method addPeer
-     * @return {Promise}
-     */
-
-  }, {
-    key: 'addPeer',
-    value: function addPeer() {}
-
-    /**
-     * Used to remove a peer from an existing connection instance.
-     * @method removePeer
-     * @return {Promise}
-     */
-
-  }, {
-    key: 'removePeer',
-    value: function removePeer() {}
-
-    // Peer Actions
-
-  }, {
-    key: 'disableMic',
-    value: function disableMic() {
-      var _this = this;
-
-      return new Promise(function (resolve, reject) {
-
-        try {
-          var localStream = _this.peerConnection.getLocalStreams()[0];
-          var audioTrack = localStream.getAudioTracks()[0];
-
-          audioTrack.enabled = audioTrack.enabled ? false : true;
-          resolve(audioTrack.enabled);
-        } catch (e) {
-          reject(e);
-        }
-      });
-    }
-  }, {
-    key: 'disableCam',
-    value: function disableCam() {
-      var _this = this;
-
-      return new Promise(function (resolve, reject) {
-
-        try {
-          var localStream = _this.peerConnection.getLocalStreams()[0];
-          var videoTrack = localStream.getVideoTracks()[0];
-
-          videoTrack.enabled = videoTrack.enabled ? false : true;
-
-          resolve(videoTrack.enabled);
-        } catch (e) {
-          reject(e);
-        }
-      });
-    }
-  }, {
-    key: 'mute',
-    value: function mute() {
-
-      var _this = this;
-
-      return new Promise(function (resolve, reject) {
-
-        try {
-          var remoteStream = _this.peerConnection.getRemoteStreams()[0];
-          var audioTrack = remoteStream.getAudioTracks()[0];
-
-          audioTrack.enabled = audioTrack.enabled ? false : true;
-
-          resolve(audioTrack.enabled);
-        } catch (e) {
-          reject(e);
-        }
-      });
-    }
-  }, {
-    key: 'stream',
-    set: function set(mediaStream) {
-      if (!mediaStream) throw new Error('The mediaStream is a needed parameter');
-
-      var _this = this;
-      console.info('set stream: ', mediaStream);
-      _this.peerConnection.addStream(mediaStream);
-    }
-  }, {
-    key: 'getLocalStreams',
-    get: function get() {
-      var _this = this;
-      return _this.peerConnection.getLocalStreams();
-    }
-  }, {
-    key: 'getRemoteStreams',
-    get: function get() {
-      var _this = this;
-      return _this.peerConnection.getRemoteStreams();
-    }
-
-    /**
-     * Set Remote peer information, like Hyperty.
-     * @param  {Object} remotePeerInformation information about the peer;
-     */
-
-  }, {
-    key: 'remotePeerInformation',
-    set: function set(remotePeerInformation) {
-      var _this = this;
-      _this._remotePeerInformation = remotePeerInformation;
-    }
-
-    /**
-     * Get information relative to the Remote Peer;
-     * @return {Object} remotePeerInformation;
-     */
-    ,
-    get: function get() {
-      var _this = this;
-      return _this._remotePeerInformation;
-    }
-
-    /**
-    * Set the dataObject in the controller
-    * @param {ConnectionDataObject} dataObject - have all information about the syncher object;
-    */
-
-  }, {
-    key: 'dataObjectReporter',
-    set: function set(dataObjectReporter) {
-      if (!dataObjectReporter) throw new Error('The Data Object Reporter is a needed parameter');
-
-      var _this = this;
-      _this._dataObjectReporter = dataObjectReporter;
-
-      var data = _this._dataObjectReporter.data;
-
-      dataObjectReporter.onSubscription(function (event) {
-        event.accept();
-      });
-
-      if (_this.mode === 'offer') {
-        data.connection = _connection2.default;
-
-        _this.createOffer();
-      } else {
-        data.peer = _peer2.default;
-
-        _this.createAnswer();
-      }
-
-      console.debug(_this._dataObjectReporter);
-    }
-
-    /**
-    * return the dataObject in the controller
-    * @return {ConnectionDataObject} dataObject
-    */
-    ,
-    get: function get() {
-      var _this = this;
-      return _this._dataObjectReporter;
-    }
-
-    /**
-    * Set the dataObject in the controller
-    * @param {ConnectionDataObject} dataObject - have all information about the syncher object;
-    */
-
-  }, {
-    key: 'dataObjectObserver',
-    set: function set(dataObjectObserver) {
-      if (!dataObjectObserver) throw new Error('The Data Object Observer is a needed parameter');
-
-      var _this = this;
-      _this._dataObjectObserver = dataObjectObserver;
-      _this.changePeerInformation(dataObjectObserver);
-    }
-
-    /**
-    * return the dataObject in the controller
-    * @return {ConnectionDataObject} dataObject
-    */
-    ,
-    get: function get() {
-      var _this = this;
-      return _this._dataObjectObserver;
-    }
-  }]);
-
-  return ConnectionController;
-}(_EventEmitter3.default);
-
-exports.default = ConnectionController;
-module.exports = exports['default'];
+'use strict';Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value" in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor);}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor;};}();require('webrtc-adapter-test');var _EventEmitter2=require('../utils/EventEmitter');var _EventEmitter3=_interopRequireDefault(_EventEmitter2);var _connection=require('./connection');var _connection2=_interopRequireDefault(_connection);var _peer=require('./peer');var _peer2=_interopRequireDefault(_peer);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj};}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function");}}function _possibleConstructorReturn(self,call){if(!self){throw new ReferenceError("this hasn't been initialised - super() hasn't been called");}return call&&(typeof call==="object"||typeof call==="function")?call:self;}function _inherits(subClass,superClass){if(typeof superClass!=="function"&&superClass!==null){throw new TypeError("Super expression must either be null or a function, not "+typeof superClass);}subClass.prototype=Object.create(superClass&&superClass.prototype,{constructor:{value:subClass,enumerable:false,writable:true,configurable:true}});if(superClass)Object.setPrototypeOf?Object.setPrototypeOf(subClass,superClass):subClass.__proto__=superClass;} /**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/ /* jshint undef: true */ /* globals RTCPeerConnection */ /* globals RTCSessionDescription */ /* globals RTCIceCandidate */var ConnectionController=function(_EventEmitter){_inherits(ConnectionController,_EventEmitter);function ConnectionController(syncher,domain,configuration){_classCallCheck(this,ConnectionController);if(!syncher)throw new Error('The syncher is a needed parameter');if(!domain)throw new Error('The domain is a needed parameter');if(!configuration)throw new Error('The configuration is a needed parameter');var _this2=_possibleConstructorReturn(this,Object.getPrototypeOf(ConnectionController).call(this));var _this=_this2;_this.syncher=syncher;_this.mode='offer';_this._objectDescURL='hyperty-catalogue://catalogue.'+_this._domain+'/.well-known/dataschema/Connection';console.info(configuration);console.info(configuration);_this.mediaConstraints=configuration.mediaConstraints;_this.configuration=configuration.webrtc; // Prepare the PeerConnection
+var peerConnection=new RTCPeerConnection(_this.configuration);peerConnection.addEventListener('signalingstatechange',function(event){console.info('signalingstatechange',event.currentTarget.signalingState);if(event.currentTarget.signalingState==='have-local-offer'){_this.trigger('controller:state:change',_this.mode);}if(event.currentTarget.signalingState==='have-remote-offer'){_this.mode='answer';_this.trigger('controller:state:change',_this.mode);}});peerConnection.addEventListener('iceconnectionstatechange',function(event){console.info('iceconnectionstatechange',event.currentTarget.iceConnectionState);var data=_this._dataObjectReporter.data;if(data.hasOwnProperty('connection')){data.connection.status=event.currentTarget.iceConnectionState;}});peerConnection.addEventListener('icecandidate',function(event){if(!event.candidate)return;var icecandidate={type:'candidate',candidate:event.candidate.candidate,sdpMid:event.candidate.sdpMid,sdpMLineIndex:event.candidate.sdpMLineIndex};var data=_this._dataObjectReporter.data;if(_this.mode==='offer'){data.connection.ownerPeer.iceCandidates.push(icecandidate);}else {data.peer.iceCandidates.push(icecandidate);}}); // Add stream to PeerConnection
+peerConnection.addEventListener('addstream',function(event){console.info('Add Stream: ',event);_this.trigger('stream:added',event);});_this.peerConnection=peerConnection;return _this2;}_createClass(ConnectionController,[{key:'changePeerInformation',value:function changePeerInformation(dataObjectObserver){var _this=this;var data=dataObjectObserver.data;var isOwner=data.hasOwnProperty('connection');var peerData=isOwner?data.connection.ownerPeer:data.peer;console.info('Peer Data:',JSON.stringify(peerData));if(peerData.hasOwnProperty('connectionDescription')){_this.processPeerInformation(peerData.connectionDescription);}if(peerData.hasOwnProperty('iceCandidates')){peerData.iceCandidates.forEach(function(ice){_this.processPeerInformation(ice);});}dataObjectObserver.onChange('*',function(event){console.info('Observer on change message: ',event);_this.processPeerInformation(event.data);});}},{key:'processPeerInformation',value:function processPeerInformation(data){var _this=this;console.info(JSON.stringify(data));if(data.type==='offer'||data.type==='answer'){console.info('Process Connection Description: ',data.sdp);_this.peerConnection.setRemoteDescription(new RTCSessionDescription(data),_this.remoteDescriptionSuccess,_this.remoteDescriptionError);}if(data.type==='candidate'){console.info('Process Ice Candidate: ',data);_this.peerConnection.addIceCandidate(new RTCIceCandidate({candidate:data.candidate}),_this.remoteDescriptionSuccess,_this.remoteDescriptionError);}}},{key:'remoteDescriptionSuccess',value:function remoteDescriptionSuccess(){console.info('remote success');}},{key:'remoteDescriptionError',value:function remoteDescriptionError(error){console.error('error: ',error);}},{key:'createOffer',value:function createOffer(){var _this=this;_this.peerConnection.createOffer(function(description){_this.onLocalSessionCreated(description);},_this.infoError,_this.mediaConstraints);}},{key:'createAnswer',value:function createAnswer(){var _this=this;_this.peerConnection.createAnswer(function(description){_this.onLocalSessionCreated(description);},_this.infoError);}},{key:'onLocalSessionCreated',value:function onLocalSessionCreated(description){var _this=this;_this.peerConnection.setLocalDescription(description,function(){var data=_this._dataObjectReporter.data;var sdpConnection={sdp:description.sdp,type:description.type};if(_this.mode==='offer'){data.connection.ownerPeer.connectionDescription=sdpConnection;}else {data.peer.connectionDescription=sdpConnection;}},_this.infoError);}},{key:'infoError',value:function infoError(err){console.error(err.toString(),err);} /**
+   * Used to accept an incoming connection request.
+   * @method accept
+   * @return {Promise}
+   */},{key:'accept',value:function accept(stream){ // TODO: Pass argument options as a stream, because is specific of implementation;
+var _this=this;var syncher=_this.syncher;console.log('Remote Peer Information: ',_this._remotePeerInformation);var remotePeer=_this._remotePeerInformation.from;return new Promise(function(resolve,reject){try{console.info('------------------------ Syncher Create ---------------------- \n');syncher.create(_this._objectDescURL,[remotePeer],{}).then(function(dataObjectReporter){console.info('2. Return the Data Object Reporter ',dataObjectReporter);_this.stream=stream;_this.dataObjectReporter=dataObjectReporter;resolve('accepted');}).catch(function(reason){reject(reason);});}catch(e){reject('error accepting connection');}});} /**
+  * Used to decline an incoming connection request.
+  * @method decline
+  * @return {Promise}
+  */},{key:'decline',value:function decline(){var _this=this;var syncher=_this.syncher;return new Promise(function(resolve,reject){try{console.log('syncher: ',syncher);resolve('Declined');}catch(e){reject(e);}});} /**
+   * Used to close an existing connection instance.
+   * @method disconnect
+   * @return {Promise}
+   */},{key:'disconnect',value:function disconnect(){ // TODO: optimize the disconnect function
+var _this=this;return new Promise(function(resolve,reject){try{_this.peerConnection.close();resolve(true);}catch(e){reject('error disconnecting connection');}});} /**
+   * Used to add/invite new peers on an existing connection instance (for multiparty connections).
+   * @method addPeer
+   * @return {Promise}
+   */},{key:'addPeer',value:function addPeer(){} /**
+   * Used to remove a peer from an existing connection instance.
+   * @method removePeer
+   * @return {Promise}
+   */},{key:'removePeer',value:function removePeer(){} // Peer Actions
+},{key:'disableMic',value:function disableMic(){var _this=this;return new Promise(function(resolve,reject){try{var localStream=_this.peerConnection.getLocalStreams()[0];var audioTrack=localStream.getAudioTracks()[0];audioTrack.enabled=audioTrack.enabled?false:true;resolve(audioTrack.enabled);}catch(e){reject(e);}});}},{key:'disableCam',value:function disableCam(){var _this=this;return new Promise(function(resolve,reject){try{var localStream=_this.peerConnection.getLocalStreams()[0];var videoTrack=localStream.getVideoTracks()[0];videoTrack.enabled=videoTrack.enabled?false:true;resolve(videoTrack.enabled);}catch(e){reject(e);}});}},{key:'mute',value:function mute(){var _this=this;return new Promise(function(resolve,reject){try{var remoteStream=_this.peerConnection.getRemoteStreams()[0];var audioTrack=remoteStream.getAudioTracks()[0];audioTrack.enabled=audioTrack.enabled?false:true;resolve(audioTrack.enabled);}catch(e){reject(e);}});}},{key:'stream',set:function set(mediaStream){if(!mediaStream)throw new Error('The mediaStream is a needed parameter');var _this=this;console.info('set stream: ',mediaStream);_this.peerConnection.addStream(mediaStream);}},{key:'getLocalStreams',get:function get(){var _this=this;return _this.peerConnection.getLocalStreams();}},{key:'getRemoteStreams',get:function get(){var _this=this;return _this.peerConnection.getRemoteStreams();} /**
+   * Set Remote peer information, like Hyperty.
+   * @param  {Object} remotePeerInformation information about the peer;
+   */},{key:'remotePeerInformation',set:function set(remotePeerInformation){var _this=this;_this._remotePeerInformation=remotePeerInformation;} /**
+   * Get information relative to the Remote Peer;
+   * @return {Object} remotePeerInformation;
+   */,get:function get(){var _this=this;return _this._remotePeerInformation;} /**
+  * Set the dataObject in the controller
+  * @param {ConnectionDataObject} dataObject - have all information about the syncher object;
+  */},{key:'dataObjectReporter',set:function set(dataObjectReporter){if(!dataObjectReporter)throw new Error('The Data Object Reporter is a needed parameter');var _this=this;_this._dataObjectReporter=dataObjectReporter;var data=_this._dataObjectReporter.data;dataObjectReporter.onSubscription(function(event){event.accept();});if(_this.mode==='offer'){data.connection=_connection2.default;_this.createOffer();}else {data.peer=_peer2.default;_this.createAnswer();}console.debug(_this._dataObjectReporter);} /**
+  * return the dataObject in the controller
+  * @return {ConnectionDataObject} dataObject
+  */,get:function get(){var _this=this;return _this._dataObjectReporter;} /**
+  * Set the dataObject in the controller
+  * @param {ConnectionDataObject} dataObject - have all information about the syncher object;
+  */},{key:'dataObjectObserver',set:function set(dataObjectObserver){if(!dataObjectObserver)throw new Error('The Data Object Observer is a needed parameter');var _this=this;_this._dataObjectObserver=dataObjectObserver;_this.changePeerInformation(dataObjectObserver);} /**
+  * return the dataObject in the controller
+  * @return {ConnectionDataObject} dataObject
+  */,get:function get(){var _this=this;return _this._dataObjectObserver;}}]);return ConnectionController;}(_EventEmitter3.default);exports.default=ConnectionController;module.exports=exports['default'];
 
 },{"../utils/EventEmitter":8,"./connection":6,"./peer":7,"webrtc-adapter-test":3}],5:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-exports.default = activate;
-
-var _HypertyDiscovery = require('service-framework/dist/HypertyDiscovery');
-
-var _HypertyDiscovery2 = _interopRequireDefault(_HypertyDiscovery);
-
-var _Syncher = require('service-framework/dist/Syncher');
-
-var _EventEmitter2 = require('../utils/EventEmitter');
-
-var _EventEmitter3 = _interopRequireDefault(_EventEmitter2);
-
-var _utils = require('../utils/utils');
-
-var _ConnectionController = require('./ConnectionController');
-
-var _ConnectionController2 = _interopRequireDefault(_ConnectionController);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 PT Inovação e Sistemas SA
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 INESC-ID
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 QUOBIS NETWORKS SL
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 ORANGE SA
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 Deutsche Telekom AG
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 Apizee
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Licensed under the Apache License, Version 2.0 (the "License");
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * you may not use this file except in compliance with the License.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * You may obtain a copy of the License at
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               *   http://www.apache.org/licenses/LICENSE-2.0
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * Unless required by applicable law or agreed to in writing, software
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * distributed under the License is distributed on an "AS IS" BASIS,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * See the License for the specific language governing permissions and
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               * limitations under the License.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               **/
-
-/* jshint undef: true */
-
-// Service Framework
-
-
+'use strict';Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value" in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor);}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor;};}();exports.default=activate;var _HypertyDiscovery=require('service-framework/dist/HypertyDiscovery');var _HypertyDiscovery2=_interopRequireDefault(_HypertyDiscovery);var _Syncher=require('service-framework/dist/Syncher');var _EventEmitter2=require('../utils/EventEmitter');var _EventEmitter3=_interopRequireDefault(_EventEmitter2);var _utils=require('../utils/utils');var _ConnectionController=require('./ConnectionController');var _ConnectionController2=_interopRequireDefault(_ConnectionController);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj};}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function");}}function _possibleConstructorReturn(self,call){if(!self){throw new ReferenceError("this hasn't been initialised - super() hasn't been called");}return call&&(typeof call==="object"||typeof call==="function")?call:self;}function _inherits(subClass,superClass){if(typeof superClass!=="function"&&superClass!==null){throw new TypeError("Super expression must either be null or a function, not "+typeof superClass);}subClass.prototype=Object.create(superClass&&superClass.prototype,{constructor:{value:subClass,enumerable:false,writable:true,configurable:true}});if(superClass)Object.setPrototypeOf?Object.setPrototypeOf(subClass,superClass):subClass.__proto__=superClass;} /**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/ /* jshint undef: true */ // Service Framework
 // Utils
-
-
 // Internals
-
-
 /**
 * Hyperty Connector;
 * @author Vitor Silva [vitor-t-silva@telecom.pt]
 * @version 0.1.0
-*/
-
-var HypertyConnector = function (_EventEmitter) {
-  _inherits(HypertyConnector, _EventEmitter);
-
-  /**
+*/var HypertyConnector=function(_EventEmitter){_inherits(HypertyConnector,_EventEmitter); /**
   * Create a new Hyperty Connector
   * @param  {Syncher} syncher - Syncher provided from the runtime core
-  */
-
-  function HypertyConnector(hypertyURL, bus, configuration) {
-    _classCallCheck(this, HypertyConnector);
-
-    if (!hypertyURL) throw new Error('The hypertyURL is a needed parameter');
-    if (!bus) throw new Error('The MiniBus is a needed parameter');
-    if (!configuration) throw new Error('The configuration is a needed parameter');
-
-    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(HypertyConnector).call(this, hypertyURL, bus, configuration));
-
-    var _this = _this2;
-    _this._hypertyURL = hypertyURL;
-    _this._bus = bus;
-    _this._configuration = configuration;
-    _this._domain = (0, _utils.divideURL)(hypertyURL).domain;
-
-    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + _this._domain + '/.well-known/dataschema/Communication';
-
-    _this._controllers = {};
-
-    _this.hypertyDiscovery = new _HypertyDiscovery2.default(hypertyURL, bus);
-
-    var syncher = new _Syncher.Syncher(hypertyURL, bus, configuration);
-    syncher.onNotification(function (event) {
-      _this._onNotification(event);
-    });
-
-    _this._syncher = syncher;
-    return _this2;
-  }
-
-  _createClass(HypertyConnector, [{
-    key: '_onNotification',
-    value: function _onNotification(event) {
-
-      var _this = this;
-
-      console.info('------------ Acknowledges the Reporter ------------ \n');
-      event.ack();
-      console.info('------------------------ END ---------------------- \n');
-
-      if (_this._controllers[event.from]) {
-        _this._autoSubscribe(event);
-      } else {
-        _this._autoAccept(event);
-      }
-    }
-  }, {
-    key: '_autoSubscribe',
-    value: function _autoSubscribe(event) {
-      var _this = this;
-      var syncher = _this._syncher;
-
-      console.info('---------------- Syncher Auto Subscribe ---------------- \n');
-      console.info('Subscribe URL Object ', event, syncher);
-      syncher.subscribe(_this._objectDescURL, event.url).then(function (dataObjectObserver) {
-        console.info('1. Return Subscribe Data Object Observer', dataObjectObserver);
-        console.log(_this._controllers);
-        _this._controllers[event.from].dataObjectObserver = dataObjectObserver;
-      }).catch(function (reason) {
-        console.error(reason);
-      });
-    }
-  }, {
-    key: '_autoAccept',
-    value: function _autoAccept(event) {
-      var _this = this;
-      var syncher = _this._syncher;
-
-      console.info('----------- Syncher Subscribe (Auto Accept) ------------- \n');
-      console.info('Subscribe URL Object ', event, syncher);
-      syncher.subscribe(_this._objectDescURL, event.url).then(function (dataObjectObserver) {
-        console.info('1. Return Subscribe Data Object Observer', dataObjectObserver);
-
-        var connectionController = new _ConnectionController2.default(syncher, _this._domain, _this._configuration);
-        connectionController.remotePeerInformation = event;
-        connectionController.dataObjectObserver = dataObjectObserver;
-
-        _this.trigger('connector:connected', connectionController);
-        _this.trigger('have:notification', event);
-
-        console.info('------------------------ END ---------------------- \n');
-      }).catch(function (reason) {
-        console.error(reason);
-      });
-    }
-
-    /**
-    * Establish connection with other client identifier
-    * @param  {HypertyURL} HypertyURL - Define the identifier of the other component
-    * @param  {Object} options - Object with options to improve the connect
-    */
-
-  }, {
-    key: 'connect',
-    value: function connect(hypertyURL, stream) {
-      // TODO: Pass argument options as a stream, because is specific of implementation;
-      // TODO: CHange the hypertyURL for a list of URLS
-      var _this = this;
-      var syncher = _this._syncher;
-
-      return new Promise(function (resolve, reject) {
-
-        var connectionController = void 0;
-        console.info('------------------------ Syncher Create ---------------------- \n');
-        syncher.create(_this._objectDescURL, [hypertyURL], {}).then(function (dataObjectReporter) {
-          console.info('1. Return Create Data Object Reporter', dataObjectReporter);
-
-          connectionController = new _ConnectionController2.default(syncher, _this._domain, _this._configuration);
-          connectionController.stream = stream;
-          connectionController.dataObjectReporter = dataObjectReporter;
-
-          _this._controllers[hypertyURL] = connectionController;
-
-          resolve(connectionController);
-          console.info('--------------------------- END --------------------------- \n');
-        }).catch(function (reason) {
-          console.error(reason);
-          reject(reason);
-        });
-      });
-    }
-  }]);
-
-  return HypertyConnector;
-}(_EventEmitter3.default);
-
-function activate(hypertyURL, bus, configuration) {
-
-  return {
-    name: 'HypertyConnector',
-    instance: new HypertyConnector(hypertyURL, bus, configuration)
-  };
-}
-module.exports = exports['default'];
+  */function HypertyConnector(hypertyURL,bus,configuration){_classCallCheck(this,HypertyConnector);if(!hypertyURL)throw new Error('The hypertyURL is a needed parameter');if(!bus)throw new Error('The MiniBus is a needed parameter');if(!configuration)throw new Error('The configuration is a needed parameter');var _this2=_possibleConstructorReturn(this,Object.getPrototypeOf(HypertyConnector).call(this,hypertyURL,bus,configuration));var _this=_this2;_this._hypertyURL=hypertyURL;_this._bus=bus;_this._configuration=configuration;_this._domain=(0,_utils.divideURL)(hypertyURL).domain;_this._objectDescURL='hyperty-catalogue://catalogue.'+_this._domain+'/.well-known/dataschema/Communication';_this._controllers={};_this.hypertyDiscovery=new _HypertyDiscovery2.default(hypertyURL,bus);var syncher=new _Syncher.Syncher(hypertyURL,bus,configuration);syncher.onNotification(function(event){_this._onNotification(event);});_this._syncher=syncher;return _this2;}_createClass(HypertyConnector,[{key:'_onNotification',value:function _onNotification(event){var _this=this;console.info('------------ Acknowledges the Reporter ------------ \n');event.ack();console.info('------------------------ END ---------------------- \n');if(_this._controllers[event.from]){_this._autoSubscribe(event);}else {_this._autoAccept(event);}}},{key:'_autoSubscribe',value:function _autoSubscribe(event){var _this=this;var syncher=_this._syncher;console.info('---------------- Syncher Auto Subscribe ---------------- \n');console.info('Subscribe URL Object ',event,syncher);syncher.subscribe(_this._objectDescURL,event.url).then(function(dataObjectObserver){console.info('1. Return Subscribe Data Object Observer',dataObjectObserver);console.log(_this._controllers);_this._controllers[event.from].dataObjectObserver=dataObjectObserver;}).catch(function(reason){console.error(reason);});}},{key:'_autoAccept',value:function _autoAccept(event){var _this=this;var syncher=_this._syncher;console.info('----------- Syncher Subscribe (Auto Accept) ------------- \n');console.info('Subscribe URL Object ',event,syncher);syncher.subscribe(_this._objectDescURL,event.url).then(function(dataObjectObserver){console.info('1. Return Subscribe Data Object Observer',dataObjectObserver);var connectionController=new _ConnectionController2.default(syncher,_this._domain,_this._configuration);connectionController.remotePeerInformation=event;connectionController.dataObjectObserver=dataObjectObserver;_this.trigger('connector:connected',connectionController);_this.trigger('have:notification',event);console.info('------------------------ END ---------------------- \n');}).catch(function(reason){console.error(reason);});} /**
+  * Establish connection with other client identifier
+  * @param  {HypertyURL} HypertyURL - Define the identifier of the other component
+  * @param  {Object} options - Object with options to improve the connect
+  */},{key:'connect',value:function connect(hypertyURL,stream){ // TODO: Pass argument options as a stream, because is specific of implementation;
+// TODO: CHange the hypertyURL for a list of URLS
+var _this=this;var syncher=_this._syncher;return new Promise(function(resolve,reject){var connectionController=void 0;console.info('------------------------ Syncher Create ---------------------- \n');syncher.create(_this._objectDescURL,[hypertyURL],{}).then(function(dataObjectReporter){console.info('1. Return Create Data Object Reporter',dataObjectReporter);connectionController=new _ConnectionController2.default(syncher,_this._domain,_this._configuration);connectionController.stream=stream;connectionController.dataObjectReporter=dataObjectReporter;_this._controllers[hypertyURL]=connectionController;resolve(connectionController);console.info('--------------------------- END --------------------------- \n');}).catch(function(reason){console.error(reason);reject(reason);});});}}]);return HypertyConnector;}(_EventEmitter3.default);function activate(hypertyURL,bus,configuration){return {name:'HypertyConnector',instance:new HypertyConnector(hypertyURL,bus,configuration)};}module.exports=exports['default'];
 
 },{"../utils/EventEmitter":8,"../utils/utils":9,"./ConnectionController":4,"service-framework/dist/HypertyDiscovery":1,"service-framework/dist/Syncher":2}],6:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/**
+'use strict';Object.defineProperty(exports,"__esModule",{value:true}); /**
 * Copyright 2016 PT Inovação e Sistemas SA
 * Copyright 2016 INESC-ID
 * Copyright 2016 QUOBIS NETWORKS SL
@@ -2600,9 +1965,7 @@ Object.defineProperty(exports, "__esModule", {
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-**/
-
-// dataObjectReporter.data = {
+**/ // dataObjectReporter.data = {
 //    status : "connected",
 //    owner : "hyperty://example.com/alicehy",
 //    peer : "connection://example.com/alice/bob27012016",
@@ -2627,28 +1990,10 @@ Object.defineProperty(exports, "__esModule", {
 //        ]
 //      }
 //  }
-
-var connection = {
-  name: '',
-  status: '',
-  owner: '',
-  peer: '',
-  ownerPeer: {
-    connectionDescription: {},
-    iceCandidates: []
-  }
-};
-
-exports.default = connection;
-module.exports = exports['default'];
+var connection={name:'',status:'',owner:'',peer:'',ownerPeer:{connectionDescription:{},iceCandidates:[]}};exports.default=connection;module.exports=exports['default'];
 
 },{}],7:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/**
+'use strict';Object.defineProperty(exports,"__esModule",{value:true}); /**
 * Copyright 2016 PT Inovação e Sistemas SA
 * Copyright 2016 INESC-ID
 * Copyright 2016 QUOBIS NETWORKS SL
@@ -2669,29 +2014,10 @@ Object.defineProperty(exports, "__esModule", {
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-**/
-
-var peer = {
-  name: '',
-  connectionDescription: {},
-  iceCandidates: []
-};
-
-exports.default = peer;
-module.exports = exports['default'];
+**/var peer={name:'',connectionDescription:{},iceCandidates:[]};exports.default=peer;module.exports=exports['default'];
 
 },{}],8:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/**
+"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value" in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor);}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor;};}();function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function");}} /**
 * Copyright 2016 PT Inovação e Sistemas SA
 * Copyright 2016 INESC-ID
 * Copyright 2016 QUOBIS NETWORKS SL
@@ -2712,68 +2038,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-**/
-
-/**
+**/ /**
  * EventEmitter
  * All classes which extends this, can have addEventListener and trigger events;
- */
-
-var EventEmitter = function () {
-  function EventEmitter() {
-    _classCallCheck(this, EventEmitter);
-  }
-
-  _createClass(EventEmitter, [{
-    key: "addEventListener",
-
-
-    /**
-     * addEventListener listen for an eventType
-     * @param  {string}         eventType - listening for this type of event
-     * @param  {Function}       cb        - callback function will be executed when the event it is invoked
-     */
-    value: function addEventListener(eventType, cb) {
-      var _this = this;
-      _this[eventType] = cb;
-    }
-
-    /**
-     * Invoke the eventType
-     * @param  {string} eventType - event will be invoked
-     * @param  {object} params - parameters will be passed to the addEventListener
-     */
-
-  }, {
-    key: "trigger",
-    value: function trigger(eventType, params) {
-      var _this = this;
-
-      if (_this[eventType]) {
-        _this[eventType](params);
-      }
-    }
-  }]);
-
-  return EventEmitter;
-}();
-
-exports.default = EventEmitter;
-module.exports = exports['default'];
+ */var EventEmitter=function(){function EventEmitter(){_classCallCheck(this,EventEmitter);}_createClass(EventEmitter,[{key:"addEventListener", /**
+   * addEventListener listen for an eventType
+   * @param  {string}         eventType - listening for this type of event
+   * @param  {Function}       cb        - callback function will be executed when the event it is invoked
+   */value:function addEventListener(eventType,cb){var _this=this;_this[eventType]=cb;} /**
+   * Invoke the eventType
+   * @param  {string} eventType - event will be invoked
+   * @param  {object} params - parameters will be passed to the addEventListener
+   */},{key:"trigger",value:function trigger(eventType,params){var _this=this;if(_this[eventType]){_this[eventType](params);}}}]);return EventEmitter;}();exports.default=EventEmitter;module.exports=exports['default'];
 
 },{}],9:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.divideURL = divideURL;
-exports.deepClone = deepClone;
-exports.getConfig = getConfig;
-exports.getUserMedia = getUserMedia;
-exports.serialize = serialize;
-exports.getTemplate = getTemplate;
-/**
+'use strict';Object.defineProperty(exports,"__esModule",{value:true});exports.divideURL=divideURL;exports.deepClone=deepClone;exports.getConfig=getConfig;exports.getUserMedia=getUserMedia;exports.serialize=serialize;exports.getTemplate=getTemplate; /**
  * Copyright 2016 PT Inovação e Sistemas SA
  * Copyright 2016 INESC-ID
  * Copyright 2016 QUOBIS NETWORKS SL
@@ -2794,163 +2073,37 @@ exports.getTemplate = getTemplate;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
-
-// jshint browser:true, jquery: true
+ **/ // jshint browser:true, jquery: true
 // jshint varstmt: true
-/* global Handlebars */
-
-/**
+/* global Handlebars */ /**
  * Support module with some functions will be useful
  * @module utils
- */
-
-/**
+ */ /**
  * @typedef divideURL
  * @type Object
  * @property {string} type The type of URL
  * @property {string} domain The domain of URL
  * @property {string} identity The identity of URL
- */
-
-/**
+ */ /**
  * Divide an url in type, domain and identity
  * @param  {URL.URL} url - url address
  * @return {divideURL} the result of divideURL
- */
-function divideURL(url) {
-
-  // let re = /([a-zA-Z-]*)?:\/\/(?:\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)*(\/[\/\d\w\.-]*)*(?:[\?])*(.+)*/gi;
-  var re = /([a-zA-Z-]*):\/\/(?:\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256})([-a-zA-Z0-9@:%._\+~#=\/]*)/gi;
-  var subst = '$1,$2,$3';
-  var parts = url.replace(re, subst).split(',');
-
-  // If the url has no protocol, the default protocol set is https
-  if (parts[0] === url) {
-    parts[0] = 'https';
-    parts[1] = url;
-  }
-
-  var result = {
-    type: parts[0],
-    domain: parts[1],
-    identity: parts[2]
-  };
-
-  return result;
-}
-
-/**
+ */function divideURL(url){ // let re = /([a-zA-Z-]*)?:\/\/(?:\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)*(\/[\/\d\w\.-]*)*(?:[\?])*(.+)*/gi;
+var re=/([a-zA-Z-]*):\/\/(?:\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256})([-a-zA-Z0-9@:%._\+~#=\/]*)/gi;var subst='$1,$2,$3';var parts=url.replace(re,subst).split(','); // If the url has no protocol, the default protocol set is https
+if(parts[0]===url){parts[0]='https';parts[1]=url;}var result={type:parts[0],domain:parts[1],identity:parts[2]};return result;} /**
  * Make a COPY of the original data
  * @param  {Object}  obj - object to be cloned
  * @return {Object}
- */
-function deepClone(obj) {
-  //TODO: simple but inefficient JSON deep clone...
-  if (obj) return JSON.parse(JSON.stringify(obj));
-}
-
-/**
+ */function deepClone(obj){ //TODO: simple but inefficient JSON deep clone...
+if(obj)return JSON.parse(JSON.stringify(obj));} /**
  * Get the configuration from an json file;
  * @param  {JSONObject} jsonFile
  * @return {object}
- */
-function getConfig(JSONObject) {
-  console.log('develop');
-  return JSONObject['develop'];
-}
-
-/**
+ */function getConfig(JSONObject){console.log('production');return JSONObject['production'];} /**
  * Get WebRTC API resources
  * @param  {Object}     options Object containing the information that resources will be used (camera, mic, resolution, etc);
  * @return {Promise}
- */
-function getUserMedia(constraints) {
-
-  return new Promise(function (resolve, reject) {
-
-    navigator.mediaDevices.getUserMedia(constraints).then(function (mediaStream) {
-      resolve(mediaStream);
-    }).catch(function (reason) {
-      reject(reason);
-    });
-  });
-}
-
-function serialize() {
-
-  $.fn.serializeObject = function () {
-    var o = {};
-    var a = this.serializeArray();
-    $.each(a, function () {
-      if (o[this.name] !== undefined) {
-        if (!o[this.name].push) {
-          o[this.name] = [o[this.name]];
-        }
-
-        o[this.name].push(this.value || '');
-      } else {
-        o[this.name] = this.value || '';
-      }
-    });
-
-    return o;
-  };
-
-  $.fn.serializeObjectArray = function () {
-    var o = {};
-    var a = this.serializeArray();
-    $.each(a, function () {
-      if (o[this.name] !== undefined) {
-        if (!o[this.name].push) {
-          o[this.name] = [o[this.name]];
-        }
-
-        o[this.name].push(this.value || '');
-      } else {
-        if (!o[this.name]) o[this.name] = [];
-        o[this.name].push(this.value || '');
-      }
-    });
-
-    return o;
-  };
-}
-
-function getTemplate(path, script) {
-
-  return new Promise(function (resolve, reject) {
-
-    if (Handlebars.templates === undefined || Handlebars.templates[name] === undefined) {
-      Handlebars.templates = {};
-    } else {
-      resolve(Handlebars.templates[name]);
-    }
-
-    var templateFile = $.ajax({
-      url: path + '.hbs',
-      success: function success(data) {
-        Handlebars.templates[name] = Handlebars.compile(data);
-      },
-
-      fail: function fail(reason) {
-        return reason;
-      }
-    });
-
-    var scriptFile = $.getScript(script);
-
-    var requests = [];
-    if (path) requests.push(templateFile);
-    if (script) requests.push(scriptFile);
-
-    Promise.all(requests).then(function (result) {
-      resolve(Handlebars.templates[name]);
-    }).catch(function (reason) {
-      reject(reason);
-    });
-  });
-}
+ */function getUserMedia(constraints){return new Promise(function(resolve,reject){navigator.mediaDevices.getUserMedia(constraints).then(function(mediaStream){resolve(mediaStream);}).catch(function(reason){reject(reason);});});}function serialize(){$.fn.serializeObject=function(){var o={};var a=this.serializeArray();$.each(a,function(){if(o[this.name]!==undefined){if(!o[this.name].push){o[this.name]=[o[this.name]];}o[this.name].push(this.value||'');}else {o[this.name]=this.value||'';}});return o;};$.fn.serializeObjectArray=function(){var o={};var a=this.serializeArray();$.each(a,function(){if(o[this.name]!==undefined){if(!o[this.name].push){o[this.name]=[o[this.name]];}o[this.name].push(this.value||'');}else {if(!o[this.name])o[this.name]=[];o[this.name].push(this.value||'');}});return o;};}function getTemplate(path,script){return new Promise(function(resolve,reject){if(Handlebars.templates===undefined||Handlebars.templates[name]===undefined){Handlebars.templates={};}else {resolve(Handlebars.templates[name]);}var templateFile=$.ajax({url:path+'.hbs',success:function success(data){Handlebars.templates[name]=Handlebars.compile(data);},fail:function fail(reason){return reason;}});var scriptFile=$.getScript(script);var requests=[];if(path)requests.push(templateFile);if(script)requests.push(scriptFile);Promise.all(requests).then(function(result){resolve(Handlebars.templates[name]);}).catch(function(reason){reject(reason);});});}
 
 },{}]},{},[5])(5)
 });
