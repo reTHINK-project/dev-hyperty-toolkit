@@ -101,7 +101,7 @@ gulp.task('server', function(done) {
 gulp.task('environment', function() {
 
   var environment = getEnvironment();
-  var configuration = systemConfig[environment];
+  var configuration = {};
 
   if (process.env.DEVELOPMENT && process.env.DOMAIN) {
 
@@ -123,6 +123,8 @@ gulp.task('environment', function() {
     gutil.log(gutil.colors.yellow('To use the environment variables you need use'));
     console.log('export DEVELOPMENT=true|false\nexport DOMAIN=<your domain>\nexport RUNTIME_URL=<runtime location> (optional)');
     gutil.log(gutil.colors.yellow('For default the settings applied are in the system.config.json file'));
+
+    configuration = systemConfig[environment];
   }
 
   return gulp.src('./')
