@@ -103,6 +103,24 @@ gulp.task('environment', function() {
   var environment = getEnvironment();
   var configuration = systemConfig[environment];
 
+  if (process.env.DEVELOPMENT && process.env.DOMAIN) {
+
+    if (process.env.DEVELOPMENT) {
+      configuration.development = process.env.DEVELOPMENT;
+    }
+
+    if (process.env.RUNTIME_URL) {
+      configuration.runtimeURL = process.env.RUNTIME_URL;
+    } else {
+      delete configuration.runtimeURL;
+    }
+
+    if (process.env.DOMAIN) {
+      configuration.doamin = process.env.DOMAIN;
+    }
+
+  }
+
   return gulp.src('./')
   .pipe(createFile('config.json', new Buffer(JSON.stringify(configuration, null, 2))))
   .pipe(gulp.dest('./'))
