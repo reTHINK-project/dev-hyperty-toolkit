@@ -120,7 +120,7 @@ function emailDiscoveredError(result) {
 
 function openVideo(result) {
 
-  var toUser = result.hypertyURL;
+  var toUser = result.id;
 
   var options = options || {video: true, audio: true};
   getUserMedia(options).then(function(mediaStream) {
