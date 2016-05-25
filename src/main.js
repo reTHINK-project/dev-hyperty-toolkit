@@ -12,6 +12,8 @@ window.KJUR = {};
 let domain = config.domain;
 let runtimeLoader;
 
+console.log('configuration file: ', config);
+
 rethink.install(config).then(function(result) {
 
   runtimeLoader = result;

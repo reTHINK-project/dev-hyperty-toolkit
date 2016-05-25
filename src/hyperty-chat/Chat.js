@@ -35,7 +35,7 @@ class ChatGroup extends EventEmitter {
 
     let _this = this;
     _this._syncher = syncher;
-    _this._hypertyDiscovery = hypertyDiscovery;
+    _this.hypertyDiscovery = hypertyDiscovery;
 
     _this._objectDescURL = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/dataschema/Communication';
   }

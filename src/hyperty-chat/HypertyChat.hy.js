@@ -23,6 +23,8 @@
 
 // Service Framework
 import HypertyDiscovery from 'service-framework/dist/HypertyDiscovery';
+import IdentityManager from 'service-framework/dist/IdentityManager';
+import Discovery from 'service-framework/dist/Discovery';
 import {Syncher} from 'service-framework/dist/Syncher';
 
 // Utils
@@ -53,13 +55,22 @@ class HypertyChat extends EventEmitter {
 
     let domain = divideURL(hypertyURL).domain;
     let hypertyDiscovery = new HypertyDiscovery(hypertyURL, bus);
+    let discovery = new Discovery(hypertyURL, bus);
+    let identityManager = new IdentityManager(hypertyURL, configuration.runtimeURL, bus);
 
     _this._objectDescURL = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/dataschema/Communication';
 
     _this._hypertyURL = hypertyURL;
     _this._syncher = syncher;
     _this._domain = domain;
-    _this._hypertyDiscovery = hypertyDiscovery;
+
+    _this.hypertyDiscovery = hypertyDiscovery;
+    _this.discovery = discovery;
+    _this.identityManager = identityManager;
+
+    console.log('Discover: ', discovery);
+    console.log('Identity Manager: ', identityManager);
+    console.log('Hyperty Discovery: ', hypertyDiscovery);
 
     syncher.onNotification(function(event) {
       console.log('Notification: ', event);
@@ -78,7 +89,7 @@ class HypertyChat extends EventEmitter {
 
     let _this = this;
     let syncher = _this._syncher;
-    let hypertyDiscovery = _this._hypertyDiscovery;
+    let hypertyDiscovery = _this.hypertyDiscovery;
 
     return new Promise(function(resolve, reject) {
 
@@ -125,7 +136,7 @@ class HypertyChat extends EventEmitter {
 
       syncher.subscribe(_this._objectDescURL, resource).then(function(dataObjectObserver) {
         console.info('Data Object Observer: ', dataObjectObserver);
-        let chat = new ChatGroup(syncher, _this._hypertyDiscovery, _this._domain);
+        let chat = new ChatGroup(syncher, _this.hypertyDiscovery, _this._domain);
         chat.dataObjectObserver = dataObjectObserver;
 
         resolve(chat);
@@ -190,7 +201,7 @@ class HypertyChat extends EventEmitter {
       userList.forEach(function(user) {
         console.log(user);
         if (user.email.length) {
-          return _this._hypertyDiscovery.discoverHypertyPerUser(user.email, user.domain).then(activeUsers).catch(inactiveUsers);
+          return _this.hypertyDiscovery.discoverHypertyPerUser(user.email, user.domain).then(activeUsers).catch(inactiveUsers);
         }
       });
 

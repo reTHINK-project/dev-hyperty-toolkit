@@ -46,10 +46,10 @@ class ConnectionController extends EventEmitter {
 
     _this.syncher = syncher;
     _this.mode = 'offer';
+    _this._domain = domain;
 
     _this._objectDescURL = 'hyperty-catalogue://catalogue.' + _this._domain + '/.well-known/dataschema/Connection';
 
-    console.info(configuration);
     console.info(configuration);
 
     _this.mediaConstraints = configuration.mediaConstraints;

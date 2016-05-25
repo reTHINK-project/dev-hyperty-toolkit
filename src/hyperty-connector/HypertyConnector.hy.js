@@ -25,6 +25,8 @@
 
 // Service Framework
 import HypertyDiscovery from 'service-framework/dist/HypertyDiscovery';
+import IdentityManager from 'service-framework/dist/IdentityManager';
+import Discovery from 'service-framework/dist/Discovery';
 import {Syncher} from 'service-framework/dist/Syncher';
 
 // Utils
@@ -63,7 +65,17 @@ class HypertyConnector extends EventEmitter {
 
     _this._controllers = {};
 
-    _this.hypertyDiscovery = new HypertyDiscovery(hypertyURL, bus);
+    let hypertyDiscovery = new HypertyDiscovery(hypertyURL, bus);
+    let discovery = new Discovery(hypertyURL, bus);
+    let identityManager = new IdentityManager(hypertyURL, configuration.runtimeURL, bus);
+
+    _this.hypertyDiscovery = hypertyDiscovery;
+    _this.discovery = discovery;
+    _this.identityManager = identityManager;
+
+    console.log('Discover: ', discovery);
+    console.log('Identity Manager: ', identityManager);
+    console.log('Hyperty Discovery: ', hypertyDiscovery);
 
     let syncher = new Syncher(hypertyURL, bus, configuration);
     syncher.onNotification(function(event) {
@@ -132,17 +144,26 @@ class HypertyConnector extends EventEmitter {
   * @param  {HypertyURL} HypertyURL - Define the identifier of the other component
   * @param  {Object} options - Object with options to improve the connect
   */
-  connect(hypertyURL, stream) {
+  connect(email, stream, domain) {
     // TODO: Pass argument options as a stream, because is specific of implementation;
     // TODO: CHange the hypertyURL for a list of URLS
     let _this = this;
     let syncher = _this._syncher;
+    let hypertyURL;
 
     return new Promise(function(resolve, reject) {
 
       let connectionController;
       console.info('------------------------ Syncher Create ---------------------- \n');
-      syncher.create(_this._objectDescURL, [hypertyURL], {})
+
+      _this.hypertyDiscovery.discoverHypertyPerUser(email, domain).then(function(user) {
+
+        hypertyURL = user.hypertyURL;
+
+        console.log('Hyperty: ', user);
+
+        return syncher.create(_this._objectDescURL, [hypertyURL], {});
+      })
       .then(function(dataObjectReporter) {
         console.info('1. Return Create Data Object Reporter', dataObjectReporter);
 
