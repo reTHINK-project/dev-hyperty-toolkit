@@ -16,7 +16,7 @@
     "signature": "",
     "messageSchemas": "",
     "configuration": {
-      "url": "wss://msg-node.hybroker.rethink.ptinovacao.pt:9090/ws"
+      "url": "wss://msg-node.hybroker.rethink.ptinovacao.pt/ws"
     },
     "constraints": "",
     "hypertyCapabilities": "",
