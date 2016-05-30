@@ -30,7 +30,7 @@ function hypertyLoaded(result) {
   $('.card-panel').html(hypertyInfo);
 
   // Prepare to discover email:
-  var hypertyDiscovery = result.instance.hypertyDiscovery;
+  var hypertyDiscovery = result.instance.discovery;
   discoverEmail(hypertyDiscovery);
 
   connector = result.instance;

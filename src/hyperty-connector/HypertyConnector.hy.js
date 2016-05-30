@@ -61,7 +61,7 @@ class HypertyConnector extends EventEmitter {
     _this._configuration = configuration;
     _this._domain = divideURL(hypertyURL).domain;
 
-    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + _this._domain + '/.well-known/dataschema/Communication';
+    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + _this._domain + '/.well-known/dataschema/Connection';
 
     _this._controllers = {};
 
@@ -158,8 +158,9 @@ class HypertyConnector extends EventEmitter {
 
       console.info('email: ', email, ' stream: ', stream, ' domain:', domain);
 
-      // user, schema, resources, domain
-      _this.hypertyDiscovery.discoverHypertyPerUser(email, domain).then(function(user) {
+      // user, scheme, resources, domain
+      // scheme: ['COMM', 'CONNECTION', 'CTXT', 'IDENTITY']
+      _this.discovery.discoverHypertyPerUser(email, domain).then(function(user) {
 
         hypertyURL = user.hypertyURL;
 

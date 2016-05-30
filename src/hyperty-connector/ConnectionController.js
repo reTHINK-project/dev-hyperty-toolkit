@@ -264,7 +264,7 @@ class ConnectionController extends EventEmitter {
 
     _this.peerConnection.createOffer(function(description) {
       _this.onLocalSessionCreated(description);
-    }, _this.infoError, _this.mediaConstraints);
+    }, _this.infoError);
 
   }
 

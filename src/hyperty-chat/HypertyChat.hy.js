@@ -201,7 +201,7 @@ class HypertyChat extends EventEmitter {
       userList.forEach(function(user) {
         console.log(user);
         if (user.email.length) {
-          return _this.hypertyDiscovery.discoverHypertyPerUser(user.email, user.domain).then(activeUsers).catch(inactiveUsers);
+          return _this.discovery.discoverHypertyPerUser(user.email, user.domain).then(activeUsers).catch(inactiveUsers);
         }
       });
 

@@ -485,8 +485,25 @@ function encode(opts) {
 
     if (opts.descriptor === 'Runtimes') {
       json[value].runtimeType = 'browser';
-      json[value].hypertyCapabilities = {mic: false };
-      json[value].protocolCapabilities = {http: true };
+      json[value].hypertyCapabilities = {
+        mic: true,
+        camera: true,
+        sensor: false,
+        webrtc: true,
+        ortc: true
+      };
+      json[value].protocolCapabilities = {
+        http: true,
+        https: true,
+        ws: true,
+        wss: true,
+        coap: false,
+        datachannel: false
+      };
+    }
+
+    if (opts.descriptor === 'Hyperties') {
+      json[value].hypertyType = ['audio', 'video'];
     }
 
     if (opts.descriptor === 'ProtoStubs' || opts.descriptor === 'IDPProxys') {
@@ -507,7 +524,11 @@ function encode(opts) {
     json[value].language = language;
     json[value].signature = '';
     json[value].messageSchemas = '';
-    json[value].dataObjects = [];
+
+    if (!json[value].dataObjects) {
+      json[value].dataObjects = [];
+    }
+
     json[value].accessControlPolicy = 'somePolicy';
 
     var newDescriptor = new Buffer(JSON.stringify(json, null, 2));
