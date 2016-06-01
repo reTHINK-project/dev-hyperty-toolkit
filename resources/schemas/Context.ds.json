@@ -5,6 +5,9 @@
 	"type": "object",
 	"required": ["id", "type", "value"],
 	"properties": {
+		"scheme": {
+			"constant": "context"
+		},
 		"id": {
 			"type": "string"
 		},
@@ -30,17 +33,17 @@
 		"tag": {
 			"type": "string"
 		}
-	}, 
+	},
 	"ContextUnit": {
 		"type": "object",
 		"properties": {
 		}
-	}, 
+	},
 	"ContextValueList": {
 		"type": "object",
 		"properties": {
 		}
-	}, 
+	},
 	"ContextValue": {
 		"type": "object",
 		"required": ["name", "units", "value", "sum"],
@@ -78,12 +81,12 @@
 				"type": "string"
 			}
 		}
-	}, 
+	},
 	"RawContextValue": {
 		"type": "object",
 		"properties": {
 		}
-	}, 
+	},
 	"ProcessedContextValue": {
 		"type": "object",
 		"properties": {
