@@ -61,7 +61,7 @@ class HypertyConnector extends EventEmitter {
     _this._configuration = configuration;
     _this._domain = divideURL(hypertyURL).domain;
 
-    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + _this._domain + '/.well-known/dataschema/Communication';
+    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + _this._domain + '/.well-known/dataschema/Connection';
 
     _this._controllers = {};
 
@@ -156,13 +156,21 @@ class HypertyConnector extends EventEmitter {
       let connectionController;
       console.info('------------------------ Syncher Create ---------------------- \n');
 
-      _this.hypertyDiscovery.discoverHypertyPerUser(email, domain).then(function(user) {
+      console.info('email: ', email, ' stream: ', stream, ' domain:', domain);
+
+      // user, scheme, resources, domain
+      // scheme: ['COMM', 'CONNECTION', 'CTXT', 'IDENTITY']
+      _this.discovery.discoverHypertyPerUser(email, domain).then(function(user) {
 
         hypertyURL = user.hypertyURL;
 
         console.log('Hyperty: ', user);
 
         return syncher.create(_this._objectDescURL, [hypertyURL], {});
+      })
+      .catch(function(reason) {
+        console.error(reason);
+        reject(reason);
       })
       .then(function(dataObjectReporter) {
         console.info('1. Return Create Data Object Reporter', dataObjectReporter);

@@ -89,7 +89,6 @@ class HypertyChat extends EventEmitter {
 
     let _this = this;
     let syncher = _this._syncher;
-    let hypertyDiscovery = _this.hypertyDiscovery;
 
     return new Promise(function(resolve, reject) {
 
@@ -113,8 +112,9 @@ class HypertyChat extends EventEmitter {
       .then(function(dataObjectReporter) {
         console.info('3. Return Create Data Object Reporter', dataObjectReporter);
 
-        let chat = new ChatGroup(syncher, hypertyDiscovery, _this._domain);
+        let chat = new ChatGroup(syncher, _this.discovery, _this._domain);
         chat.dataObjectReporter = dataObjectReporter;
+        _this.chat = chat;
         resolve(chat);
 
       }).catch(function(reason) {
@@ -136,13 +136,38 @@ class HypertyChat extends EventEmitter {
 
       syncher.subscribe(_this._objectDescURL, resource).then(function(dataObjectObserver) {
         console.info('Data Object Observer: ', dataObjectObserver);
-        let chat = new ChatGroup(syncher, _this.hypertyDiscovery, _this._domain);
+        let chat = new ChatGroup(syncher, _this.discovery, _this._domain);
         chat.dataObjectObserver = dataObjectObserver;
 
         resolve(chat);
       }).catch(function(reason) {
         reject(reason);
       });
+    });
+
+  }
+
+  /**
+   * Invite other observers
+   * @param  {userList} Array Array of objects that contining the user.email and user.domain;
+   * @return {chat}           Chat Group controller
+   */
+  invite(userList) {
+
+    let _this = this;
+    let syncher = _this._syncher;
+
+    return new Promise(function(resolve, reject) {
+
+      _this.chat.invite(userList).then(function() {
+        console.info('users are invited');
+        let chat = new ChatGroup(syncher, _this.discovery, _this._domain);
+
+        resolve(chat);
+      }).catch(function(reason) {
+        reject(reason);
+      });
+
     });
 
   }
@@ -178,6 +203,8 @@ class HypertyChat extends EventEmitter {
       let hyperties = [];
       let count = 0;
 
+      console.log('User List:', userList, userList.length);
+
       if (userList.length === 0) reject(hyperties);
 
       let resultUsers = function() {
@@ -201,7 +228,7 @@ class HypertyChat extends EventEmitter {
       userList.forEach(function(user) {
         console.log(user);
         if (user.email.length) {
-          return _this.hypertyDiscovery.discoverHypertyPerUser(user.email, user.domain).then(activeUsers).catch(inactiveUsers);
+          return _this.discovery.discoverHypertyPerUser(user.email, user.domain).then(activeUsers).catch(inactiveUsers);
         }
       });
 

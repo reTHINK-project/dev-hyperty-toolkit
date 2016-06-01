@@ -101,7 +101,7 @@ gulp.task('server', function(done) {
 gulp.task('environment', function() {
 
   var environment = getEnvironment();
-  var configuration = {};
+  var configuration = systemConfig[environment];
 
   if (process.env.DEVELOPMENT && process.env.DOMAIN) {
 
@@ -511,23 +511,50 @@ function encode(opts) {
 
     if (opts.descriptor === 'Runtimes') {
       json[value].runtimeType = 'browser';
-      json[value].hypertyCapabilities = {mic: false };
-      json[value].protocolCapabilities = {http: true };
+      json[value].hypertyCapabilities = {
+        mic: true,
+        camera: true,
+        sensor: false,
+        webrtc: true,
+        ortc: true
+      };
+      json[value].protocolCapabilities = {
+        http: true,
+        https: true,
+        ws: true,
+        wss: true,
+        coap: false,
+        datachannel: false
+      };
+    }
+
+    if (opts.descriptor === 'Hyperties' && !json[value].hypertyType) {
+      json[value].hypertyType = [];
     }
 
     if (opts.descriptor === 'ProtoStubs' || opts.descriptor === 'IDPProxys') {
       json[value].constraints = '';
     }
 
-    json[value].sourcePackageURL = '/sourcePackage';
-    json[value].sourcePackage.sourceCode = encoded;
-    json[value].sourcePackage.sourceCodeClassname = filename;
-    json[value].sourcePackage.encoding = 'base64';
-    json[value].sourcePackage.signature = '';
+    if (json[value].sourcePackageURL === '/sourcePackage') {
+      json[value].sourcePackageURL = '/sourcePackage';
+    }
+
+    if (json[value].sourcePackage) {
+      json[value].sourcePackage.sourceCode = encoded;
+      json[value].sourcePackage.sourceCodeClassname = filename;
+      json[value].sourcePackage.encoding = 'base64';
+      json[value].sourcePackage.signature = '';
+    }
+
     json[value].language = language;
     json[value].signature = '';
     json[value].messageSchemas = '';
-    json[value].dataObjects = [];
+
+    if (!json[value].dataObjects) {
+      json[value].dataObjects = [];
+    }
+
     json[value].accessControlPolicy = 'somePolicy';
 
     var newDescriptor = new Buffer(JSON.stringify(json, null, 2));

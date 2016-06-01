@@ -21,6 +21,7 @@ class HelloWorldReporter {
     if (!bus) throw new Error('The MiniBus is a needed parameter');
     if (!configuration) throw new Error('The configuration is a needed parameter');
 
+
     let _this = this;
 
     let domain = divideURL(hypertyURL).domain;
