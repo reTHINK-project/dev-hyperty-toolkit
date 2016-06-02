@@ -32,6 +32,7 @@ function hypertyLoaded(result) {
 
   createBtn.on('click', createRoom);
   joinBtn.on('click', joinRoom);
+
 }
 
 /*
@@ -134,6 +135,54 @@ function joinRoom(event) {
 
 }
 
+function inviteParticipants(event) {
+
+  event.preventDefault();
+
+  let inviteModal = $('.invite-chat');
+  let inviteBtn = inviteModal.find('.btn-modal-invite');
+
+  inviteBtn.on('click', function(event) {
+
+    event.preventDefault();
+
+    let emails = inviteModal.find('.input-emails').val();
+    let participants = [];
+    if (emails.includes(',')) {
+      let emails = emails.replace(', ', ',').split(',');
+    } else {
+      participants.push(emails);
+    }
+
+    console.log(emails, participants, participants.length);
+
+    let listOfEmails = participants.map((value, key) => {
+      let domain = '';
+      let email = value;
+
+      if (value.includes('(') && value.includes(')')) {
+        email = value.substring(value.indexOf('(') - 1);
+        domain = value.substr(value.indexOf('()') + 1, value.length - 1);
+      };
+
+      console.log(value, key);
+      return {email: email, domain: domain};
+    });
+
+    console.log('Participants:', listOfEmails);
+
+    hypertyChat.invite(listOfEmails).then(function(result) {
+      console.log('Invite emails', result);
+    }).catch(function(reason) {
+      console.log('Error:', reason);
+    });
+
+  });
+
+  inviteModal.openModal();
+
+}
+
 function prepareChat(chatGroup) {
 
   chatGroup.addEventListener('have:new:notification', function(event) {
@@ -168,6 +217,9 @@ function prepareChat(chatGroup) {
         addParticipant(participant);
       }
     });
+
+    let inviteBtn = $('.invite-btn');
+    inviteBtn.on('click', inviteParticipants);
 
   });
 

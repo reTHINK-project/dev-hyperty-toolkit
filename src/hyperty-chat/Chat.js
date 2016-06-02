@@ -26,18 +26,18 @@ import participant from './participant';
 
 class ChatGroup extends EventEmitter {
 
-  constructor(syncher, hypertyDiscovery, domain) {
+  constructor(syncher, discovery, domain) {
 
     if (!syncher) throw Error('Syncher is a necessary dependecy');
-    if (!hypertyDiscovery) throw Error('Hyperty discover is a necessary dependecy');
+    if (!discovery) throw Error('Hyperty discover is a necessary dependecy');
 
-    super(syncher, hypertyDiscovery);
+    super(syncher, discovery);
 
     let _this = this;
     _this._syncher = syncher;
-    _this._hypertyDiscovery = hypertyDiscovery;
+    _this.discovery = discovery;
 
-    _this._objectDescURL = 'hyperty-catalogue://' + domain + '/.well-known/dataschemas/Communication';
+    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/dataschema/Communication';
   }
 
   set dataObjectReporter(dataObjectReporter) {
@@ -163,14 +163,6 @@ class ChatGroup extends EventEmitter {
 
   }
 
-  /**
-   * This function is used to close an existing Group Chat instance.
-   *
-   */
-  close() {
-
-  }
-
   join(resource) {
 
     let _this = this;
@@ -192,12 +184,21 @@ class ChatGroup extends EventEmitter {
    * This function is used to add / invite new participant on an existing Group Chat instance.
    * @return {Promise} Promise with the status
    */
-  addParticipant(email) {
+  invite(userList) {
 
     let _this = this;
-    let syncher = _this._syncher;
 
     return new Promise(function(resolve, reject) {
+
+      console.info('----------------------- Mapping Particpants -------------------- \n');
+      _this._mappingUser(userList)
+      .then((hyperties) => { return _this.dataObject.inviteObservers(hyperties); })
+      .then(function() {
+        console.info('2. Result of invition');
+        resolve();
+      }).catch(function(reason) {
+        reject(reason);
+      });
 
     });
 
@@ -220,11 +221,45 @@ class ChatGroup extends EventEmitter {
 
   }
 
-  /**
-   * This function is used to open a Group Chat instance that was previously closed.
-   * @return {[type]} [description]
-   */
-  open() {
+  _mappingUser(userList) {
+
+    let _this = this;
+
+    return new Promise(function(resolve, reject) {
+
+      let hyperties = [];
+      let count = 0;
+
+      console.log('User List:', userList, userList.length);
+
+      if (userList.length === 0) reject(hyperties);
+
+      let resultUsers = function() {
+        if (count === userList.length) {
+          console.info('Have ' + hyperties.length + 'users found;');
+          resolve(hyperties);
+        }
+      };
+
+      let activeUsers = function(user) {
+        count++;
+        hyperties.push(user.hypertyURL);
+        resultUsers();
+      };
+
+      let inactiveUsers = function() {
+        count++;
+        resultUsers();
+      };
+
+      userList.forEach(function(user) {
+        console.log(user);
+        if (user.email.length) {
+          return _this.discovery.discoverHypertyPerUser(user.email, user.domain).then(activeUsers).catch(inactiveUsers);
+        }
+      });
+
+    });
 
   }
 
