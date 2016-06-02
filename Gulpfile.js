@@ -503,6 +503,7 @@ function encode(opts) {
     }
 
     if (opts.descriptor === 'Hyperties') {
+      delete json[value].type;
       json[value].hypertyType = ['audio', 'video'];
     }
 
