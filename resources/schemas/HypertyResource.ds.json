@@ -6,7 +6,15 @@
 	"required": ["type"],
 	"properties": {
 		"type": {
-			"$ref": "#/HypertyResourceType"
+			"enum": [
+				"chat",
+				"audio",
+				"video",
+				"av",
+				"screen",
+				"file",
+				"midi"
+			]
 		},
 		"direction": {
 			"enum": [
@@ -14,33 +22,6 @@
 				"out",
 				"inout"
 			]
-		}
-	}, 
-	"HypertyResourceType": {
-		"type": "object",
-		"required": ["CHAT", "AUDIO", "VIDEO", "AV", "SCREEN", "FILE", "MIDI"],
-		"properties": {
-			"CHAT": {
-				"type": "null"
-			},
-			"AUDIO": {
-				"type": "null"
-			},
-			"VIDEO": {
-				"type": "null"
-			},
-			"AV": {
-				"type": "null"
-			},
-			"SCREEN": {
-				"type": "null"
-			},
-			"FILE": {
-				"type": "null"
-			},
-			"MIDI": {
-				"type": "null"
-			}
 		}
 	}
 }

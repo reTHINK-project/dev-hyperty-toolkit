@@ -3,7 +3,7 @@
 
 	"id": "Connection",
 	"type": "object",
-	"required": ["status", "owner", "peer"],
+	"required": ["scheme", "status", "owner", "peer"],
 	"properties": {
 		"scheme": {
 			"constant": "connection"
@@ -17,17 +17,17 @@
 		"peer": {
 			"type": "string"
 		}
-	},
+	}, 
 	"OwnerPeer": {
 		"type": "object",
 		"properties": {
 		}
-	},
+	}, 
 	"Peer": {
 		"type": "object",
 		"properties": {
 		}
-	},
+	}, 
 	"IceCandidate": {
 		"type": "object",
 		"required": ["candidate", "sdpMLineIndex", "sdpMid"],
@@ -42,7 +42,7 @@
 				"type": "string"
 			}
 		}
-	},
+	}, 
 	"IceCandidates": {
 		"type": "object",
 		"required": ["status"],
@@ -59,7 +59,7 @@
 				]
 			}
 		}
-	},
+	}, 
 	"ConnectionDescription": {
 		"type": "object",
 		"required": ["sdp"],
@@ -68,7 +68,7 @@
 				"type": "string"
 			}
 		}
-	},
+	}, 
 	"RtpTransportParameters": {
 		"type": "object",
 		"required": ["status"],

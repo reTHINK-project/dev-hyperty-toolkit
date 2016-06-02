@@ -3,7 +3,7 @@
 
 	"id": "Context",
 	"type": "object",
-	"required": ["id", "type", "value"],
+	"required": ["scheme", "id", "type", "values"],
 	"properties": {
 		"scheme": {
 			"constant": "context"
@@ -12,7 +12,15 @@
 			"type": "string"
 		},
 		"type": {
-			"$ref": "HypertyResource.json#/HypertyResourceType"
+			"enum": [
+				"chat",
+				"audio",
+				"video",
+				"av",
+				"screen",
+				"file",
+				"midi"
+			]
 		},
 		"description": {
 			"type": "string"
@@ -21,32 +29,33 @@
 			"type": "string",
 			"format": "date-time"
 		},
-		"units": {
+		"unit": {
 			"$ref": "#/ContextUnit"
 		},
 		"version": {
 			"type": "integer"
 		},
-		"value": {
-			"$ref": "#/ContextValueList"
+		"values": {
+			"type": "array",
+			"items": {
+				"$ref": "#/ContextValue"
+			}
 		},
 		"tag": {
 			"type": "string"
+		},
+		"children": {
+			"constant": ["actions","contexts"]
 		}
-	},
+	}, 
 	"ContextUnit": {
 		"type": "object",
 		"properties": {
 		}
-	},
-	"ContextValueList": {
-		"type": "object",
-		"properties": {
-		}
-	},
+	}, 
 	"ContextValue": {
 		"type": "object",
-		"required": ["name", "units", "value", "sum"],
+		"required": ["name", "unit", "value", "sum"],
 		"anyOf": [
 			{ "$ref": "#/RawContextValue" },
 			{ "$ref": "#/ProcessedContextValue" }
@@ -56,14 +65,14 @@
 			"name": {
 				"type": "string"
 			},
-			"units": {
+			"unit": {
 				"$ref": "#/ContextUnit"
 			},
 			"value": {
 				"type": "object"
 			},
 			"sum": {
-				"type": "null"
+				"$ref": "#/ContextUnit"
 			},
 			"time": {
 				"type": "string",
@@ -81,12 +90,87 @@
 				"type": "string"
 			}
 		}
-	},
+	}, 
+	"Contexts": {
+		"type": "object",
+		"stereotype": "children",
+		"required": ["parent", "listener", "type"],
+		"properties": {
+			"parent": {
+				"constant": "context"
+			},
+			"listener": {
+				"constant": "contexts"
+			},
+			"type": {
+				"constant": "Context"
+			}
+		}
+	}, 
+	"Actions": {
+		"type": "object",
+		"stereotype": "children",
+		"required": ["parent", "listener", "type"],
+		"properties": {
+			"parent": {
+				"constant": "context"
+			},
+			"listener": {
+				"constant": "actions"
+			},
+			"type": {
+				"constant": "Action"
+			}
+		}
+	}, 
+	"Action": {
+		"type": "object",
+		"stereotype": "syncobjectchild",
+		"required": ["id", "type", "values"],
+		"properties": {
+			"id": {
+				"type": "string"
+			},
+			"type": {
+				"enum": [
+					"chat",
+					"audio",
+					"video",
+					"av",
+					"screen",
+					"file",
+					"midi"
+				]
+			},
+			"description": {
+				"type": "string"
+			},
+			"time": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"unit": {
+				"$ref": "#/ContextUnit"
+			},
+			"version": {
+				"type": "integer"
+			},
+			"values": {
+				"type": "array",
+				"items": {
+					"$ref": "#/ContextValue"
+				}
+			},
+			"tag": {
+				"type": "string"
+			}
+		}
+	}, 
 	"RawContextValue": {
 		"type": "object",
 		"properties": {
 		}
-	},
+	}, 
 	"ProcessedContextValue": {
 		"type": "object",
 		"properties": {
