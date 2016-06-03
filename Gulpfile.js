@@ -540,7 +540,7 @@ function encode(opts) {
       json[value].constraints = '';
     }
 
-    if (json[value].sourcePackageURL === '/sourcePackage') {
+    if (!json[value].sourcePackageURL) {
       json[value].sourcePackageURL = '/sourcePackage';
     }
 
