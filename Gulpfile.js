@@ -43,12 +43,12 @@ gulp.task('serve', function(done) {
 
 gulp.task('src-hyperties', function(done) {
 
-  if (process.env.LINK) {
+  if (process.env.HYPERTY_REPO) {
 
-    fs.stat(process.env.LINK, function(error) {
+    fs.stat(process.env.HYPERTY_REPO, function(error) {
       if (error) return error;
 
-      copyHyperties(process.env.LINK, done);
+      copyHyperties(process.env.HYPERTY_REPO, done);
     });
 
   } else {
@@ -69,7 +69,7 @@ gulp.task('src-hyperties', function(done) {
 });
 
 gulp.task('clean', function() {
-  return gulp.src(['./src', './dist', './examples'], {read: false}).pipe(clean());
+  return gulp.src(['src', 'dist', 'examples'], {read: false}).pipe(clean());
 });
 
 gulp.task('copy-src', copySrc);
