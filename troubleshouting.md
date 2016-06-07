@@ -22,4 +22,3 @@ Check your Firefox browser is updated.
 
 2- Open at "catalogue.<domain>" eg "catalogue.hybroker.rethink.ptinovacao.pt" and accept certificate
 
-### Demos: after selecting an Hyperty, there is no popup from google (to login, or verify access)
