@@ -25,10 +25,6 @@ var systemConfig = require('./system.config.json');
 
 var extensions = ['.js', '.json'];
 
-// var uglify = require('gulp-uglify');
-// var replace = require('gulp-replace');
-// var insert = require('gulp-insert');
-
 gulp.task('serve', function(done) {
 
   var environment = getEnvironment();
@@ -43,12 +39,18 @@ gulp.task('serve', function(done) {
 
 gulp.task('src-hyperties', function(done) {
 
-  if (process.env.LINK) {
+  var path;
+  if (process.env.HYPERTY_REPO) {
 
-    fs.stat(process.env.LINK, function(error) {
-      if (error) return error;
+    path = '../' + process.env.HYPERTY_REPO;
 
-      copyHyperties(process.env.LINK, done);
+    fs.stat(path, function(error) {
+      if (error) {
+        console.log('ERROR:', error);
+        return error;
+      }
+
+      copyHyperties(path, done);
     });
 
   } else {
@@ -61,7 +63,8 @@ gulp.task('src-hyperties', function(done) {
         choices: parentDirs
       }
     ], function(res) {
-      copyHyperties(res.folders, done);
+      path = '../' + res.folders;
+      copyHyperties(path, done);
     }));
 
   }
@@ -69,7 +72,7 @@ gulp.task('src-hyperties', function(done) {
 });
 
 gulp.task('clean', function() {
-  return gulp.src(['./src', './dist', './examples'], {read: false}).pipe(clean());
+  return gulp.src(['src', 'dist', 'examples'], {read: false}).pipe(clean());
 });
 
 gulp.task('copy-src', copySrc);
@@ -691,7 +694,7 @@ function copyExamples() {
 
 function copyHyperties(from, done) {
   if (from) {
-    dirname = '../' + from;
+    dirname = from;
     runSequence('copy-src', 'copy-examples', done);
   }
 }

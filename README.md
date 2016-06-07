@@ -32,9 +32,11 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else;
 
-2. run the command `npm install` (this may take some minutes)
+2. Side by side with toolkit should be the [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty) repository, clone the repository;
 
-3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
+3. run the command `npm install` (this may take some minutes)
+
+4. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
  ```
  127.0.0.1   hybroker.rethink.ptinovacao.pt
  127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
@@ -43,11 +45,11 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  * In Linux is normally available at: ```/etc/hosts```
  * In windows is normally available at:  ```C:\Windows\System32\drivers\etc\hosts```
 
-4. run the local http-server and catalogue with ```npm run start:dev```. Check the following url's to allow the certificates:
+5. run the local http-server and catalogue with ```npm run start:dev```. Check the following url's to allow the certificates:
  * https://hybroker.rethink.ptinovacao.pt
  * https://catalogue.hybroker.rethink.ptinovacao.pt
 
-5. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
+6. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
 
  - Hello World Reporter;
  - Hello World Observer that observes changes made by the first Hello World Reporter;
