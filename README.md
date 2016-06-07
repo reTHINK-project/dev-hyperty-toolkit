@@ -56,7 +56,8 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 ### First Hyperty Development
 
-1. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
+1. move to **[dev-hyperty](https://github.com/reTHINK-project/dev-hyperty)**
+2. move to **src** folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
 
  - a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldOberver.hy.js](/src/hello-world/HelloWorldObserver.hy.js).
 
@@ -134,7 +135,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
  This is optional in case you are reusing existing data schemas. **To Do:** explain how to reuse existing data schemas.
 
-2. To test your Hyperty, you need to:
+3. To test your Hyperty, you need to:
 
  - expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
 
@@ -157,20 +158,36 @@ The toolkit is pre-configured to use **hybroker.rethink.ptinovacao.pt** cloud de
 
 **NOTE:** You need open this file with administration permission
 
- ```
- 127.0.0.1   hybroker.rethink.ptinovacao.pt
- 127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
- ```
+```
+127.0.0.1   hybroker.rethink.ptinovacao.pt
+127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
+```
 
 #### Local Development Environment
 
 In case you prefer not to depend on third party services you also have the option to install the full reTHINK environment in you local development environment. In that case follow these guidelines. **to do:** provide here the link for the installation guide.
 
+#### Environment variables
+
+You can use this toolkit like a server in your testbed.
+This repository are ready to handle with environment variables, you have some variables available to use;
+
+```shell
+- DEVELOPMENT=false
+- RUNTIME_URL=hyperty-catalogue://catalogue.hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime
+- DOMAIN=hybroker.rethink.ptinovacao.pt
+- LINK='<path to the source code of hyperties>'
+```
+
 ### The Repository structure
 
-#### **src** folder
+#### **src** folder (see note)
 
-Hold all Hyperty related source code, like hyperty classes and JSON-Schemas. The hyperty class must have the suffix ".hy.js", on the file.
+This folder is a copy from [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty) repository and hold all Hyperty related with the source code, like hyperty classes and JSON-Schemas.
+
+The hyperty class must have the suffix ".hy.js", on the file.
+
+**Note:** the changes need to be done on [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty) repository, this is only a copy;
 
 **Example:** Hello.hy.js
 
@@ -238,7 +255,7 @@ The same happens with JSON-Schemas that are added / updated in the DataSchemas.j
 
 
 
-#### **examples** folder
+#### **examples** folder  (see note)
 
 In this folder you have, for each hyperty you develop, the Web side testing.
 This is customized with HTML using [Handlebars](http://handlebarsjs.com/) and ES5 javascript;
@@ -253,6 +270,8 @@ With this template system you can:
  - hello-world > helloWorld.hbs
  - hyperty-chat > HypertyChat.hbs
  - hyperty-connector > HypertyConnector.hbs
+
+**Note:** the changes need to be done on [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty) repository, this is only a copy;
 
 #### **Test** folder
 

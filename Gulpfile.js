@@ -18,6 +18,9 @@ var gutil = require('gulp-util');
 var argv = require('yargs').argv;
 var runSequence = require('run-sequence');
 var gulpif = require('gulp-if');
+var clean = require('gulp-clean');
+var dirname = __dirname;
+
 var systemConfig = require('./system.config.json');
 
 var extensions = ['.js', '.json'];
@@ -29,7 +32,7 @@ var extensions = ['.js', '.json'];
 gulp.task('serve', function(done) {
 
   var environment = getEnvironment();
-  var sequence = ['environment', 'schemas', 'js', 'hyperties', 'server'];
+  var sequence = ['environment', 'clean', 'src-hyperties', 'schemas', 'js', 'hyperties', 'server'];
   if (environment !== 'production') {
     sequence.push('watch');
   }
@@ -37,6 +40,40 @@ gulp.task('serve', function(done) {
   runSequence.apply(runSequence, sequence, done);
 
 });
+
+gulp.task('src-hyperties', function(done) {
+
+  if (process.env.LINK) {
+
+    fs.stat(process.env.LINK, function(error) {
+      if (error) return error;
+
+      copyHyperties(process.env.LINK, done);
+    });
+
+  } else {
+    var parentDirs = fs.readdirSync('../');
+    gulp.src('./', {buffer:false})
+      .pipe(prompt.prompt([{
+        type: 'list',
+        name: 'folders',
+        message: 'Where is dev-hyperty?',
+        choices: parentDirs
+      }
+    ], function(res) {
+      copyHyperties(res.folders, done);
+    }));
+
+  }
+
+});
+
+gulp.task('clean', function() {
+  return gulp.src(['./src', './dist', './examples'], {read: false}).pipe(clean());
+});
+
+gulp.task('copy-src', copySrc);
+gulp.task('copy-examples', copyExamples);
 
 // use default task to launch Browsersync and watch JS files
 gulp.task('server', function(done) {
@@ -137,23 +174,62 @@ gulp.task('environment', function() {
 
 });
 
+function copyFiles(opts) {
+
+  return through.obj(function(chunk, enc, done) {
+
+    var fileObject = path.parse(chunk.path);
+    var dest = '';
+    if (opts && opts.dest) {
+      dest = opts.dest;
+    }
+
+    var dirPath = fileObject.dir.substring(fileObject.dir.indexOf(dest));
+    var dir = __dirname + '/' + dirPath;
+
+    console.log(dirPath, dir, dirPath.includes(__dirname));
+    if (dirPath.indexOf(__dirname) !== -1) {
+      dir = dirPath;
+    }
+
+    gutil.log('Copy changes from ' + fileObject.base + ' to ' + dir);
+    return gulp.src(chunk.path)
+    .pipe(gulp.dest(dir))
+    .on('end', function() {
+      done();
+    });
+
+  });
+
+}
+
 gulp.task('watch', function(done) {
 
   // add browserSync.reload to the tasks array to make
   // all browsers reload after tasks are complete.
-  gulp.watch(['src/*.js', 'system.config.json'], ['main-watch']);
+  gulp.watch(['system.config.json'], ['main-watch']);
+  gulp.watch(['./resources/schemas/**/*.ds.json'], ['schemas'], browserSync.reload);
 
-  gulp.watch(['src/**/*.js'], function(event) {
-    var fileObject = path.parse(event.path);
-    return gulp.src(fileObject.dir + '/*.hy.js')
+  gulp.watch([dirname + '/src/**/*.js'], function(event) {
+    return gulp.src([event.path])
+    .pipe(copyFiles({dest: 'src'}))
     .pipe(convertHyperty())
-    .on('end', function() {
-      browserSync.reload();
-    });
+    .on('end', browserSync.reload);
+
   });
 
-  gulp.watch(['src/**/*.json', 'resources/schemas/**/*.ds.json'], ['schemas']);
-  gulp.watch(['examples/*.html', 'examples/**/*.hbs', 'examples/**/*.js'], browserSync.reload);
+  gulp.watch([dirname + '/src/**/*.json'], function(event) {
+    return gulp.src([event.path])
+    .pipe(copyFiles({dest: 'src'}))
+    .pipe(convertSchema())
+    .on('end', browserSync.reload);
+  });
+
+  gulp.watch([dirname + '/examples/*.html', dirname + '/examples/**/*.hbs', dirname + '/examples/**/*.js'], function(event) {
+    return gulp.src([event.path])
+    .pipe(copyFiles({dest: 'examples'}))
+    .on('end', browserSync.reload);
+  });
 
 });
 
@@ -162,9 +238,9 @@ gulp.task('hyperties-watch', ['hyperties'], browserSync.reload);
 
 gulp.task('js', function() {
 
-  return gulp.src('./src/main.js')
+  return gulp.src('./examples/main.js')
   .on('end', function() {
-    var fileObject = path.parse('./src/main.js');
+    var fileObject = path.parse('./examples/main.js');
     gutil.log('-----------------------------------------------------------');
     gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
   })
@@ -181,31 +257,21 @@ gulp.task('js', function() {
 gulp.task('hyperties', function() {
 
   return gulp.src('./src/**/*.hy.js')
-  .pipe(convertHyperty());
+  .pipe(convertHyperty())
+  .on('end', function() {
+    browserSync.reload();
+  });
 
 });
 
 gulp.task('schemas', function() {
 
   return gulp.src(['./src/**/*.ds.json', './resources/schemas/**/*.ds.json'])
-  .pipe(through.obj(function(chunk, enc, done) {
+  .pipe(convertSchema())
+  .on('end', function() {
+    browserSync.reload();
+  });
 
-    var fileObject = path.parse(chunk.path);
-
-    return gulp.src([chunk.path])
-    .on('end', function() {
-      gutil.log('-----------------------------------------------------------');
-      gutil.log('Encoding ' + fileObject.base + ' to base64');
-    })
-    .pipe(resource())
-    .resume()
-    .on('end', function() {
-      gutil.log('DataSchema', fileObject.name, ' was encoded');
-      gutil.log('-----------------------------------------------------------');
-      done();
-    });
-
-  }));
 });
 
 gulp.task('encode', function(done) {
@@ -323,6 +389,29 @@ function convertHyperty() {
     .resume()
     .on('end', function() {
       gutil.log('Hyperty', fileObject.name, ' was converted and encoded');
+      gutil.log('-----------------------------------------------------------');
+      done();
+    });
+
+  });
+
+}
+
+function convertSchema() {
+
+  return through.obj(function(chunk, enc, done) {
+
+    var fileObject = path.parse(chunk.path);
+
+    return gulp.src([chunk.path])
+    .on('end', function() {
+      gutil.log('-----------------------------------------------------------');
+      gutil.log('Encoding ' + fileObject.base + ' to base64');
+    })
+    .pipe(resource())
+    .resume()
+    .on('end', function() {
+      gutil.log('DataSchema', fileObject.name, ' was encoded');
       gutil.log('-----------------------------------------------------------');
       done();
     });
@@ -582,10 +671,27 @@ function getEnvironment() {
 
   if (argv.dev) {
     environment = argv.dev ? 'develop' : 'production';
-  } else if (process.env.MODE) {
-    environment = process.env.MODE;
+  } else if (process.env.DEVELOPMENT) {
+    environment = process.env.DEVELOPMENT ? 'develop' : 'production';
   }
 
   process.env.environment = environment;
   return environment;
+}
+
+function copySrc() {
+  return gulp.src([dirname + '/src/**/*'])
+  .pipe(gulp.dest('./src'));
+}
+
+function copyExamples() {
+  return gulp.src([dirname + '/examples/**/*'])
+  .pipe(gulp.dest('./examples'));
+}
+
+function copyHyperties(from, done) {
+  if (from) {
+    dirname = '../' + from;
+    runSequence('copy-src', 'copy-examples', done);
+  }
 }
