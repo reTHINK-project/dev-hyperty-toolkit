@@ -178,7 +178,7 @@ This repository are ready to handle with environment variables, you have some va
 - DEVELOPMENT=false
 - RUNTIME_URL=hyperty-catalogue://catalogue.hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime
 - DOMAIN=hybroker.rethink.ptinovacao.pt
-- LINK='<path to the source code of hyperties>'
+- HYPERTY_REPO='<path to the source code of hyperties>'
 ```
 
 ### The Repository structure
