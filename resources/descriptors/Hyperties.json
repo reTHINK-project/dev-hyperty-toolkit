@@ -92,8 +92,7 @@
       "signature": ""
     },
     "hypertyType": [
-      "audio",
-      "video"
+      "chat"
     ],
     "cguid": 10004,
     "version": "0.1",
