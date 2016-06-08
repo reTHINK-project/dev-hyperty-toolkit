@@ -213,26 +213,33 @@ gulp.task('watch', function(done) {
   gulp.watch(['system.config.json'], ['main-watch']);
   gulp.watch(['./resources/schemas/**/*.ds.json'], ['schemas'], browserSync.reload);
 
+  gulp.watch(['./src/**/*.js'], function(event) {
+    var fileObject = path.parse(event.path);
+    return gulp.src([fileObject.dir + '/*.hy.js'])
+    .pipe(convertHyperty());
+  }, browserSync.reload());
+
+  gulp.watch(['./src/**/*.ds.json'], function(event) {
+    var fileObject = path.parse(event.path);
+    return gulp.src([fileObject.dir + '/*.ds.js'])
+    .pipe(convertSchema());
+  }, browserSync.reload);
+
+  // Watch
   gulp.watch([dirname + '/src/**/*.js'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'src'}))
-    .pipe(convertHyperty())
-    .on('end', browserSync.reload);
-
+    .pipe(copyFiles({dest: 'src'}));
   });
 
   gulp.watch([dirname + '/src/**/*.json'], function(event) {
     return gulp.src([event.path])
     .pipe(copyFiles({dest: 'src'}))
-    .pipe(convertSchema())
-    .on('end', browserSync.reload);
   });
 
   gulp.watch([dirname + '/examples/*.html', dirname + '/examples/**/*.hbs', dirname + '/examples/**/*.js'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'examples'}))
-    .on('end', browserSync.reload);
-  });
+    .pipe(copyFiles({dest: 'examples'}));
+  }, browserSync.reload);
 
 });
 

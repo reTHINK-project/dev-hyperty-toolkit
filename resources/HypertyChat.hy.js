@@ -144,6 +144,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                **/
 
+/**
+* The Group Chat API is used to control a Group Chat instance.
+* @author Vitor Silva [vitor-t-silva@telecom.pt]
+* @version 0.1.0
+*/
+
 var ChatGroup = function (_EventEmitter) {
   _inherits(ChatGroup, _EventEmitter);
 
@@ -151,9 +157,9 @@ var ChatGroup = function (_EventEmitter) {
     _classCallCheck(this, ChatGroup);
 
     if (!syncher) throw Error('Syncher is a necessary dependecy');
-    if (!discovery) throw Error('Hyperty discover is a necessary dependecy');
+    if (!discovery) throw Error('Discover is a necessary dependecy');
 
-    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(ChatGroup).call(this, syncher, discovery));
+    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(ChatGroup).call(this, syncher, discovery, domain));
 
     var _this = _this2;
     _this._syncher = syncher;
@@ -183,52 +189,44 @@ var ChatGroup = function (_EventEmitter) {
     }
 
     /**
-     * Process child messages
-     * @param  {[type]} child [description]
-     * @return {[type]}          [description]
-     */
-
-  }, {
-    key: '_processChild',
-    value: function _processChild(child) {
-      var _this = this;
-
-      console.info('Process Message:', child);
-
-      _this.trigger('new:message:recived', child);
-    }
-
-    /**
      * This function is used to send a chat message.
-     * @param  {Message} message text to be send
+     * @param  {string} message value of message to be sent
+     * @return {Message}        complete information related with message
      */
 
   }, {
     key: 'send',
     value: function send(message) {
 
-      console.info('Send Message:', message, this);
-
       var _this = this;
       var dataObject = _this.dataObjectReporter ? _this.dataObjectReporter : _this.dataObjectObserver;
 
-      return new Promise(function (resolve, reject) {
+      dataObject.addChild('chatmessages', { chatMessage: message }).then(function (dataObjectChild) {
 
-        dataObject.addChild('chatmessages', { chatMessage: message }).then(function (dataObjectChild) {
-          console.info('Data Object Child: ', dataObjectChild);
-          var msg = {
-            childId: dataObjectChild._childId,
-            from: dataObjectChild._owner,
-            value: dataObjectChild.data
-          };
+        console.log('[addChild - Chat Message]: ', dataObjectChild);
 
-          _this._processChild(msg);
-          resolve(dataObjectChild);
-        }).catch(function (reason) {
-          console.error('Reason:', reason);
-          reject(reason);
-        });
+        var msg = {
+          childId: dataObjectChild._childId,
+          from: dataObjectChild._owner,
+          value: dataObjectChild.data
+        };
+
+        _this._onMessage(msg);
+      }).catch(function (reason) {
+        console.error('Reason:', reason);
       });
+    }
+
+    /**
+     * This function is used to receive new messages.
+     * @param  {Function} callback Function to handle with new messages
+     */
+
+  }, {
+    key: 'onMessage',
+    value: function onMessage(callback) {
+      var _this = this;
+      _this._onMessage = callback;
     }
   }, {
     key: 'join',
@@ -357,7 +355,7 @@ var ChatGroup = function (_EventEmitter) {
       dataObjectReporter.onAddChild(function (child) {
         console.info('Reporter - Add Child: ', child);
         dataObjectReporter.data.lastModified = new Date().toJSON();
-        _this._processChild(child);
+        if (_this._onMessage) _this._onMessage(child);
       });
 
       _this._dataObjectReporter = dataObjectReporter;
@@ -379,8 +377,8 @@ var ChatGroup = function (_EventEmitter) {
       });
 
       dataObjectObserver.onAddChild(function (child) {
-        console.info('Observer - Add Child: ', child);
-        _this._processChild(child);
+        console.info('Data Object Observer - Add Child: ', child);
+        if (_this._onMessage) _this._onMessage(child);
       });
     },
     get: function get() {
@@ -477,7 +475,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 /**
-* Hyperty Chat;
+* Hyperty Group Chat Manager API (HypertyChat)
 * @author Vitor Silva [vitor-t-silva@telecom.pt]
 * @version 0.1.0
 */
@@ -510,28 +508,46 @@ var HypertyChat = function (_EventEmitter) {
     _this.discovery = discovery;
     _this.identityManager = identityManager;
 
+    console.log('Discover: ', discovery);
     console.log('Identity Manager: ', identityManager);
-    console.log('Discovery: ', discovery);
 
     syncher.onNotification(function (event) {
-      console.log('Notification: ', event);
-      _this._autoSubscribe(event.url);
+
+      // TODO: replace the 100 for Message.Response
+      event.ack(100);
+
+      if (_this._onInvitation) {
+        _this._onInvitation(event);
+      }
     });
 
     return _this2;
   }
 
   /**
-   * This function is used to create a new Group Chat providing the identifier of the Group to be notified.
-   * @param  {String} name             chat name
-   * @param  {URL.UserURL} UserURLList List of User allowed
-   * @return {Promise}
+   * This function is used to handle notifications about incoming invitations to join a Group Chat.
+   * @param  {Function} callback Function with handle with the answer
+   * @return {Event}             Event with information about the Group Chat Manager
    */
 
 
   _createClass(HypertyChat, [{
+    key: 'onInvitation',
+    value: function onInvitation(callback) {
+      var _this = this;
+      _this._onInvitation = callback;
+    }
+
+    /**
+     * This function is used to create a new Group Chat providing the name and the identifiers of users to be invited.
+     * @param  {string} name  Group chat name
+     * @param  {array}  users Users to be invited to the chat
+     * @return {Chat}         The Group Chat Manager API manages the creation of new Group Chats;
+     */
+
+  }, {
     key: 'create',
-    value: function create(name, participants) {
+    value: function create(name, users) {
 
       var _this = this;
       var syncher = _this._syncher;
@@ -545,24 +561,24 @@ var HypertyChat = function (_EventEmitter) {
         _communication.communicationObject.id = name;
         _communication.communicationObject.status = _communication.CommunicationStatus.OPEN;
         _communication.communicationObject.startingTime = new Date().toJSON();
-        _communication.communicationObject.lastModified = _communication.communicationObject.startingTime;
+        _communication.communicationObject.lastModifed = _communication.communicationObject.startingTime;
 
         // Set the other subscription like a participant
         _participant2.default.hypertyResource = _this._hypertyURL;
         _communication.communicationObject.participants.push(_participant2.default);
 
         console.info('----------------------- Mapping Particpants -------------------- \n');
-        _this._mappingUser(participants).then(function (hyperties) {
+        _this._mappingUser(users).then(function (hyperties) {
           return _this._createSyncher(hyperties, _communication.communicationObject);
         }).catch(function (hyperties) {
           return _this._createSyncher(hyperties, _communication.communicationObject);
         }).then(function (dataObjectReporter) {
           console.info('3. Return Create Data Object Reporter', dataObjectReporter);
 
-          var chat = new _Chat2.default(syncher, _this.discovery, _this._domain);
-          chat.dataObjectReporter = dataObjectReporter;
-          _this.chat = chat;
-          resolve(chat);
+          var chatGroup = new _Chat2.default(syncher, _this.discovery, _this._domain);
+          chatGroup.dataObjectReporter = dataObjectReporter;
+          _this.chatGroup = chatGroup;
+          resolve(chatGroup);
         }).catch(function (reason) {
           reject(reason);
         });
@@ -581,10 +597,10 @@ var HypertyChat = function (_EventEmitter) {
 
         syncher.subscribe(_this._objectDescURL, resource).then(function (dataObjectObserver) {
           console.info('Data Object Observer: ', dataObjectObserver);
-          var chat = new _Chat2.default(syncher, _this.discovery, _this._domain);
-          chat.dataObjectObserver = dataObjectObserver;
+          var chatGroup = new _Chat2.default(syncher, _this.discovery, _this._domain);
+          chatGroup.dataObjectObserver = dataObjectObserver;
 
-          resolve(chat);
+          resolve(chatGroup);
         }).catch(function (reason) {
           reject(reason);
         });
@@ -608,23 +624,12 @@ var HypertyChat = function (_EventEmitter) {
 
         _this.chat.invite(userList).then(function () {
           console.info('users are invited');
-          var chat = new _Chat2.default(syncher, _this.discovery, _this._domain);
+          var chatGroup = new _Chat2.default(syncher, _this.discovery, _this._domain);
 
-          resolve(chat);
+          resolve(chatGroup);
         }).catch(function (reason) {
           reject(reason);
         });
-      });
-    }
-  }, {
-    key: '_autoSubscribe',
-    value: function _autoSubscribe(resource) {
-      var _this = this;
-
-      _this.join(resource).then(function (chatGroup) {
-        _this.trigger('chat:subscribe', chatGroup);
-      }).catch(function (reason) {
-        console.error(reason);
       });
     }
   }, {
