@@ -132,7 +132,7 @@ var HelloWorldReporter = function () {
 
       console.log('bye:', _this.helloObjtReporter);
 
-      _this.helloObjtReporter.data.hello = "Bye!!";
+      _this.helloObjtReporter.data.hello = "Bye, Bye!!";
     }
   }]);
 
@@ -158,7 +158,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var hello = {
   name: "hello",
-  hello: "Hello World!!"
+  hello: "Hello buddy!!"
 };
 
 exports.default = hello;
