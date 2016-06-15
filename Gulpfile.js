@@ -156,7 +156,7 @@ gulp.task('environment', function() {
     }
 
     if (process.env.DOMAIN) {
-      configuration.doamin = process.env.DOMAIN;
+      configuration.domain = process.env.DOMAIN;
     }
 
   } else {

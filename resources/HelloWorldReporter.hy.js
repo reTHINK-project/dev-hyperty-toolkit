@@ -33,149 +33,27 @@ return e[t]=!0,e})),i.push({m:e,l:o(e,n)}),this.f||r(this)},takeRecords:function
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],2:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* jshint undef: true */
-
-exports.default = activate;
-
-var _Syncher = require('service-framework/dist/Syncher');
-
-var _utils = require('../utils/utils');
-
-var _hello2 = require('./hello');
-
-var _hello3 = _interopRequireDefault(_hello2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/**
+'use strict';Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value" in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor);}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor;};}(); /* jshint undef: true */exports.default=activate;var _Syncher=require('service-framework/dist/Syncher');var _utils=require('../utils/utils');var _hello2=require('./hello');var _hello3=_interopRequireDefault(_hello2);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj};}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function");}} /**
 * Hyperty Connector;
 * @author Paulo Chainho [paulo-g-chainho@telecom.pt]
 * @version 0.1.0
-*/
-
-var HelloWorldReporter = function () {
-
-  /**
+*/var HelloWorldReporter=function(){ /**
   * Create a new HelloWorldReporter
   * @param  {Syncher} syncher - Syncher provided from the runtime core
-  */
-
-  function HelloWorldReporter(hypertyURL, bus, configuration) {
-    _classCallCheck(this, HelloWorldReporter);
-
-    if (!hypertyURL) throw new Error('The hypertyURL is a needed parameter');
-    if (!bus) throw new Error('The MiniBus is a needed parameter');
-    if (!configuration) throw new Error('The configuration is a needed parameter');
-
-    var _this = this;
-
-    var domain = (0, _utils.divideURL)(hypertyURL).domain;
-    _this._domain = domain;
-    _this._objectDescURL = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/dataschema/HelloWorldDataSchema';
-
-    var syncher = new _Syncher.Syncher(hypertyURL, bus, configuration);
-
-    _this._syncher = syncher;
-  }
-
-  /**
+  */function HelloWorldReporter(hypertyURL,bus,configuration){_classCallCheck(this,HelloWorldReporter);if(!hypertyURL)throw new Error('The hypertyURL is a needed parameter');if(!bus)throw new Error('The MiniBus is a needed parameter');if(!configuration)throw new Error('The configuration is a needed parameter');var _this=this;var domain=(0,_utils.divideURL)(hypertyURL).domain;_this._domain=domain;_this._objectDescURL='hyperty-catalogue://catalogue.'+domain+'/.well-known/dataschema/HelloWorldDataSchema';var syncher=new _Syncher.Syncher(hypertyURL,bus,configuration);_this._syncher=syncher;} /**
   * Create HelloWorld Data Object
   * @param  {HypertyURL} HypertyURL - Invited
-  */
-
-  _createClass(HelloWorldReporter, [{
-    key: 'hello',
-    value: function hello(hypertyURL) {
-      var _this = this;
-      var syncher = _this._syncher;
-
-      return new Promise(function (resolve, reject) {
-
-        syncher.create(_this._objectDescURL, [hypertyURL], _hello3.default).then(function (helloObjtReporter) {
-          console.info('1. Return Created Hello World Data Object Reporter', helloObjtReporter);
-
-          _this.helloObjtReporter = helloObjtReporter;
-
-          helloObjtReporter.onSubscription(function (event) {
-            console.info('-------- Hello World Reporter received subscription request --------- \n');
-
-            // All subscription requested are accepted
-
-            event.accept();
-          });
-
-          resolve(helloObjtReporter);
-        }).catch(function (reason) {
-          console.error(reason);
-          reject(reason);
-        });
-      });
-    }
-
-    /**
-    * Update HelloWorld Data Object
-    *
-    */
-
-  }, {
-    key: 'bye',
-    value: function bye() {
-      var _this = this;
-
-      console.log('bye:', _this.helloObjtReporter);
-
-      _this.helloObjtReporter.data.hello = "Bye, Bye!!";
-    }
-  }]);
-
-  return HelloWorldReporter;
-}();
-
-function activate(hypertyURL, bus, configuration) {
-
-  return {
-    name: 'HelloWorldReporter',
-    instance: new HelloWorldReporter(hypertyURL, bus, configuration)
-  };
-}
-module.exports = exports['default'];
+  */_createClass(HelloWorldReporter,[{key:'hello',value:function hello(hypertyURL){var _this=this;var syncher=_this._syncher;return new Promise(function(resolve,reject){syncher.create(_this._objectDescURL,[hypertyURL],_hello3.default).then(function(helloObjtReporter){console.info('1. Return Created Hello World Data Object Reporter',helloObjtReporter);_this.helloObjtReporter=helloObjtReporter;helloObjtReporter.onSubscription(function(event){console.info('-------- Hello World Reporter received subscription request --------- \n'); // All subscription requested are accepted
+event.accept();});resolve(helloObjtReporter);}).catch(function(reason){console.error(reason);reject(reason);});});} /**
+  * Update HelloWorld Data Object
+  *
+  */},{key:'bye',value:function bye(){var _this=this;console.log('bye:',_this.helloObjtReporter);_this.helloObjtReporter.data.hello="Bye, Bye!!";}}]);return HelloWorldReporter;}();function activate(hypertyURL,bus,configuration){return {name:'HelloWorldReporter',instance:new HelloWorldReporter(hypertyURL,bus,configuration)};}module.exports=exports['default'];
 
 },{"../utils/utils":4,"./hello":3,"service-framework/dist/Syncher":1}],3:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-
-var hello = {
-  name: "hello",
-  hello: "Hello buddy!!"
-};
-
-exports.default = hello;
-module.exports = exports['default'];
+"use strict";Object.defineProperty(exports,"__esModule",{value:true});var hello={name:"hello",hello:"Hello buddy!!"};exports.default=hello;module.exports=exports['default'];
 
 },{}],4:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.divideURL = divideURL;
-exports.deepClone = deepClone;
-exports.getUserMedia = getUserMedia;
-exports.serialize = serialize;
-exports.getTemplate = getTemplate;
-/**
+'use strict';Object.defineProperty(exports,"__esModule",{value:true});exports.divideURL=divideURL;exports.deepClone=deepClone;exports.getUserMedia=getUserMedia;exports.serialize=serialize;exports.getTemplate=getTemplate; /**
  * Copyright 2016 PT Inovação e Sistemas SA
  * Copyright 2016 INESC-ID
  * Copyright 2016 QUOBIS NETWORKS SL
@@ -196,153 +74,33 @@ exports.getTemplate = getTemplate;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
-
-// jshint browser:true, jquery: true
+ **/ // jshint browser:true, jquery: true
 // jshint varstmt: true
-/* global Handlebars */
-
-/**
+/* global Handlebars */ /**
  * Support module with some functions will be useful
  * @module utils
- */
-
-/**
+ */ /**
  * @typedef divideURL
  * @type Object
  * @property {string} type The type of URL
  * @property {string} domain The domain of URL
  * @property {string} identity The identity of URL
- */
-
-/**
+ */ /**
  * Divide an url in type, domain and identity
  * @param  {URL.URL} url - url address
  * @return {divideURL} the result of divideURL
- */
-function divideURL(url) {
-
-  // let re = /([a-zA-Z-]*)?:\/\/(?:\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)*(\/[\/\d\w\.-]*)*(?:[\?])*(.+)*/gi;
-  var re = /([a-zA-Z-]*):\/\/(?:\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256})([-a-zA-Z0-9@:%._\+~#=\/]*)/gi;
-  var subst = '$1,$2,$3';
-  var parts = url.replace(re, subst).split(',');
-
-  // If the url has no protocol, the default protocol set is https
-  if (parts[0] === url) {
-    parts[0] = 'https';
-    parts[1] = url;
-  }
-
-  var result = {
-    type: parts[0],
-    domain: parts[1],
-    identity: parts[2]
-  };
-
-  return result;
-}
-
-/**
+ */function divideURL(url){ // let re = /([a-zA-Z-]*)?:\/\/(?:\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)*(\/[\/\d\w\.-]*)*(?:[\?])*(.+)*/gi;
+var re=/([a-zA-Z-]*):\/\/(?:\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256})([-a-zA-Z0-9@:%._\+~#=\/]*)/gi;var subst='$1,$2,$3';var parts=url.replace(re,subst).split(','); // If the url has no protocol, the default protocol set is https
+if(parts[0]===url){parts[0]='https';parts[1]=url;}var result={type:parts[0],domain:parts[1],identity:parts[2]};return result;} /**
  * Make a COPY of the original data
  * @param  {Object}  obj - object to be cloned
  * @return {Object}
- */
-function deepClone(obj) {
-  //TODO: simple but inefficient JSON deep clone...
-  if (obj) return JSON.parse(JSON.stringify(obj));
-}
-
-/**
+ */function deepClone(obj){ //TODO: simple but inefficient JSON deep clone...
+if(obj)return JSON.parse(JSON.stringify(obj));} /**
  * Get WebRTC API resources
  * @param  {object}     options Object containing the information that resources will be used (camera, mic, resolution, etc);
  * @return {Promise}
- */
-function getUserMedia(constraints) {
-
-  return new Promise(function (resolve, reject) {
-
-    navigator.mediaDevices.getUserMedia(constraints).then(function (mediaStream) {
-      resolve(mediaStream);
-    }).catch(function (reason) {
-      reject(reason);
-    });
-  });
-}
-
-function serialize() {
-
-  $.fn.serializeObject = function () {
-    var o = {};
-    var a = this.serializeArray();
-    $.each(a, function () {
-      if (o[this.name] !== undefined) {
-        if (!o[this.name].push) {
-          o[this.name] = [o[this.name]];
-        }
-
-        o[this.name].push(this.value || '');
-      } else {
-        o[this.name] = this.value || '';
-      }
-    });
-
-    return o;
-  };
-
-  $.fn.serializeObjectArray = function () {
-    var o = {};
-    var a = this.serializeArray();
-    $.each(a, function () {
-      if (o[this.name] !== undefined) {
-        if (!o[this.name].push) {
-          o[this.name] = [o[this.name]];
-        }
-
-        o[this.name].push(this.value || '');
-      } else {
-        if (!o[this.name]) o[this.name] = [];
-        o[this.name].push(this.value || '');
-      }
-    });
-
-    return o;
-  };
-}
-
-function getTemplate(path, script) {
-
-  return new Promise(function (resolve, reject) {
-
-    if (Handlebars.templates === undefined || Handlebars.templates[name] === undefined) {
-      Handlebars.templates = {};
-    } else {
-      resolve(Handlebars.templates[name]);
-    }
-
-    var templateFile = $.ajax({
-      url: path + '.hbs',
-      success: function success(data) {
-        Handlebars.templates[name] = Handlebars.compile(data);
-      },
-
-      fail: function fail(reason) {
-        return reason;
-      }
-    });
-
-    var scriptFile = $.getScript(script);
-
-    var requests = [];
-    if (path) requests.push(templateFile);
-    if (script) requests.push(scriptFile);
-
-    Promise.all(requests).then(function (result) {
-      resolve(Handlebars.templates[name]);
-    }).catch(function (reason) {
-      reject(reason);
-    });
-  });
-}
+ */function getUserMedia(constraints){return new Promise(function(resolve,reject){navigator.mediaDevices.getUserMedia(constraints).then(function(mediaStream){resolve(mediaStream);}).catch(function(reason){reject(reason);});});}function serialize(){$.fn.serializeObject=function(){var o={};var a=this.serializeArray();$.each(a,function(){if(o[this.name]!==undefined){if(!o[this.name].push){o[this.name]=[o[this.name]];}o[this.name].push(this.value||'');}else {o[this.name]=this.value||'';}});return o;};$.fn.serializeObjectArray=function(){var o={};var a=this.serializeArray();$.each(a,function(){if(o[this.name]!==undefined){if(!o[this.name].push){o[this.name]=[o[this.name]];}o[this.name].push(this.value||'');}else {if(!o[this.name])o[this.name]=[];o[this.name].push(this.value||'');}});return o;};}function getTemplate(path,script){return new Promise(function(resolve,reject){if(Handlebars.templates===undefined||Handlebars.templates[name]===undefined){Handlebars.templates={};}else {resolve(Handlebars.templates[name]);}var templateFile=$.ajax({url:path+'.hbs',success:function success(data){Handlebars.templates[name]=Handlebars.compile(data);},fail:function fail(reason){return reason;}});var scriptFile=$.getScript(script);var requests=[];if(path)requests.push(templateFile);if(script)requests.push(scriptFile);Promise.all(requests).then(function(result){resolve(Handlebars.templates[name]);}).catch(function(reason){reject(reason);});});}
 
 },{}]},{},[2])(2)
 });
