@@ -237,7 +237,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.divideURL = divideURL;
 exports.deepClone = deepClone;
-exports.getConfig = getConfig;
 exports.getUserMedia = getUserMedia;
 exports.serialize = serialize;
 exports.getTemplate = getTemplate;
@@ -319,18 +318,8 @@ function deepClone(obj) {
 }
 
 /**
- * Get the configuration from an json file;
- * @param  {JSONObject} jsonFile
- * @return {object}
- */
-function getConfig(JSONObject) {
-  console.log('develop');
-  return JSONObject['develop'];
-}
-
-/**
  * Get WebRTC API resources
- * @param  {Object}     options Object containing the information that resources will be used (camera, mic, resolution, etc);
+ * @param  {object}     options Object containing the information that resources will be used (camera, mic, resolution, etc);
  * @return {Promise}
  */
 function getUserMedia(constraints) {
