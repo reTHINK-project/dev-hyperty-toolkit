@@ -681,13 +681,15 @@ function getEnvironment() {
 
   if (argv.dev) {
     environment = argv.dev ? 'develop' : 'production';
-  } else if (process.env.DEVELOPMENT) {
-    environment = process.env.DEVELOPMENT ? 'develop' : 'production';
   }
-
-  process.env.environment = environment;
+  
+  if (process.env.hasOwnProperty('DEVELOPMENT')) {
+    environment = process.env.DEVELOPMENT === 'true' ? 'develop' : 'production';
+  }
+  
   return environment;
 }
+
 
 function copySrc() {
   return gulp.src([dirname + '/src/**/*'])
