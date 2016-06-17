@@ -195,8 +195,7 @@
       }
     },
     "hypertyType": [
-      "audio",
-      "video"
+      "chat"
     ],
     "sourcePackageURL": "/sourcePackage",
     "language": "javascript",
