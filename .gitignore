@@ -18,6 +18,3 @@ resources/*.hy.js
 dist
 config.json
 resources/tmp
-
-src
-examples
