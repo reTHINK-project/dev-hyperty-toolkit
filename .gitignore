@@ -17,4 +17,5 @@ resources/*.hy.js
 *.komodoproject
 dist
 config.json
-resources/tmp
+resources
+test
