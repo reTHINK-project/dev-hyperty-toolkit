@@ -32,11 +32,9 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 2);
 
-2. Create the folder that will contain your Hyperty source code (`<foldername>/src`), Side by side with toolkit. You are free to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty);
+2. run the command `npm install` (this may take some minutes)
 
-3. run the command `npm install` (this may take some minutes)
-
-4. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
+3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
  ```
  127.0.0.1   hybroker.rethink.ptinovacao.pt
  127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
@@ -45,6 +43,8 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  * In Linux is normally available at: ```/etc/hosts```
  * In windows is normally available at:  ```C:\Windows\System32\drivers\etc\hosts```
 
+4. Create the folder thet will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use somethinf else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
+ 
 5. run the local http-server and catalogue with ```npm run start:dev```. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
 
 6. Check the following url's to allow the certificates:
