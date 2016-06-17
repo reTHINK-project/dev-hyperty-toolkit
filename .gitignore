@@ -15,7 +15,11 @@ node_modules
 resources/bundle.js
 resources/*.hy.js
 *.komodoproject
+
+
 dist
 config.json
+src
+examples
 resources
 test
