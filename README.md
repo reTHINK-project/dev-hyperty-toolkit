@@ -30,11 +30,13 @@ In case you want want to know more details about reTHINK, have a look [here](doc
 
 To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the following steps:
 
-1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else;
+1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 2);
 
-2. run the command `npm install` (this may take some minutes)
+2. Create the folder that will contain your Hyperty source code (`<foldername>/src`), Side by side with toolkit. You are free to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty);
 
-3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
+3. run the command `npm install` (this may take some minutes)
+
+4. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
  ```
  127.0.0.1   hybroker.rethink.ptinovacao.pt
  127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
@@ -43,11 +45,13 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  * In Linux is normally available at: ```/etc/hosts```
  * In windows is normally available at:  ```C:\Windows\System32\drivers\etc\hosts```
 
-4. run the local http-server and catalogue with ```npm run start:dev```. Check the following url's to allow the certificates:
+5. run the local http-server and catalogue with ```npm run start:dev```. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
+
+6. Check the following url's to allow the certificates:
  * https://hybroker.rethink.ptinovacao.pt
  * https://catalogue.hybroker.rethink.ptinovacao.pt
 
-5. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
+7. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
 
  - Hello World Reporter;
  - Hello World Observer that observes changes made by the first Hello World Reporter;
@@ -132,9 +136,11 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  }
 ```
 
- This is optional in case you are reusing existing data schemas. **To Do:** explain how to reuse existing data schemas.
+This is optional in case you are reusing existing [data schemas](https://github.com/reTHINK-project/dev-service-framework/tree/master/schemas/json-schema/data-objects). In that situation, you just have to set in your Hyperty Descriptor the Catalogue URL that points to the data schema (see below).
 
-2. To test your Hyperty, you need to:
+3. Complete your Hyperty Descriptor by editing `dev-hyperty-toolkit\resources\descriptors\Hyperties.json`:
+
+4. To test your Hyperty, you need to:
 
  - expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
 
