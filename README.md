@@ -28,7 +28,7 @@ In case you want want to know more details about reTHINK, have a look [here](doc
 
 ### Quick Guide Setup
 
-To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the following steps:
+To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the steps below. In case you want to use Hyperties in your Application please read [this tutorial](docs/tutorials/development-of-apps.md).
 
 1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 2);
 
