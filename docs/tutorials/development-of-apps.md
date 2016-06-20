@@ -7,8 +7,6 @@ A Hyperty is a module of software logic that is dynamically deployed in web runt
 
 
 ### How to use Hyperties
-\* Here we can explain how hyperties are being used based on this example from PTIN: https://github.com/reTHINK-project/dev-service-framework/blob/develop/example/demo.js \*
-
 
 The usage of Hyperties is very simple and similar to the usage of any common Javascript library:
 
@@ -63,7 +61,7 @@ The diagram below depicts an Higher level picture of the Core Runtime architectu
 ![reTHINK App Diagram](hyperty_app_diagrams.png)
 
 #####Security: sandboxes
-The Web developer does not have to deal with low level details of the architecture. The sandboxes and the management of hyperties and protostubs is done by the core framework. The sandboxes allows to isolate code from different providers reducing the risk of suffering cross-site scripting attacks. 
+The Web developer does not have to deal with low level details of the architecture. The sandboxes and the management of hyperties and protostubs is done by the core framework. The sandboxes allows to isolate code from different providers reducing the risk of suffering cross-site scripting attacks.
 There are special cases where the Hyperty needs to be executed in the same sandbox as the main web application, for example, when the Hyperty needs to access the WebRTC API. These hyperties which are executed in the same sandbox as the main app are called **App Hyperties**. The hyperties which are executed in a different sandbox (a Web Worker in the case of the runtime browser) are called **Service Hyperties**.  
 
 #####Compatibility: Protostubs

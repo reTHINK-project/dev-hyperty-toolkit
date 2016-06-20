@@ -28,9 +28,9 @@ In case you want want to know more details about reTHINK, have a look [here](doc
 
 ### Quick Guide Setup
 
-To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the following steps:
+To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the steps below. In case you want to use Hyperties in your Application please read [this tutorial](docs/tutorials/development-of-apps.md).
 
-1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else;
+1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 2);
 
 2. run the command `npm install` (this may take some minutes)
 
@@ -43,11 +43,15 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  * In Linux is normally available at: ```/etc/hosts```
  * In windows is normally available at:  ```C:\Windows\System32\drivers\etc\hosts```
 
-4. run the local http-server and catalogue with ```npm run start:dev```. Check the following url's to allow the certificates:
+4. Create the folder thet will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use somethinf else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
+
+5. run the local http-server and catalogue with ```npm run start:dev```. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
+
+6. Check the following url's to allow the certificates:
  * https://hybroker.rethink.ptinovacao.pt
  * https://catalogue.hybroker.rethink.ptinovacao.pt
 
-5. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
+7. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
 
  - Hello World Reporter;
  - Hello World Observer that observes changes made by the first Hello World Reporter;
@@ -132,9 +136,11 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  }
 ```
 
- This is optional in case you are reusing existing data schemas. **To Do:** explain how to reuse existing data schemas.
+This is optional in case you are reusing existing [data schemas](https://github.com/reTHINK-project/dev-service-framework/tree/master/schemas/json-schema/data-objects). In that situation, you just have to set in your Hyperty Descriptor the Catalogue URL that points to the data schema (see below).
 
-2. To test your Hyperty, you need to:
+3. Complete your Hyperty Descriptor by editing `dev-hyperty-toolkit\resources\descriptors\Hyperties.json`:
+
+4. To test your Hyperty, you need to:
 
  - expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
 
@@ -168,35 +174,6 @@ In case you prefer not to depend on third party services you also have the optio
 
 ### The Repository structure
 
-#### **src** folder
-
-Hold all Hyperty related source code, like hyperty classes and JSON-Schemas. The hyperty class must have the suffix ".hy.js", on the file.
-
-**Example:** Hello.hy.js
-
-**Why?**
-Because all the files in folder, could be a possible hyperty, with this suffix, we can distinguish the main hyperty from others files that complement it;
-
-To expose your hyperty in the Testing Web App you need to go to *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file** file to the switch cases presented there.
-
-**example:**
-
-```javascript
-
-function hypertyDeployed(hyperty) {
-
-  ...
-  switch (hyperty.name) {
-
-    // You can add your own hyperty with this code
-    case '<hyperty name>':
-      template = '<hyperty-name>/<HypertyName>';
-      script =  '<hyperty-name>/<app.js>';
-      break;
-  }
-}
-```
-**NOTE:** This probably need to be optimized, suggestion are welcome;
 
 #### **resources** folder
 
@@ -235,30 +212,6 @@ Hyperties.json
 ```
 
 The same happens with JSON-Schemas that are added / updated in the DataSchemas.json file.
-
-
-
-#### **examples** folder
-
-In this folder you have, for each hyperty you develop, the Web side testing.
-This is customized with HTML using [Handlebars](http://handlebarsjs.com/) and ES5 javascript;
-
-With this template system you can:
-
- - avoid the initial html setup, like **&lt;html&gt;, &lt;head&gt;, &lt;body&gt;**, and add only the html tags you need, like **&lt;div&gt;, &lt;p&gt;, &lt;b&gt;** and others.
- - use some extra features like, **variables, {{each}}, {{if}}**, look at [documentation](http://handlebarsjs.com/expressions.html)
- -
-
-**Examples:**
- - hello-world > helloWorld.hbs
- - hyperty-chat > HypertyChat.hbs
- - hyperty-connector > HypertyConnector.hbs
-
-#### **Test** folder
-
- You can make your own tests to an hyperty, only need create an file with your hyperty name, and suffix the ".spec.js"
-
- **Example:** Hello.spec.js
 
 ### Gulp Tasks
 
