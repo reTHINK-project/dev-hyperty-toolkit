@@ -218,12 +218,16 @@
     "description": "Description of BraceletSensorObserver",
     "objectName": "BraceletSensorObserver",
     "configuration": {},
-    "hypertyType": [],
+    "hypertyType": [
+      "heart_rate", "sleep", "steps", "battery"
+    ],
     "sourcePackageURL": "/sourcePackage",
     "language": "javascript",
     "signature": "",
     "messageSchemas": "",
-    "dataObjects": [],
+    "dataObjects": [
+      "https://catalogue.hybroker.rethink.ptinovacao.pt/.well-known/dataschema/Context"
+    ],
     "accessControlPolicy": "somePolicy"
   },
   "BraceletSensorReporter": {
@@ -238,12 +242,16 @@
     "description": "Description of BraceletSensorReporter",
     "objectName": "BraceletSensorReporter",
     "configuration": {},
-    "hypertyType": [],
+    "hypertyType": [
+      "heart_rate", "sleep", "steps", "battery"
+    ],
     "sourcePackageURL": "/sourcePackage",
     "language": "javascript",
     "signature": "",
     "messageSchemas": "",
-    "dataObjects": [],
+    "dataObjects": [
+      "https://catalogue.hybroker.rethink.ptinovacao.pt/.well-known/dataschema/Context"
+    ],
     "accessControlPolicy": "somePolicy"
   },
   "NotificationsObserver": {
