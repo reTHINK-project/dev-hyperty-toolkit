@@ -13,7 +13,21 @@ The usage of Hyperties is very simple and similar to the usage of any common Jav
 1- the App has to ensure the runtime is instantiated:
 
 ```
-let runtime = new RuntimeLoader('hyperty-catalogue://example.com/.well-known/hyperty.runtime/default');
+let config = '{
+  "development": true,
+  "runtimeURL": "hyperty-catalogue://hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime",
+  "domain": "hybroker.rethink.ptinovacao.pt"
+}'
+
+rethink.install(config).then(function(result) {
+
+  runtime = result;
+  
+  // your code
+
+}).catch(function(reason) {
+  console.error(reason);
+});
 ```
 
 2- then load and deploy the required Hyperty from the Catalogue
