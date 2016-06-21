@@ -4,7 +4,7 @@ let nIdentity = 0;
 let googleInfo = {
   clientSecret:          'Xx4rKucb5ZYTaXlcZX9HLfZW',
   clientID:              '808329566012-tqr8qoh111942gd2kg007t0s8f277roi.apps.googleusercontent.com',
-  redirectURI:           location.protocol + '//' + location.host, //location.origin,
+  redirectURI:           location.protocol + '//' + location.hostname, //location.origin,
   issuer:                'https://accounts.google.com',
   tokenEndpoint:         'https://www.googleapis.com/oauth2/v4/token?',
   jwksUri:               'https://www.googleapis.com/oauth2/v3/certs?',
@@ -132,14 +132,14 @@ let IdpProxy = {
     //start the login phase
     //TODO later should be defined a better approach
     return new Promise(function(resolve, reject) {
-      if (!contents) {
+      if (!hint) {
         /*try {
           if (window) {
             resolve('url');
           }
         } catch (error) {*/
 
-        let requestUrl = i.authorisationEndpoint + 'scope=' + i.scope + '&client_id=' + i.clientID + '&redirect_uri=' + i.redirectURI + '&response_type=' + i.type + '&state=' + i.state + '&access_type=' + i.accessType;
+        let requestUrl = i.authorisationEndpoint + 'scope=' + i.scope + '&client_id=' + i.clientID + '&redirect_uri=' + i.redirectURI + '&response_type=' + i.type + '&state=' + i.state + '&access_type=' + i.accessType + '&nonce=' + contents;
 
         reject({name: 'IdPLoginError', loginUrl: requestUrl});
 
@@ -147,9 +147,9 @@ let IdpProxy = {
 
       } else {
         // the request have already been made, so idpPRoxy will exchange the tokens along to the idp, to obtain the information necessary
-        let accessToken = urlParser(contents, 'access_token');
-        let idToken = urlParser(contents, 'id_token');
-        let code = urlParser(contents, 'code');
+        let accessToken = urlParser(hint, 'access_token');
+        let idToken = urlParser(hint, 'id_token');
+        let code = urlParser(hint, 'code');
 
         exchangeCode(code).then(function(value) {
 
