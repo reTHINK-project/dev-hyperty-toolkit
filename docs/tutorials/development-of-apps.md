@@ -12,12 +12,37 @@ The usage of Hyperties is very simple and similar to the usage of any common Jav
 
 1- the App has to ensure the runtime is instantiated:
 
+You can use through the npm module like:
+```shell
+npm install npm install github:reTHINK-project/dev-runtime-browser#master --save
 ```
-let config = '{
+```javascript
+import rethink from 'runtime-browser';
+```
+
+or you can load through the html script tag
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your App Name</title>
+</head>
+<body>
+    <script src="https://<domain>/.well-know/runtime/rethink.js"></script>
+</body>
+</html>
+```
+
+For both methods you need to do:
+
+```javascript
+let config = {
   "development": true,
   "runtimeURL": "hyperty-catalogue://hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime",
   "domain": "hybroker.rethink.ptinovacao.pt"
-}'
+}
 
 rethink.install(config).then(function(result) {
 
@@ -32,7 +57,7 @@ rethink.install(config).then(function(result) {
 
 2- then load and deploy the required Hyperty from the Catalogue
 
-```
+```javascript
 runtime.requireHyperty('hyperty-catalogue://catalogue.example.com/.well-known/hyperty/HelloWorldReporter').then(
 
   startUsingHpertyDeployed;
