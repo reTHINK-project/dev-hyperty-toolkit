@@ -33,7 +33,7 @@ rethink.install(config).then(function(result) {
 2- then load and deploy the required Hyperty from the Catalogue
 
 ```
-runtime.requireHyperty('hyperty-catalogue://example.com/.well-known/hyperty/HelloWorldReporter').then(
+runtime.requireHyperty('hyperty-catalogue://catalogue.example.com/.well-known/hyperty/HelloWorldReporter').then(
 
   startUsingHpertyDeployed;
 
