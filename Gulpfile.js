@@ -466,7 +466,7 @@ function transpile(opts) {
 
     return browserify(args)
     .transform(babel, {
-      compact: compact,
+      compact: true,
       presets: ['es2015', 'stage-0'],
       plugins: ['add-module-exports', 'transform-inline-environment-variables']
     })
