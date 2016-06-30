@@ -199,7 +199,15 @@ function copyFiles(opts) {
     return gulp.src(chunk.path)
     .pipe(gulp.dest(dir))
     .on('end', function() {
-      done();
+
+      fs.readFile(dir + '/' + fileObject.base, function(err, data) {
+        if (err) throw err;
+        var a = chunk;
+        a.path = dir + '/' + fileObject.base;
+        a.contents = data;
+        done(null, a);
+      });
+
     });
 
   });
@@ -233,12 +241,18 @@ gulp.task('watch', function(done) {
 
   gulp.watch([dirname + '/src/**/*.json'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'src'}))
+    .pipe(copyFiles({dest: 'src'}));
   });
 
   gulp.watch([dirname + '/examples/*.html', dirname + '/examples/**/*.hbs', dirname + '/examples/**/*.js'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'examples'}));
+    .pipe(copyFiles({dest: 'examples'}))
+    .pipe(transpile({destination: __dirname + '/dist', debug: false}))
+    .on('end', function() {
+      gutil.log('The main file was created like a distribution file on /dist');
+      gutil.log('-----------------------------------------------------------');
+      browserSync.reload();
+    });
   }, browserSync.reload);
 
 });
@@ -682,14 +696,13 @@ function getEnvironment() {
   if (argv.dev) {
     environment = argv.dev ? 'develop' : 'production';
   }
-  
+
   if (process.env.hasOwnProperty('DEVELOPMENT')) {
     environment = process.env.DEVELOPMENT === 'true' ? 'develop' : 'production';
   }
-  
+
   return environment;
 }
-
 
 function copySrc() {
   return gulp.src([dirname + '/src/**/*'])
