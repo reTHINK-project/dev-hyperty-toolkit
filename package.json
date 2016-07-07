@@ -20,8 +20,8 @@
   },
   "homepage": "https://github.com/reTHINK-project/dev-hyperty-toolkit#readme",
   "dependencies": {
-    "runtime-browser": "github:rethink-project/dev-runtime-browser#master",
-    "service-framework": "github:rethink-project/dev-service-framework#develop"
+    "runtime-browser": "github:rethink-project/dev-runtime-core#master",
+    "service-framework": "github:rethink-project/dev-service-framework#master"
   },
   "devDependencies": {
     "babel-plugin-add-module-exports": "^0.1.2",

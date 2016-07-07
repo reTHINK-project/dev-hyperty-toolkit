@@ -98,21 +98,7 @@ let IdpProxy = {
   * @return {Promise}      Returns a promise with the identity assertion validation result
   */
   validateAssertion: (assertion, origin) => {
-
-    //TODO check the values with the hash received
     return new Promise(function(resolve,reject) {
-
-      let decodedContent = atob(assertion);
-      let content = JSON.parse(decodedContent);
-
-      let idTokenSplited = content.tokenID.split('.');
-
-      let idToken = JSON.parse(atob(idTokenSplited[1]));
-
-      resolve({identity: idToken.email, contents: idToken});
-
-    });
-    /*return new Promise(function(resolve,reject) {
       let i = googleInfo;
 
       let decodedContent = atob(assertion);
@@ -128,7 +114,7 @@ let IdpProxy = {
 
         reject(err);
       });
-    });*/
+    });
   },
 
   /**
@@ -146,14 +132,14 @@ let IdpProxy = {
     //start the login phase
     //TODO later should be defined a better approach
     return new Promise(function(resolve, reject) {
-      if (!hint) {
+      if (!contents) {
         /*try {
           if (window) {
             resolve('url');
           }
         } catch (error) {*/
 
-        let requestUrl = i.authorisationEndpoint + 'scope=' + i.scope + '&client_id=' + i.clientID + '&redirect_uri=' + i.redirectURI + '&response_type=' + i.type + '&state=' + i.state + '&access_type=' + i.accessType + '&nonce=' + contents;
+        let requestUrl = i.authorisationEndpoint + 'scope=' + i.scope + '&client_id=' + i.clientID + '&redirect_uri=' + i.redirectURI + '&response_type=' + i.type + '&state=' + i.state + '&access_type=' + i.accessType;
 
         reject({name: 'IdPLoginError', loginUrl: requestUrl});
 
@@ -161,9 +147,9 @@ let IdpProxy = {
 
       } else {
         // the request have already been made, so idpPRoxy will exchange the tokens along to the idp, to obtain the information necessary
-        let accessToken = urlParser(hint, 'access_token');
-        let idToken = urlParser(hint, 'id_token');
-        let code = urlParser(hint, 'code');
+        let accessToken = urlParser(contents, 'access_token');
+        let idToken = urlParser(contents, 'id_token');
+        let code = urlParser(contents, 'code');
 
         exchangeCode(code).then(function(value) {
 
