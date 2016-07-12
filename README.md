@@ -4,8 +4,6 @@ Hyperty Development Toolkit
 
 This repository provides required tools to develop Hyperties and a few demos. Currently limited to hyperties to be executed in the Browser. Soon NodeJS support will also be added;
 
-**TODO:** Add a docker file with this pre-configured;
-
 -	[Overview](#rethink-framework-overview)
 -	[Getting Started](#quick-start)
 
@@ -13,23 +11,61 @@ This repository provides required tools to develop Hyperties and a few demos. Cu
 
 reTHINK Project provides a Javascript framework to build and deliver Real Time Communication Microservices in end-user devices (browsers and standalone mobile apps) and in Network edge servers (NodeJS):
 
-* **Hyperty** is a the so called Javascript Microservice that communicates through P2P Data Synchronisation with mimimum usage of back-end services; A Hyperty must be deployed in a runtime (as mentioned in an end-user device or Network edge server).
-* **Protocol on-the-fly** is used by Hyperties to support seamless interoperability without federation or standardisation of network protocols;
+* **Hyperty** is similar to an Agent or a Bot that performs tasks on user's behalf, by communicating through P2P Data Synchronisation with other Hyperties. Some examples (see demos), are:
+
+  - the Hyperty Connector that uses WebRTC to manage video calls between users;
+
+  - the Group Chat Hyperty (name says it all);
+
+  - the myBracelet Hyperty, is a sensing Hyperty that encapsulates a Bracelet, by collecting and publishing data from it
+
+  - the myContext Hyperty is a Big Data Hyperty that uses data published by different sensing Hyperties (like the myBracelet Hyperty) to infer and calculate more meaningful Contextual data about the user.
+
+* **Protocol on-the-fly** is used by Hyperties to support interoperability with other Hyperties from other domains, without requiring federation or standardisation of network protocols;
 * Hyperties are **Trustful**. Hyperties are decoupled from the User Identity, which can be securely asserted by existing IDPs (Identity Provider), when communicating with other Hyperties.
 
 In case you want want to know more details about reTHINK, have a look [here](docs/tutorials/readme.md)
 
-### Quick Guide
+### Quick Guide Setup
 
-To start the development of an Hyperty (make sure you have node 5.4 and npm 3.3 globaly available in your environment), perform the following steps:
+To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the steps below. In case you want to use Hyperties in your Application please read [this tutorial](docs/tutorials/development-of-apps.md).
+**NOTE for Windows Users:** You should use "Windows PowerShell" and not the standard command line.
 
-1. clone this repository; **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else;
+1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 2);
 
-2. run the command `npm install` (this may take some minutes) followed by the command `npm start` for production mode or `npm run start:dev` for develop mode;
+2. run the command `npm install` (this may take some minutes)
 
-3. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
+3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
+ ```
+ 127.0.0.1   hybroker.rethink.ptinovacao.pt
+ 127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
+ ```
 
-- a ".hy.js" containing your Hyperty classes. For example the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) looks like:
+ * In Linux is normally available at: ```/etc/hosts```
+ * In windows is normally available at:  ```C:\Windows\System32\drivers\etc\hosts```
+
+4. Create the folder thet will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use somethinf else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
+
+5. run the local http-server and catalogue with ```npm run start:dev```. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
+
+6. Check the following url's to allow the certificates:
+ * https://hybroker.rethink.ptinovacao.pt
+ * https://catalogue.hybroker.rethink.ptinovacao.pt
+
+7. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
+
+ - Hello World Reporter;
+ - Hello World Observer that observes changes made by the first Hello World Reporter;
+ - WebRTC Connector example;
+ - Group Chat;
+
+### First Hyperty Development
+
+1. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
+
+ - a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldOberver.hy.js](/src/hello-world/HelloWorldObserver.hy.js).
+
+ The HelloWorldReporter.hy.js looks like:
 
  ```
  // This is the Hello World Reporter who owns and reports changes done in the Hello Data Object.
@@ -64,7 +100,7 @@ To start the development of an Hyperty (make sure you have node 5.4 and npm 3.3 
  // This change  will be received by the Observer:
  ```
 
- Another example is the [HelloWorldObserver.hy.js](/src/hello-world/HelloWorldObserver.hy.js) which is Hyperty observing changes on the Hello Data Object performed by the Observer:
+  The Hello World Observer (which is the Hyperty observing changes on the Hello Data Object performed by the Hello World Reporter) looks like :
 
  ```
  // This is the Hello World Observer who subscribes the Hello Data Object to be synched with it.
@@ -81,7 +117,7 @@ To start the development of an Hyperty (make sure you have node 5.4 and npm 3.3 
  });
 ```
 
-- a ".ds.json" containing the JSON-Schema describing data objects handled by your Hyperty e.g. HelloWorldDataSchema.ds.json:
+ - a ".ds.json" containing the JSON-Schema describing data objects handled by your Hyperty e.g. HelloWorldDataSchema.ds.json:
 
  ```
  {
@@ -101,25 +137,15 @@ To start the development of an Hyperty (make sure you have node 5.4 and npm 3.3 
  }
 ```
 
-  This is optional in case you are reusing existing data schemas. **To Do:** explain how to reuse existing data schemas.
+This is optional in case you are reusing existing [data schemas](https://github.com/reTHINK-project/dev-service-framework/tree/master/schemas/json-schema/data-objects). In that situation, you just have to set in your Hyperty Descriptor the Catalogue URL that points to the data schema (see below).
+
+3. Complete your Hyperty Descriptor by editing `dev-hyperty-toolkit\resources\descriptors\Hyperties.json`:
 
 4. To test your Hyperty, you need to:
 
  - expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
 
  - In case your Hyperty exposes an API to be used by a Web App, you should move to "examples" folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
-
- - To avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), you can change your hosts file to point to your `localhost` the DNS name of an existing reTHINK domain like `hybroker.rethink.ptinovacao.pt`. **to do:** provide a link for the back-end setup guide
-
-5. Open `https://localhost/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
-
- - Hello World Reporter;
-
- - Hello World Observer that observes changes made by the first Hello World Reporter;
-
- - WebRTC Connector example;
-
- - Group Chat;
 
 ### Cloud and Local development environment
 
@@ -140,6 +166,7 @@ The toolkit is pre-configured to use **hybroker.rethink.ptinovacao.pt** cloud de
 
  ```
  127.0.0.1   hybroker.rethink.ptinovacao.pt
+ 127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
  ```
 
 #### Local Development Environment
@@ -148,35 +175,6 @@ In case you prefer not to depend on third party services you also have the optio
 
 ### The Repository structure
 
-#### **src** folder
-
-Hold all Hyperty related source code, like hyperty classes and JSON-Schemas. The hyperty class must have the suffix ".hy.js", on the file.
-
-**Example:** Hello.hy.js
-
-**Why?**
-Because all the files in folder, could be a possible hyperty, with this suffix, we can distinguish the main hyperty from others files that complement it;
-
-To expose your hyperty in the Testing Web App you need to go to *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file** file to the switch cases presented there.
-
-**example:**
-
-```javascript
-
-function hypertyDeployed(hyperty) {
-
-  ...
-  switch (hyperty.name) {
-
-    // You can add your own hyperty with this code
-    case '<hyperty name>':
-      template = '<hyperty-name>/<HypertyName>';
-      script =  '<hyperty-name>/<app.js>';
-      break;
-  }
-}
-```
-**NOTE:** This probably need to be optimized, suggestion are welcome;
 
 #### **resources** folder
 
@@ -216,30 +214,6 @@ Hyperties.json
 
 The same happens with JSON-Schemas that are added / updated in the DataSchemas.json file.
 
-
-
-#### **examples** folder
-
-In this folder you have, for each hyperty you develop, the Web side testing.
-This is customized with HTML using [Handlebars](http://handlebarsjs.com/) and ES5 javascript;
-
-With this template system you can:
-
- - avoid the initial html setup, like **&lt;html&gt;, &lt;head&gt;, &lt;body&gt;**, and add only the html tags you need, like **&lt;div&gt;, &lt;p&gt;, &lt;b&gt;** and others.
- - use some extra features like, **variables, {{each}}, {{if}}**, look at [documentation](http://handlebarsjs.com/expressions.html)
- -
-
-**Examples:**
- - hello-world > helloWorld.hbs
- - hyperty-chat > HypertyChat.hbs
- - hyperty-connector > HypertyConnector.hbs
-
-#### **Test** folder
-
- You can make your own tests to an hyperty, only need create an file with your hyperty name, and suffix the ".spec.js"
-
- **Example:** Hello.spec.js
-
 ### Gulp Tasks
 
 The following Gulp Tasks are provided:
@@ -277,3 +251,5 @@ This task will:
 ```shell
 gulp encode
 ```
+
+### [Troubleshooting](troubleshouting.md)

@@ -7,7 +7,6 @@ let microsoftInfo = {
   tokenEndpoint:         'https://login.windows.net/common/oauth2/authorize?',
   type:                  'id_token',
   scope:                 'openid',
-  nonce:                 '7362CAEA-9CA5-4B43-9BA3-34D7C303EBA7', //TODO change to a random number
   mode:                  'fragment'
 };
 
@@ -48,24 +47,24 @@ let idp = {
     //start the login phase
     //TODO later should be defined a better approach
     return new Promise(function(resolve, reject) {
-      if (!contents) {
+      if (!hint) {
         let m = microsoftInfo;
 
         //let requestUrl = 'https://login.windows.net/common/oauth2/authorize?response_type=id_token&client_id=7e2f3589-4b38-4b1c-a321-c9251de00ef2&scope=openid&nonce=7362CAEA-9CA5-4B43-9BA3-34D7C303EBA7&response_mode=fragment&redirect_uri=' + location.origin;
 
-        let requestUrl = m.tokenEndpoint + 'response_type=' + m.type + '&client_id=' + m.clientID + '&scope=' + m.scope + '&nonce=' +  m.nonce + '&response_mode=' + m.mode + '&redirect_uri=' +  m.redirectURI;
+        let requestUrl = m.tokenEndpoint + 'response_type=' + m.type + '&client_id=' + m.clientID + '&scope=' + m.scope + '&nonce=' +  contents + '&response_mode=' + m.mode + '&redirect_uri=' +  m.redirectURI;
 
         reject({name: 'IdPLoginError', loginUrl: requestUrl});
 
       } else {
 
         //later verify the token and use the information from the JWT
-        let contentSplited = contents.split('.');
+        let hintSplited = hint.split('.');
 
-        let idToken = JSON.parse(atob(contentSplited[1]));
+        let idToken = JSON.parse(atob(hintSplited[1]));
 
         let idpBundle = {domain: 'google.com', protocol: 'OIDC'};
-        let identityBundle = {assertion: contentSplited[1], idp: idpBundle, infoToken: idToken};
+        let identityBundle = {assertion: hintSplited[1], idp: idpBundle, infoToken: idToken};
 
         resolve(identityBundle);
 

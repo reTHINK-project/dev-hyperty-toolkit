@@ -47,7 +47,7 @@
 		"children": {
 			"constant": ["chatmessages"]
 		}
-	}, 
+	},
 	"ChatMessages": {
 		"type": "object",
 		"stereotype": "children",
@@ -63,7 +63,7 @@
 				"constant": "ChatMessage"
 			}
 		}
-	}, 
+	},
 	"ChatMessage": {
 		"type": "object",
 		"stereotype": "syncobjectchild",
@@ -73,7 +73,7 @@
 				"type": "string"
 			}
 		}
-	}, 
+	},
 	"Participant": {
 		"type": "object",
 		"properties": {
@@ -82,7 +82,7 @@
 				]
 			}
 		}
-	}, 
+	},
 	"CommunicationQuality": {
 		"type": "object",
 		"properties": {
