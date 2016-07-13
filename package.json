@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/reTHINK-project/dev-hyperty-toolkit#readme",
   "dependencies": {
-    "runtime-browser": "github:rethink-project/dev-runtime-browser#master",
+    "runtime-core": "github:rethink-project/dev-runtime-core#develop",
     "service-framework": "github:rethink-project/dev-service-framework#develop"
   },
   "devDependencies": {
@@ -48,6 +48,7 @@
     "mocha": "^2.4.5",
     "run-sequence": "^1.1.5",
     "through2": "^2.0.1",
+    "urijs": "^1.18.1",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "webrtc-adapter-test": "^0.2.5",
