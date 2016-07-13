@@ -244,16 +244,39 @@ gulp.task('watch', function(done) {
     .pipe(copyFiles({dest: 'src'}));
   });
 
-  gulp.watch([dirname + '/examples/*.html', dirname + '/examples/**/*.hbs', dirname + '/examples/**/*.js'], function(event) {
+  gulp.watch([dirname + '/examples/*.html', dirname + '/examples/**/*.hbs'], function(event) {
     return gulp.src([event.path])
     .pipe(copyFiles({dest: 'examples'}))
-    .pipe(transpile({destination: __dirname + '/dist', debug: false}))
+    .resume()
     .on('end', function() {
-      gutil.log('The main file was created like a distribution file on /dist');
+      gutil.log('The html templates are copied with success');
       gutil.log('-----------------------------------------------------------');
       browserSync.reload();
     });
-  }, browserSync.reload);
+  });
+
+  gulp.watch([dirname + '/examples/main.js'], function(event) {
+    return gulp.src([event.path])
+    .pipe(copyFiles({dest: 'examples'}))
+    .pipe(transpile({destination: __dirname + '/dist', debug: false}))
+    .resume()
+    .on('end', function() {
+      gutil.log('The main file was created like a distribution file on /dist');
+      gutil.log('-----------------------------------------------------------');
+    });
+  });
+
+  gulp.watch([dirname + '/examples/**/*.js', '!' + dirname + '/examples/main.js'], function(event) {
+    return gulp.src([event.path])
+    .pipe(copyFiles({dest: 'examples'}))
+    .pipe(transpile({destination: __dirname + '/examples', debug: false}))
+    .resume()
+    .on('end', function() {
+      gutil.log('The javascript was copied and converted to es5');
+      gutil.log('-----------------------------------------------------------');
+      browserSync.reload();
+    });
+  });
 
 });
 
@@ -472,7 +495,7 @@ function transpile(opts) {
     })
     .bundle()
     .on('error', function(err) {
-      gutil.log(gutil.colors.red(err.message));
+      gutil.log(gutil.colors.red(err));
       this.emit('end');
     })
     .pipe(source(filename))
