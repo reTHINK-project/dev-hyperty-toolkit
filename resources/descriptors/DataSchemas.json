@@ -1,7 +1,7 @@
 {
   "HelloWorldDataSchema": {
     "sourcePackage": {
-      "sourceCode": "ewoJIiRzY2hlbWEiOiAiaHR0cDovL2pzb24tc2NoZW1hLm9yZy9kcmFmdC0wNC9zY2hlbWEjIiwKCSJpZCI6ICJIZWxsb09iamVjdCIsCgkidHlwZSI6ICJvYmplY3QiLAoJInJlcXVpcmVkIjogWyJoZWxsbyJdLAoJImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsCiAgInByb3BlcnRpZXMiOiB7CgkJInNjaGVtZSI6IHsKCQkJImNvbnN0YW50IjogImhlbGxvIgoJCX0sCgkJImhlbGxvIjogewoJCQkidHlwZSI6ICJzdHJpbmciCgkJfQoJfQp9Cg==",
+      "sourceCode": "ewoJIiRzY2hlbWEiOiAiaHR0cDovL2pzb24tc2NoZW1hLm9yZy9kcmFmdC0wNC9zY2hlbWEjIiwKCSJpZCI6ICJIZWxsb09iamVjdCIsCgkidHlwZSI6ICJvYmplY3QiLAoJInJlcXVpcmVkIjogWyJoZWxsbyJdLAogICJwcm9wZXJ0aWVzIjogewoJCSJzY2hlbWUiOiB7CgkJCSJjb25zdGFudCI6ICJoZWxsbyIKCQl9LAoJCSJoZWxsbyI6IHsKCQkJInR5cGUiOiAic3RyaW5nIgoJCX0KCX0KfQo=",
       "sourceCodeClassname": "HelloWorldDataSchema",
       "encoding": "base64",
       "signature": ""

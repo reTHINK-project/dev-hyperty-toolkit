@@ -84,13 +84,13 @@ this.__eventListeners={};}/**
      * @param  {Function}       cb        - callback function will be executed when the event it is invoked
      */_createClass(EventEmitter,[{key:"addEventListener",value:function addEventListener(eventType,cb){// add callback to the list of callbacks for this type
 // if the list doesn't exist yet, create it with the callback as member
-if(!this.__eventListeners[eventType])this.__eventListeners[eventType]=[cb];else this.__eventListeners[eventType].push(cb);}/**
+if(cb!=undefined){if(!this.__eventListeners[eventType])this.__eventListeners[eventType]=[cb];else this.__eventListeners[eventType].push(cb);}}/**
      * Invoke the eventType
      * @param  {string} eventType - event will be invoked
      * @param  {object} params - parameters will be passed to the addEventListener
      */},{key:"trigger",value:function trigger(eventType,params){// check if there are callbacks for this type
 var callbacks=this.__eventListeners[eventType];if(callbacks){callbacks.forEach(function(cb){// catch errors to make sure every callback is being called
-try{cb(params);}catch(e){console.warn("calling listener "+cb.name+" for event type "+eventType+" with parameters '"+params+"' resulted in an error!",e);}});}}}]);return EventEmitter;}();exports.default=EventEmitter;module.exports=exports['default'];
+try{cb(params);}catch(e){console.warn("calling listener "+cb.name+" for event type "+eventType+" with parameters '"+params+"' resulted in an error!",e);}});}}}]);return EventEmitter;}();exports.default=EventEmitter;module.exports=exports["default"];
 
 },{}],4:[function(require,module,exports){
 'use strict';Object.defineProperty(exports,"__esModule",{value:true});exports.divideURL=divideURL;exports.deepClone=deepClone;exports.getUserMedia=getUserMedia;exports.serialize=serialize;exports.getTemplate=getTemplate;/**
