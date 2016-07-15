@@ -23,11 +23,14 @@ class AppSandboxBrowser extends Sandbox {
     _this._sbr._create = (url, sourceCode, config) => {
       console.log('SandboxRegistry._create ', url, config);
       window.eval(sourceCode);
-      return activate(url, _this._bus, config);
-    };
 
-    //for testing, this make components accessible from browser console
-    window.components = _this._sbr.components;
+      let component = activate(url, this._bus, config);
+
+      //for testing, this make components accessible from browser console
+      window.components[url] = component;
+
+      return component;
+    };
   }
 
   _onPostMessage(msg) {

@@ -3,6 +3,7 @@ import runtimeFactory from './runtimeFactory';
 
 import MiniBus from 'runtime-core/dist/minibus';
 
+window.components = {};
 let minibus = new MiniBus();
 
 let runtimeProxy = {

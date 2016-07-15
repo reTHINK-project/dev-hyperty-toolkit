@@ -131,6 +131,7 @@ gulp.task('server', function(done) {
       },
       routes: {
         '/.well-known/runtime': 'node_modules/runtime-browser/bin',
+        '/.well-known/protocolstub': 'resources/descriptors/',
         '/.well-known/hyperty': 'resources/descriptors/'
       }
     }
@@ -489,9 +490,10 @@ function transpile(opts) {
 
     return browserify(args)
     .transform(babel, {
-      compact: true,
+      compact: false,
+      sourceMaps: true,
       presets: ['es2015', 'stage-0'],
-      plugins: ['add-module-exports', 'transform-inline-environment-variables']
+      plugins: ['add-module-exports', 'transform-async-to-generator', 'transform-inline-environment-variables']
     })
     .bundle()
     .on('error', function(err) {
