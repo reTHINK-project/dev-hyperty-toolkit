@@ -131,6 +131,7 @@ gulp.task('server', function(done) {
       },
       routes: {
         '/.well-known/runtime': 'node_modules/runtime-browser/bin',
+        '/.well-known/protocolstub': 'resources/descriptors/',
         '/.well-known/hyperty': 'resources/descriptors/'
       }
     }
@@ -263,6 +264,7 @@ gulp.task('watch', function(done) {
     .on('end', function() {
       gutil.log('The main file was created like a distribution file on /dist');
       gutil.log('-----------------------------------------------------------');
+      browserSync.reload();
     });
   });
 
@@ -285,11 +287,10 @@ gulp.task('hyperties-watch', ['hyperties'], browserSync.reload);
 
 gulp.task('js', function() {
 
-  return gulp.src('./examples/main.js')
+  return gulp.src(['./examples/main.js', './server/rethink.js'])
   .on('end', function() {
-    var fileObject = path.parse('./examples/main.js');
     gutil.log('-----------------------------------------------------------');
-    gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
+    gutil.log('Converting file from ES6 to ES5');
   })
   .pipe(transpile({destination: __dirname + '/dist', debug: false}))
   .on('end', function() {
