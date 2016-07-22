@@ -259,7 +259,7 @@ gulp.task('watch', function(done) {
   gulp.watch([dirname + '/examples/main.js'], function(event) {
     return gulp.src([event.path])
     .pipe(copyFiles({dest: 'examples'}))
-    .pipe(transpile({destination: __dirname + '/dist', debug: false}))
+    .pipe(transpile({destination: __dirname + '/dist', debug: true}))
     .resume()
     .on('end', function() {
       gutil.log('The main file was created like a distribution file on /dist');
@@ -270,7 +270,7 @@ gulp.task('watch', function(done) {
   gulp.watch([dirname + '/examples/**/*.js', '!' + dirname + '/examples/main.js'], function(event) {
     return gulp.src([event.path])
     .pipe(copyFiles({dest: 'examples'}))
-    .pipe(transpile({destination: __dirname + '/examples', debug: false}))
+    .pipe(transpile({destination: __dirname + '/examples', debug: true}))
     .resume()
     .on('end', function() {
       gutil.log('The javascript was copied and converted to es5');
@@ -292,7 +292,7 @@ gulp.task('js', function() {
     gutil.log('-----------------------------------------------------------');
     gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
   })
-  .pipe(transpile({destination: __dirname + '/dist', debug: false}))
+  .pipe(transpile({destination: __dirname + '/dist', debug: true}))
   .on('end', function() {
     gutil.log('The main file was created like a distribution file on /dist');
     gutil.log('-----------------------------------------------------------');
