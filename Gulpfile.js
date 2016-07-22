@@ -286,7 +286,7 @@ gulp.task('hyperties-watch', ['hyperties'], browserSync.reload);
 
 gulp.task('js', function() {
 
-  return gulp.src('./examples/main.js')
+  return gulp.src(['./examples/main.js', './server/rethink.js'])
   .on('end', function() {
     var fileObject = path.parse('./examples/main.js');
     gutil.log('-----------------------------------------------------------');
@@ -423,7 +423,6 @@ gulp.task('encode', function(done) {
   );
 
 });
-
 
 function createHypertyDescriptor() {
 
