@@ -301,6 +301,13 @@ gulp.task('js', function() {
 
 });
 
+gulp.task('descriptor', function() {
+
+  return gulp.src('./src/**/descriptor.json')
+  .pipe(createHypertyDescriptor())
+
+});
+
 // process JS files and return the stream.
 gulp.task('hyperties', function() {
 
@@ -416,6 +423,22 @@ gulp.task('encode', function(done) {
   );
 
 });
+
+
+function createHypertyDescriptor() {
+
+  return through.obj(function(chunk, enc, done) {
+
+    var file = new gutil.File({
+      base: path.join(__dirname, '/resources/descriptors/'),
+      cwd: __dirname,
+      path: path.join(__dirname, '/resources/descriptors/Hyperties2.json')
+    });
+
+    console.log(path.parse(file.path), file.contents);
+
+  });
+}
 
 function convertHyperty() {
 
