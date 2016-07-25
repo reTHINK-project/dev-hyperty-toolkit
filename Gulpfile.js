@@ -135,7 +135,10 @@ gulp.task('server', function(done) {
         '/.well-known/hyperty': 'resources/descriptors/'
       }
     }
-  }, done);
+  }, function() {
+    browserSync.reload();
+    done();
+  });
 
 });
 
@@ -222,6 +225,15 @@ gulp.task('watch', function(done) {
   gulp.watch(['system.config.json'], ['main-watch']);
   gulp.watch(['./resources/schemas/**/*.ds.json'], ['schemas'], browserSync.reload);
 
+  gulp.watch(['./server/rethink.js', './examples/main.js'], function() {
+    return gulp.src('./server/rethink.js')
+    .pipe(transpile({destination: __dirname + '/dist', debug: true}))
+    .resume()
+    .on('end', function() {
+      browserSync.reload();
+    });
+  });
+
   gulp.watch(['./src/**/*.js'], function(event) {
     var fileObject = path.parse(event.path);
     return gulp.src([fileObject.dir + '/*.hy.js'])
@@ -264,6 +276,7 @@ gulp.task('watch', function(done) {
     .on('end', function() {
       gutil.log('The main file was created like a distribution file on /dist');
       gutil.log('-----------------------------------------------------------');
+      browserSync.reload();
     });
   });
 
