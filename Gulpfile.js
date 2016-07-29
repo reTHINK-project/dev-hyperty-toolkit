@@ -147,6 +147,9 @@ gulp.task('environment', function() {
   var environment = getEnvironment();
   var configuration = systemConfig[environment];
 
+  console.log(process.env.DEVELOPMENT, process.env.DOMAIN);
+  console.log(configuration, environment);
+
   if (process.env.DEVELOPMENT && process.env.DOMAIN) {
 
     if (process.env.DEVELOPMENT) {
@@ -777,6 +780,11 @@ function copyExamples() {
 function copyHyperties(from, done) {
   if (from) {
     dirname = from;
-    runSequence('copy-src', 'copy-examples', done);
+    var environment = getEnvironment();
+    if (environment !== 'production') {
+      runSequence('copy-src', 'copy-examples', done);
+    } else {
+      runSequence('copy-examples', done);
+    }
   }
 }

@@ -22,8 +22,12 @@ const runtimeFactory = Object.create({
   },
 
   createRuntimeCatalogue(development) {
-    if (!this.catalogue)
-      this.catalogue = development ? new RuntimeCatalogueLocal(this) : new RuntimeCatalogue(this);
+    if (!this.catalogue) {
+      let _dev = JSON.parse(development);
+      let mode = _dev ? 'development' : 'production';
+      console.log('Create Runtime Catalogue in', mode, 'mode', development);
+      this.catalogue = _dev ? new RuntimeCatalogueLocal(this) : new RuntimeCatalogue(this);
+    }
 
     return this.catalogue;
   }

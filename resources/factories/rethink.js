@@ -1,4 +1,6 @@
-import config from '../../config.json';
+// jshint
+// Runtime
+
 import runtimeFactory from './runtimeFactory';
 
 import MiniBus from 'runtime-core/dist/minibus';
@@ -10,13 +12,6 @@ let runtimeProxy = {
   requireHyperty: (hypertyDescriptor) => {
 
     let from = 'app:requireHyperty';
-
-    // TODO: change the messages to this:
-    // from: <AppSandboxURL>/app
-    // to: hyperty-runtime://<runtime-instance-identitifier>/runtime-ua
-    // <runtime-instance-identitifier> should be generated wen the runtimeUA is instantiated;
-    // body.resource = 'hyperty' || 'protostub'
-    // body.value = <hypertyDescriptorURL> || <domain>;
 
     return new Promise(function(resolve, reject) {
 
@@ -96,7 +91,7 @@ const rethink = {
 
     return new Promise(function(resolve, reject) {
 
-      let domain = config.domain;
+      console.log('Install configuration: ', development, domain, runtimeURL);
 
       let catalogue = runtimeFactory.createRuntimeCatalogue(development);
 
@@ -115,8 +110,6 @@ const rethink = {
 
         let runtime = new Runtime(runtimeFactory, domain);
         window.runtime = runtime;
-
-        console.log(runtime);
 
         minibus.addListener('core:loadHyperty', function(msg) {
           console.log('Load Hyperty: ', msg);
@@ -158,7 +151,6 @@ const rethink = {
 
         });
 
-        console.log('Runtime Instaled: ');
         resolve(runtimeProxy);
 
       })
