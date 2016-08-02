@@ -4,6 +4,7 @@
 var gulp = require('gulp');
 var fs = require('fs');
 var path = require('path');
+var _ = require('underscore');
 
 var browserSync = require('browser-sync').create('Toolkit');
 
@@ -28,7 +29,7 @@ var extensions = ['.js', '.json'];
 gulp.task('serve', function(done) {
 
   var environment = getEnvironment();
-  var sequence = ['environment', 'clean', 'src-hyperties', 'schemas', 'js', 'hyperties', 'server'];
+  var sequence = ['environment', 'clean', 'src-hyperties', 'descriptor', 'schemas', 'js', 'hyperties', 'server'];
   if (environment !== 'production') {
     sequence.push('watch');
   }
@@ -246,6 +247,19 @@ gulp.task('watch', function(done) {
     .pipe(convertSchema());
   }, browserSync.reload);
 
+  gulp.watch(['./src/**/*.hy.json'], function(event) {
+
+    return gulp.src(event.path)
+    .pipe(createDescriptor())
+    .pipe(source('Hyperties.json'))
+    .pipe(gulp.dest('resources/descriptors/'))
+    .on('end', function() {
+      gutil.log('the preconfiguration hyperty was changed, and the Hyperties.json was updated');
+      browserSync.reload();
+    });
+
+  });
+
   // Watch
   gulp.watch([dirname + '/src/**/*.js'], function(event) {
     return gulp.src([event.path])
@@ -316,8 +330,14 @@ gulp.task('js', function() {
 
 gulp.task('descriptor', function() {
 
-  return gulp.src('./src/**/descriptor.json')
-  .pipe(createHypertyDescriptor())
+  return gulp.src('./src/**/*.hy.json')
+  .pipe(createDescriptor())
+  .pipe(source('Hyperties.json'))
+  .pipe(gulp.dest('resources/descriptors/'))
+  .on('end', function() {
+    gutil.log('the preconfiguration hyperty was been applied');
+    browserSync.reload();
+  });
 
 });
 
@@ -437,18 +457,68 @@ gulp.task('encode', function(done) {
 
 });
 
-function createHypertyDescriptor() {
+function createDescriptor() {
 
   return through.obj(function(chunk, enc, done) {
 
-    var file = new gutil.File({
-      base: path.join(__dirname, '/resources/descriptors/'),
-      cwd: __dirname,
-      path: path.join(__dirname, '/resources/descriptors/Hyperties2.json')
-    });
+    var fileObject = path.parse(chunk.path);
+    var nameOfHyperty = fileObject.name.replace('.hy', '');
+    var preconfig = JSON.parse(chunk.contents);
+    var updated;
+    var data;
 
-    console.log(path.parse(file.path), file.contents);
+    var descriptor;
+    gutil.log('---------------------- ' + nameOfHyperty + ' ------------------------');
 
+    try {
+      let stats = fs.lstatSync(__dirname + '/resources/descriptors/Hyperties.json');
+    }
+    catch (e) {
+      let data = {};
+      fs.writeFileSync('./resources/descriptors/Hyperties.json', JSON.stringify(data, null, '\t'));
+    }
+
+    descriptor = fs.readFileSync('./resources/descriptors/Hyperties.json', 'utf8');
+    data = JSON.parse(descriptor);
+
+    if (!data.hasOwnProperty(nameOfHyperty)) {
+      data[nameOfHyperty] = descriptorBase('hyperty');
+    }
+
+    updated = _.extend(data[nameOfHyperty], preconfig);
+    data[nameOfHyperty] = updated;
+
+    var newDescriptor = new Buffer(JSON.stringify(data, null, 2));
+    console.log(newDescriptor.contents);
+    done();
+
+    //     // var newDescriptor = new Buffer(JSON.stringify(descriptor, null, 2));
+    //     done(null);
+    //
+    //     // try {
+    //     //   json = JSON.parse(descriptor);
+    //     // } catch (e) {
+    //     //   json = descriptor;
+    //     // }
+    //     //
+    //     // if (!json.hasOwnProperty(nameOfHyperty)) {
+    //     //   json[nameOfHyperty] = descriptorBase('hyperty');
+    //     // }
+    //     //
+    //     // hypertyConfig = json[nameOfHyperty];
+    //     // console.log(nameOfHyperty, ': ', hypertyConfig);
+    //     //
+    //     // console.log('Extended:', _.extend(hypertyConfig, preconfig));
+    //     // console.log(json);
+    //     // // json[nameOfHyperty] = _.extend(hypertyConfig, preconfig);
+    //     //
+    //     // var newDescriptor = new Buffer(JSON.stringify(json, null, 2));
+    //     // gutil.log('Descriptor updated based on:');
+    //     // gutil.log(JSON.stringify(preconfig, null, 2));
+    //     // gutil.log('from file ', chunk.path);
+    //     // done(null, newDescriptor);
+    //   }
+    // });
   });
 }
 
@@ -779,4 +849,56 @@ function copyHyperties(from, done) {
     dirname = from;
     runSequence('copy-src', 'copy-examples', done);
   }
+}
+
+function descriptorBase(type) {
+
+  var base = {};
+
+  base.sourcePackage = {};
+  base.sourcePackage.sourceCode = '';
+  base.sourcePackage.sourceCodeClassname = '';
+  base.sourcePackage.encoding = 'base64';
+  base.sourcePackage.signature = '';
+
+  // Source Package configuration
+  base.sourcePackageURL = '/sourcePackage';
+
+  base.cguid = '';
+  base.version = '0.1';
+  base.description = '';
+
+  switch (type) {
+    case 'hyperty':
+      base.hypertyType = [];
+
+      break;
+
+    case 'runtime':
+      base.type = '';
+      base.runtimeType = 'browser';
+      base.hypertyCapabilities = {};
+      base.protocolCapabilities = {};
+      break;
+
+    case 'protocolstub':
+    case 'idp-proxy':
+      base.type = '';
+      base.constraints = '';
+      break;
+
+    default:
+      base.type = '';
+      break;
+  }
+
+  base.objectName = '';
+  base.configuration = {};
+  base.messageSchemas = '';
+
+  base.language = 'Javascript';
+  base.signature = '';
+  base.accessControlPolicy = 'somePolicy';
+
+  return base;
 }
