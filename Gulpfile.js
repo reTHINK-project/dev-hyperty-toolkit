@@ -41,7 +41,7 @@ gulp.task('serve', function(done) {
 gulp.task('checkHyperties', function() {
 
   try {
-    let stats = fs.lstatSync(__dirname + '/resources/descriptors/Hyperties.json');
+    var stats = fs.lstatSync(__dirname + '/resources/descriptors/Hyperties.json');
     console.log(stats.isFile());
   } catch (e) {
     fs.writeFile(__dirname + '/resources/descriptors/Hyperties.json', '{}', (err) => {
@@ -55,7 +55,7 @@ gulp.task('checkHyperties', function() {
 gulp.task('checkDataSchemas', function() {
 
   try {
-    let stats = fs.lstatSync(__dirname + '/resources/descriptors/DataSchemas.json');
+    var stats = fs.lstatSync(__dirname + '/resources/descriptors/DataSchemas.json');
     console.log(stats.isFile());
   } catch (e) {
     fs.writeFile(__dirname + '/resources/descriptors/DataSchemas.json', '{}', (err) => {
@@ -501,8 +501,8 @@ gulp.task('descriptor', function() {
 
 function createDescriptor() {
 
-  let descriptor = fs.readFileSync('./resources/descriptors/Hyperties.json', 'utf8');
-  let data = JSON.parse(descriptor);
+  var descriptor = fs.readFileSync('./resources/descriptors/Hyperties.json', 'utf8');
+  var data = JSON.parse(descriptor);
 
   return through.obj(function(chunk, enc, done) {
 
@@ -516,7 +516,7 @@ function createDescriptor() {
       data[nameOfHyperty] = descriptorBase('hyperty');
     }
 
-    let updated = _.extend(data[nameOfHyperty], preconfig);
+    var updated = _.extend(data[nameOfHyperty], preconfig);
     data[nameOfHyperty] = updated;
 
     var newChunk = _.clone(chunk);
