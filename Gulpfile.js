@@ -4,6 +4,7 @@
 var gulp = require('gulp');
 var fs = require('fs');
 var path = require('path');
+var _ = require('underscore');
 
 var browserSync = require('browser-sync').create('Toolkit');
 
@@ -28,12 +29,40 @@ var extensions = ['.js', '.json'];
 gulp.task('serve', function(done) {
 
   var environment = getEnvironment();
-  var sequence = ['environment', 'clean', 'src-hyperties', 'schemas', 'js', 'hyperties', 'server'];
+  var sequence = ['environment', 'clean', 'checkHyperties', 'checkDataSchemas', 'src-hyperties', 'descriptor', 'schemas', 'js', 'hyperties', 'server'];
   if (environment !== 'production') {
     sequence.push('watch');
   }
 
   runSequence.apply(runSequence, sequence, done);
+
+});
+
+gulp.task('checkHyperties', function() {
+
+  try {
+    var stats = fs.lstatSync(__dirname + '/resources/descriptors/Hyperties.json');
+    console.log(stats.isFile());
+  } catch (e) {
+    fs.writeFile(__dirname + '/resources/descriptors/Hyperties.json', '{}', (err) => {
+      if (err) throw new Error(err);
+      return true;
+    });
+  }
+
+});
+
+gulp.task('checkDataSchemas', function() {
+
+  try {
+    var stats = fs.lstatSync(__dirname + '/resources/descriptors/DataSchemas.json');
+    console.log(stats.isFile());
+  } catch (e) {
+    fs.writeFile(__dirname + '/resources/descriptors/DataSchemas.json', '{}', (err) => {
+      if (err) throw new Error(err);
+      return true;
+    });
+  }
 
 });
 
@@ -72,7 +101,12 @@ gulp.task('src-hyperties', function(done) {
 });
 
 gulp.task('clean', function() {
-  return gulp.src(['src', 'dist', 'examples'], {read: false}).pipe(clean());
+  return gulp.src([
+    'src',
+    'dist',
+    'examples',
+    'resources/descriptors/Hyperties.json',
+    'resources/descriptors/DataSchemas.json'], {read: false}).pipe(clean());
 });
 
 gulp.task('copy-src', copySrc);
@@ -135,7 +169,16 @@ gulp.task('server', function(done) {
         '/.well-known/hyperty': 'resources/descriptors/'
       }
     }
-  }, done);
+  }, function(err) {
+    if (err) {
+      gutil.log('Check the documentation on Gulp Task.');
+      gutil.log('Or open an issue here https://github.com/reTHINK-project/dev-hyperty-toolkit/issues');
+      done(err);
+    }
+
+    browserSync.reload();
+    done();
+  });
 
 });
 
@@ -222,17 +265,44 @@ gulp.task('watch', function(done) {
   gulp.watch(['system.config.json'], ['main-watch']);
   gulp.watch(['./resources/schemas/**/*.ds.json'], ['schemas'], browserSync.reload);
 
+  gulp.watch(['./server/rethink.js', './examples/main.js'], function() {
+    return gulp.src('./server/rethink.js')
+    .pipe(transpile({destination: __dirname + '/dist', debug: true}))
+    .resume()
+    .on('end', function() {
+      browserSync.reload();
+    });
+  });
+
   gulp.watch(['./src/**/*.js'], function(event) {
     var fileObject = path.parse(event.path);
     return gulp.src([fileObject.dir + '/*.hy.js'])
-    .pipe(convertHyperty());
-  }, browserSync.reload());
+    .pipe(convertHyperty())
+    .on('end', function() {
+      browserSync.reload();
+    });
+  });
 
   gulp.watch(['./src/**/*.ds.json'], function(event) {
     var fileObject = path.parse(event.path);
     return gulp.src([fileObject.dir + '/*.ds.js'])
-    .pipe(convertSchema());
-  }, browserSync.reload);
+    .pipe(convertSchema())
+    .on('end', function() {
+      browserSync.reload();
+    });
+  });
+
+  gulp.watch(['./src/**/*.hy.json'], function(event) {
+
+    return gulp.src(event.path)
+    .pipe(createDescriptor())
+    .pipe(gulp.dest('resources/descriptors/'))
+    .on('end', function() {
+      gutil.log('the preconfiguration hyperty was changed, and the Hyperties.json was updated');
+      browserSync.reload();
+    });
+
+  });
 
   // Watch
   gulp.watch([dirname + '/src/**/*.js'], function(event) {
@@ -259,7 +329,7 @@ gulp.task('watch', function(done) {
   gulp.watch([dirname + '/examples/main.js'], function(event) {
     return gulp.src([event.path])
     .pipe(copyFiles({dest: 'examples'}))
-    .pipe(transpile({destination: __dirname + '/dist', debug: false}))
+    .pipe(transpile({destination: __dirname + '/dist', debug: true}))
     .resume()
     .on('end', function() {
       gutil.log('The main file was created like a distribution file on /dist');
@@ -271,7 +341,7 @@ gulp.task('watch', function(done) {
   gulp.watch([dirname + '/examples/**/*.js', '!' + dirname + '/examples/main.js'], function(event) {
     return gulp.src([event.path])
     .pipe(copyFiles({dest: 'examples'}))
-    .pipe(transpile({destination: __dirname + '/examples', debug: false}))
+    .pipe(transpile({destination: __dirname + '/examples', debug: true}))
     .resume()
     .on('end', function() {
       gutil.log('The javascript was copied and converted to es5');
@@ -292,7 +362,7 @@ gulp.task('js', function() {
     gutil.log('-----------------------------------------------------------');
     gutil.log('Converting file from ES6 to ES5');
   })
-  .pipe(transpile({destination: __dirname + '/dist', debug: false}))
+  .pipe(transpile({destination: __dirname + '/dist', debug: true}))
   .on('end', function() {
     gutil.log('The main file was created like a distribution file on /dist');
     gutil.log('-----------------------------------------------------------');
@@ -417,6 +487,47 @@ gulp.task('encode', function(done) {
 
 });
 
+gulp.task('descriptor', function() {
+
+  return gulp.src('./src/**/*.hy.json')
+  .pipe(createDescriptor())
+  .pipe(gulp.dest('./resources/descriptors/'))
+  .on('end', function() {
+    browserSync.reload();
+  });
+
+});
+
+function createDescriptor() {
+
+  var descriptor = fs.readFileSync('./resources/descriptors/Hyperties.json', 'utf8');
+  var data = JSON.parse(descriptor);
+
+  return through.obj(function(chunk, enc, done) {
+
+    var fileObject = path.parse(chunk.path);
+    var nameOfHyperty = fileObject.name.replace('.hy', '');
+    var preconfig = JSON.parse(chunk.contents);
+
+    gutil.log('---------------------- ' + nameOfHyperty + ' ------------------------');
+
+    if (!data.hasOwnProperty(nameOfHyperty)) {
+      data[nameOfHyperty] = descriptorBase('hyperty');
+    }
+
+    var updated = _.extend(data[nameOfHyperty], preconfig);
+    data[nameOfHyperty] = updated;
+
+    var newChunk = _.clone(chunk);
+    newChunk.path = './descriptors/Hyperties.json';
+    newChunk.contents = new Buffer(JSON.stringify(data, null, 2));
+    gutil.log('Initial Configuration');
+    gutil.log(JSON.stringify(preconfig, null, 2));
+
+    done(null, newChunk);
+  });
+}
+
 function convertHyperty() {
 
   return through.obj(function(chunk, enc, done) {
@@ -490,9 +601,10 @@ function transpile(opts) {
 
     return browserify(args)
     .transform(babel, {
-      compact: true,
+      compact: false,
+      sourceMaps: true,
       presets: ['es2015', 'stage-0'],
-      plugins: ['add-module-exports', 'transform-inline-environment-variables']
+      plugins: ['add-module-exports', 'transform-async-to-generator', 'transform-inline-environment-variables']
     })
     .bundle()
     .on('error', function(err) {
@@ -581,6 +693,7 @@ function encode(opts) {
     var descriptor = fs.readFileSync('resources/descriptors/' + opts.descriptor + '.json', 'utf8');
     var json = JSON.parse(descriptor);
     var contents = fs.readFileSync(file.path, 'utf8');
+    var type = '';
 
     var encoded = Base64.encode(contents);
     var value = 'default';
@@ -598,52 +711,53 @@ function encode(opts) {
       value = opts.name || filename;
     }
 
-    if (!json.hasOwnProperty(value)) {
-      var newObject = {};
-      json[value] = newObject;
-      json[value].sourcePackage = {};
-    }
-
-    var language = 'javascript';
-    if (opts.descriptor === 'DataSchemas') {
-      language = 'JSON-Schema';
-    }
-
     var cguid = 0;
     switch (opts.descriptor) {
       case 'Hyperties':
+        type = 'hyperty';
         cguid = 10001;
         break;
       case 'DataSchemas':
+        type = 'dataschema';
         cguid = 20001;
         break;
       case 'Runtimes':
+        type = 'runtime';
         cguid = 30001;
         break;
       case 'ProtoStubs':
+        type = 'protostub';
         cguid = 40001;
         break;
       case 'IDPProxys':
+        type = 'idp-proxy';
         cguid = 50001;
         break;
+    }
+
+    if (!json.hasOwnProperty(value)) {
+      json[value] = descriptorBase();
     }
 
     Object.keys(json).map(function(key, index) {
       json[key].cguid = cguid + index;
     });
 
-    // json[value].cguid = cguid;
     json[value].type = opts.descriptor;
     json[value].version = '0.1';
-    json[value].description = 'Description of ' + filename;
-    json[value].objectName = filename;
+    json[value].description = checkValues('description', 'Description of ' + filename, json[value]);
+    json[value].objectName = checkValues('objectName', filename, json[value]);
 
-    if (opts.configuration) {
-      if (_.isEmpty(opts.configuration) && json[value].hasOwnProperty('configuration')) {
-        opts.configuration = json[value].configuration;
+    if (opts.descriptor !== 'Hyperties') {
+      if (opts.configuration) {
+        if (_.isEmpty(opts.configuration) && json[value].hasOwnProperty('configuration')) {
+          opts.configuration = json[value].configuration;
+        }
+        json[value].configuration = opts.configuration;
+        gutil.log('setting configuration: ', opts.configuration);
       }
-      json[value].configuration = opts.configuration;
-      gutil.log('setting configuration: ', opts.configuration);
+    } else {
+      json[value].configuration = checkValues('configuration', {}, json[value]);
     }
 
     if (opts.descriptor === 'Runtimes') {
@@ -665,11 +779,8 @@ function encode(opts) {
       };
     }
 
-    if (opts.descriptor === 'Hyperties' && !json[value].hypertyType) {
-      json[value].hypertyType = [];
-    }
-
     if (opts.descriptor === 'Hyperties') {
+      json[value].hypertyType = checkValues('hypertyType', [], json[value]);
       delete json[value].type;
     }
 
@@ -688,20 +799,23 @@ function encode(opts) {
       json[value].sourcePackage.signature = '';
     }
 
-    json[value].language = language;
-    json[value].signature = '';
-    json[value].messageSchemas = '';
+    json[value].signature = checkValues('signature', '', json[value]);
+    json[value].messageSchemas = checkValues('messageSchemas', '', json[value]);
 
     if (!json[value].dataObjects) {
-      json[value].dataObjects = [];
+      json[value].dataObjects = checkValues('dataObjects', [], json[value]);
     }
 
-    json[value].accessControlPolicy = 'somePolicy';
+    json[value].accessControlPolicy = checkValues('accessControlPolicy', 'somePolicy', json[value]);
 
     var newDescriptor = new Buffer(JSON.stringify(json, null, 2));
     cb(null, newDescriptor);
 
   });
+}
+
+function checkValues(property, value, object) {
+  return _.isEmpty(object[property]) ? value : object[property];
 }
 
 function createFile(path, contents) {
@@ -743,4 +857,59 @@ function copyHyperties(from, done) {
     dirname = from;
     runSequence('copy-src', 'copy-examples', done);
   }
+}
+
+function descriptorBase(type) {
+
+  var base = {};
+
+  base.sourcePackage = {};
+  base.sourcePackage.sourceCode = '';
+  base.sourcePackage.sourceCodeClassname = '';
+  base.sourcePackage.encoding = 'base64';
+  base.sourcePackage.signature = '';
+
+  // Source Package configuration
+  base.sourcePackageURL = '/sourcePackage';
+
+  base.cguid = '';
+  base.version = '0.1';
+  base.description = '';
+  base.language = 'Javascript';
+
+  switch (type) {
+    case 'hyperty':
+      base.hypertyType = [];
+      break;
+
+    case 'runtime':
+      base.type = '';
+      base.runtimeType = 'browser';
+      base.hypertyCapabilities = {};
+      base.protocolCapabilities = {};
+      break;
+
+    case 'protocolstub':
+    case 'idp-proxy':
+      base.type = '';
+      base.constraints = '';
+      break;
+
+    case 'dataschema':
+      base.language = 'JSON-Schema';
+      break;
+
+    default:
+      base.type = '';
+      break;
+  }
+
+  base.objectName = '';
+  base.configuration = {};
+  base.messageSchemas = '';
+
+  base.signature = '';
+  base.accessControlPolicy = 'somePolicy';
+
+  return base;
 }

@@ -25,14 +25,16 @@ console.log('Configuration file after:', config);
 rethink.install(config).then(function(result) {
 
   runtimeLoader = result;
-  console.log('Installed:', result);
+  console.log('Installed:', result, config.development);
 
   if (config.development) {
-    let a = loadStubs();
-    console.log('AAA: ', a);
+    return loadStubs().then((result) => {
+      console.log('Stubs load: ', result);
+      return getListOfHyperties(domain);
+    });
+  } else {
+    return getListOfHyperties(domain);
   }
-
-  return getListOfHyperties(domain);
 
 }).then(function(hyperties) {
 
@@ -79,16 +81,22 @@ function loadStubs() {
           response = JSON.parse(result);
         }
 
-        let stub = response.filter((stub) => {
-          return stub === window.location.hostname;
+        let stubs = response.filter((stub) => {
+          return stub !== 'default';
         });
 
-        if (stub.length) {
-          runtimeLoader.requireProtostub('https://' + domain + '/.well-known/protocolstub/' + stub[0])
-          .then((result) => {
-            console.log('result', result);
-            resolve(response);
+        console.log(stubs);
+
+        if (stubs.length) {
+
+          let loadAllStubs = [];
+          stubs.forEach((stub) => {
+            loadAllStubs.push(runtimeLoader.requireProtostub('https://' + stub + '/.well-known/protocolstub/' + stub));
           });
+
+          Promise.all(loadAllStubs).then((result) => {
+            resolve(result);
+          }).catch(reason => reject(reason));
         }
 
       },
@@ -138,6 +146,7 @@ function loadHyperty(event) {
   loading = true;
 
   let hypertyName = $(event.currentTarget).attr('data-name');
+  console.log('Hyperty Name:', hypertyName);
 
   let hypertyPath = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/hyperty/' + hypertyName;
   if (config.development) {
@@ -149,7 +158,13 @@ function loadHyperty(event) {
   $el.empty();
   addLoader($el);
 
-  runtimeLoader.requireHyperty(hypertyPath).then(hypertyDeployed).catch(hypertyFail);
+  runtimeLoader.requireHyperty(hypertyPath).then((hyperty) => {
+    hypertyDeployed(hyperty);
+    loading = false;
+  }).catch((reason) => {
+    hypertyFail(reason);
+    loading = false;
+  });
 
 }
 

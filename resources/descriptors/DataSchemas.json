@@ -6,18 +6,18 @@
       "encoding": "base64",
       "signature": ""
     },
+    "sourcePackageURL": "/sourcePackage",
     "cguid": 20001,
-    "type": "DataSchemas",
     "version": "0.1",
     "description": "Description of HelloWorldDataSchema",
+    "language": "Javascript",
+    "type": "DataSchemas",
     "objectName": "HelloWorldDataSchema",
     "configuration": {},
-    "sourcePackageURL": "/sourcePackage",
-    "language": "JSON-Schema",
-    "signature": "",
     "messageSchemas": "",
-    "dataObjects": [],
-    "accessControlPolicy": "somePolicy"
+    "signature": "",
+    "accessControlPolicy": "somePolicy",
+    "dataObjects": []
   },
   "Communication": {
     "sourcePackage": {
@@ -26,38 +26,18 @@
       "encoding": "base64",
       "signature": ""
     },
+    "sourcePackageURL": "/sourcePackage",
     "cguid": 20002,
-    "type": "DataSchemas",
     "version": "0.1",
     "description": "Description of Communication",
+    "language": "Javascript",
+    "type": "DataSchemas",
     "objectName": "Communication",
     "configuration": {},
-    "sourcePackageURL": "/sourcePackage",
-    "language": "JSON-Schema",
-    "signature": "",
     "messageSchemas": "",
-    "dataObjects": [],
-    "accessControlPolicy": "somePolicy"
-  },
-  "FakeDataSchema": {
-    "sourcePackage": {
-      "sourceCode": "ew0KCSIkc2NoZW1hIjogImh0dHA6Ly9qc29uLXNjaGVtYS5vcmcvZHJhZnQtMDQvc2NoZW1hIyIsDQoJImlkIjogIkZha2VPYmplY3QiLA0KCSJ0eXBlIjogIm9iamVjdCIsDQoJInJlcXVpcmVkIjogWyJzY2hlbWUiXSwNCgkiYWRkaXRpb25hbFByb3BlcnRpZXMiOiBmYWxzZSwNCiAgInByb3BlcnRpZXMiOiB7DQoJCSJzY2hlbWUiOiB7DQoJCQkiY29uc3RhbnQiOiAiZmFrZSINCgkJfQ0KCX0NCn0NCg==",
-      "sourceCodeClassname": "FakeDataSchema",
-      "encoding": "base64",
-      "signature": ""
-    },
-    "cguid": 20003,
-    "type": "DataSchemas",
-    "version": "0.1",
-    "description": "Description of FakeDataSchema",
-    "objectName": "FakeDataSchema",
-    "configuration": {},
-    "sourcePackageURL": "/sourcePackage",
-    "language": "JSON-Schema",
     "signature": "",
-    "messageSchemas": "",
-    "dataObjects": [],
-    "accessControlPolicy": "somePolicy"
+    "accessControlPolicy": "somePolicy",
+    "dataObjects": []
   },
   "Connection": {
     "sourcePackage": {
@@ -66,18 +46,18 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": 20004,
-    "type": "DataSchemas",
+    "sourcePackageURL": "/sourcePackage",
+    "cguid": 20003,
     "version": "0.1",
     "description": "Description of Connection",
+    "language": "Javascript",
+    "type": "DataSchemas",
     "objectName": "Connection",
     "configuration": {},
-    "sourcePackageURL": "/sourcePackage",
-    "language": "JSON-Schema",
-    "signature": "",
     "messageSchemas": "",
-    "dataObjects": [],
-    "accessControlPolicy": "somePolicy"
+    "signature": "",
+    "accessControlPolicy": "somePolicy",
+    "dataObjects": []
   },
   "Context": {
     "sourcePackage": {
@@ -86,18 +66,18 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": 20005,
-    "type": "DataSchemas",
+    "sourcePackageURL": "/sourcePackage",
+    "cguid": 20004,
     "version": "0.1",
     "description": "Description of Context",
+    "language": "Javascript",
+    "type": "DataSchemas",
     "objectName": "Context",
     "configuration": {},
-    "sourcePackageURL": "/sourcePackage",
-    "language": "JSON-Schema",
-    "signature": "",
     "messageSchemas": "",
-    "dataObjects": [],
-    "accessControlPolicy": "somePolicy"
+    "signature": "",
+    "accessControlPolicy": "somePolicy",
+    "dataObjects": []
   },
   "HypertyResource": {
     "sourcePackage": {
@@ -106,18 +86,18 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": 20006,
-    "type": "DataSchemas",
+    "sourcePackageURL": "/sourcePackage",
+    "cguid": 20005,
     "version": "0.1",
     "description": "Description of HypertyResource",
+    "language": "Javascript",
+    "type": "DataSchemas",
     "objectName": "HypertyResource",
     "configuration": {},
-    "sourcePackageURL": "/sourcePackage",
-    "language": "JSON-Schema",
-    "signature": "",
     "messageSchemas": "",
-    "dataObjects": [],
-    "accessControlPolicy": "somePolicy"
+    "signature": "",
+    "accessControlPolicy": "somePolicy",
+    "dataObjects": []
   },
   "SyncDataObject": {
     "sourcePackage": {
@@ -126,57 +106,17 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": 20007,
-    "type": "DataSchemas",
+    "sourcePackageURL": "/sourcePackage",
+    "cguid": 20006,
     "version": "0.1",
     "description": "Description of SyncDataObject",
+    "language": "Javascript",
+    "type": "DataSchemas",
     "objectName": "SyncDataObject",
     "configuration": {},
-    "sourcePackageURL": "/sourcePackage",
-    "language": "JSON-Schema",
-    "signature": "",
     "messageSchemas": "",
-    "dataObjects": [],
-    "accessControlPolicy": "somePolicy"
-  },
-  "RoomUIDataSchema": {
-    "sourcePackage": {
-      "sourceCode": "ewogICIkc2NoZW1hIjogImh0dHA6Ly9qc29uLXNjaGVtYS5vcmcvZHJhZnQtMDQvc2NoZW1hIyIsCiAgImlkIjogIkNvbnRleHQiLAogICJ0eXBlIjogIm9iamVjdCIsCiAgInJlcXVpcmVkIjogWwogICAgImlkIiwKICAgICJ0eXBlIiwKICAgICJ2YWx1ZSIKICBdLAogICJwcm9wZXJ0aWVzIjogewogICAgImlkIjogewogICAgICAidHlwZSI6ICJzdHJpbmciCiAgICB9LAogICAgInR5cGUiOiB7CiAgICAgICIkcmVmIjogIiMvSHlwZXJ0eVJlc291cmNlVHlwZSIKICAgIH0sCiAgICAiZGVzY3JpcHRpb24iOiB7CiAgICAgICJ0eXBlIjogInN0cmluZyIKICAgIH0sCiAgICAidGltZSI6IHsKICAgICAgInR5cGUiOiAic3RyaW5nIiwKICAgICAgImZvcm1hdCI6ICJkYXRlLXRpbWUiCiAgICB9LAogICAgInVuaXRzIjogewogICAgICAiJHJlZiI6ICIjL0NvbnRleHRVbml0IgogICAgfSwKICAgICJ2ZXJzaW9uIjogewogICAgICAidHlwZSI6ICJpbnRlZ2VyIgogICAgfSwKICAgICJ2YWx1ZSI6IHsKICAgICAgIiRyZWYiOiAiIy9Db250ZXh0VmFsdWVMaXN0IgogICAgfSwKICAgICJ0YWciOiB7CiAgICAgICJ0eXBlIjogInN0cmluZyIKICAgIH0sCiAgICAiY2hpbGRyZW4iOiB7CiAgICAgICJjb25zdGFudCI6IFsKICAgICAgICAiYWN0aW9ucyIsCiAgICAgICAgImNvbnRleHRzIgogICAgICBdCiAgICB9CiAgfSwKICAiQ29udGV4dFVuaXQiOiB7CiAgICAidHlwZSI6ICJvYmplY3QiLAogICAgInByb3BlcnRpZXMiOiB7CiAgICB9CiAgfSwKICAiQ29udGV4dFZhbHVlTGlzdCI6IHsKICAgICJ0eXBlIjogImFycmF5IiwKICAgICJpdGVtcyI6IHsKICAgICAgIiRyZWYiOiAiIy9Db250ZXh0VmFsdWUiCiAgICB9LAogICAgIm1pbkl0ZW1zIjogMQogIH0sCiAgIkNvbnRleHRWYWx1ZSI6IHsKICAgICJyZXF1aXJlZCI6IFsKICAgICAgIm5hbWUiLAogICAgICAidW5pdHMiLAogICAgICAidmFsdWUiLAogICAgICAic3VtIgogICAgXSwKICAgICJhbnlPZiI6IFsKICAgICAgewogICAgICAgICJ0eXBlIjogIm9iamVjdCIKICAgICAgfSwKICAgICAgewogICAgICAgICIkcmVmIjogIiMvUmF3Q29udGV4dFZhbHVlIgogICAgICB9LAogICAgICB7CiAgICAgICAgIiRyZWYiOiAiIy9Qcm9jZXNzZWRDb250ZXh0VmFsdWUiCiAgICAgIH0KICAgIF0sCiAgICAicHJvcGVydGllcyI6IHsKICAgICAgIm5hbWUiOiB7CiAgICAgICAgInR5cGUiOiAic3RyaW5nIgogICAgICB9LAogICAgICAidW5pdHMiOiB7CiAgICAgICAgIiRyZWYiOiAiIy9Db250ZXh0VW5pdCIKICAgICAgfSwKICAgICAgInZhbHVlIjogewogICAgICAgICJ0eXBlIjogIm9iamVjdCIKICAgICAgfSwKICAgICAgInN1bSI6IHsKICAgICAgICAidHlwZSI6ICJudWxsIgogICAgICB9LAogICAgICAidGltZSI6IHsKICAgICAgICAidHlwZSI6ICJzdHJpbmciLAogICAgICAgICJmb3JtYXQiOiAiZGF0ZS10aW1lIgogICAgICB9LAogICAgICAidXBkYXRlVGltZSI6IHsKICAgICAgICAidHlwZSI6ICJzdHJpbmciLAogICAgICAgICJmb3JtYXQiOiAiZGF0ZS10aW1lIgogICAgICB9LAogICAgICAiZXhwaXJlcyI6IHsKICAgICAgICAidHlwZSI6ICJzdHJpbmciLAogICAgICAgICJmb3JtYXQiOiAiZGF0ZS10aW1lIgogICAgICB9LAogICAgICAiYWRkcmVzcyI6IHsKICAgICAgICAidHlwZSI6ICJzdHJpbmciCiAgICAgIH0KICAgIH0KICB9LAogICJSYXdDb250ZXh0VmFsdWUiOiB7CiAgICAidHlwZSI6ICJvYmplY3QiLAogICAgInByb3BlcnRpZXMiOiB7CiAgICB9CiAgfSwKICAiUHJvY2Vzc2VkQ29udGV4dFZhbHVlIjogewogICAgInR5cGUiOiAib2JqZWN0IiwKICAgICJwcm9wZXJ0aWVzIjogewogICAgfQogIH0sCiAgIkh5cGVydHlSZXNvdXJjZVR5cGUiOiB7CiAgICAidHlwZSI6ICJvYmplY3QiLAogICAgInJlcXVpcmVkIjogWwogICAgICAiQ0hBVCIsCiAgICAgICJBVURJTyIsCiAgICAgICJWSURFTyIsCiAgICAgICJBViIsCiAgICAgICJTQ1JFRU4iLAogICAgICAiRklMRSIsCiAgICAgICJNSURJIgogICAgXSwKICAgICJwcm9wZXJ0aWVzIjogewogICAgICAiQ0hBVCI6IHsKICAgICAgICAidHlwZSI6ICJudWxsIgogICAgICB9LAogICAgICAiQVVESU8iOiB7CiAgICAgICAgInR5cGUiOiAibnVsbCIKICAgICAgfSwKICAgICAgIlZJREVPIjogewogICAgICAgICJ0eXBlIjogIm51bGwiCiAgICAgIH0sCiAgICAgICJBViI6IHsKICAgICAgICAidHlwZSI6ICJudWxsIgogICAgICB9LAogICAgICAiU0NSRUVOIjogewogICAgICAgICJ0eXBlIjogIm51bGwiCiAgICAgIH0sCiAgICAgICJGSUxFIjogewogICAgICAgICJ0eXBlIjogIm51bGwiCiAgICAgIH0sCiAgICAgICJNSURJIjogewogICAgICAgICJ0eXBlIjogIm51bGwiCiAgICAgIH0KICAgIH0KICB9Cn0=",
-      "sourceCodeClassname": "RoomUIDataSchema",
-      "encoding": "base64",
-      "signature": ""
-    },
-    "cguid": 20008,
-    "type": "DataSchemas",
-    "version": "0.1",
-    "description": "Description of RoomUIDataSchema",
-    "objectName": "RoomUIDataSchema",
-    "configuration": {},
-    "sourcePackageURL": "/sourcePackage",
-    "language": "JSON-Schema",
     "signature": "",
-    "messageSchemas": "",
-    "dataObjects": [],
-    "accessControlPolicy": "somePolicy"
-  },
-  "UserStatusDataSchema": {
-    "sourcePackage": {
-      "sourceCode": "ewoJIiRzY2hlbWEiOiAiaHR0cDovL2pzb24tc2NoZW1hLm9yZy9kcmFmdC0wNC9zY2hlbWEjIiwKCSJpZCI6ICJTdGF0dXNPYmplY3QiLAoJInR5cGUiOiAib2JqZWN0IiwKCSJyZXF1aXJlZCI6IFsic3RhdHVzIl0sCgkiYWRkaXRpb25hbFByb3BlcnRpZXMiOiBmYWxzZSwKICAJInByb3BlcnRpZXMiOiB7CgkJInNjaGVtZSI6IHsKCQkJImNvbnN0YW50IjogInN0YXR1cyIKCQl9LAoJCSJzdGF0dXMiOiB7CgkJCSJ0eXBlIjogInN0cmluZyIKCQl9Cgl9Cn0K",
-      "sourceCodeClassname": "UserStatusDataSchema",
-      "encoding": "base64",
-      "signature": ""
-    },
-    "cguid": 20009,
-    "type": "DataSchemas",
-    "version": "0.1",
-    "description": "Description of UserStatusDataSchema",
-    "objectName": "UserStatusDataSchema",
-    "configuration": {},
-    "sourcePackageURL": "/sourcePackage",
-    "language": "JSON-Schema",
-    "signature": "",
-    "messageSchemas": "",
-    "dataObjects": [],
-    "accessControlPolicy": "somePolicy"
+    "accessControlPolicy": "somePolicy",
+    "dataObjects": []
   }
 }
