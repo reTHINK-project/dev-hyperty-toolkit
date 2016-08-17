@@ -36,9 +36,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 2. run the command `npm install` (this may take some minutes)
 
 3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
-
-  ```shell
- # PTInovacao
+ ```shell
  127.0.0.1   hybroker.rethink.ptinovacao.pt
  127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
  ```
@@ -54,12 +52,12 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  127.0.0.1   catalogue.rethink.quobis.com
  ```
 
- * In Linux is normally available at: ```/etc/hosts```
- * In windows is normally available at:  ```C:\Windows\System32\drivers\etc\hosts```
+ * In Linux is normally available at: `/etc/hosts`
+ * In windows is normally available at: `C:\Windows\System32\drivers\etc\hosts`
 
 4. Create the folder thet will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use somethinf else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
 
-5. run the local http-server and catalogue with ```npm run start:dev```. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
+5. run the local http-server and catalogue with `npm run start:dev`. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
 
 6. Check the following url's to allow the certificates:
 
@@ -90,7 +88,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
  The HelloWorldReporter.hy.js looks like:
 
- ```
+ ```javascript
  // This is the Hello World Reporter who owns and reports changes done in the Hello Data Object.
 
  // The `hello()` function is used to create the Hello Data Object
@@ -125,7 +123,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
   The Hello World Observer (which is the Hyperty observing changes on the Hello Data Object performed by the Hello World Reporter) looks like :
 
- ```
+ ```javascript
  // This is the Hello World Observer who subscribes the Hello Data Object to be synched with it.
 
   syncher.subscribe(_this._objectDescURL, event.url).then(function(helloObjtObserver) {
@@ -142,7 +140,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
  - a ".ds.json" containing the JSON-Schema describing data objects handled by your Hyperty e.g. HelloWorldDataSchema.ds.json:
 
- ```
+ ```json
  {
  	"$schema": "http://json-schema.org/draft-04/schema#",
  	"id": "HelloObject",
@@ -160,15 +158,15 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  }
 ```
 
-This is optional in case you are reusing existing [data schemas](https://github.com/reTHINK-project/dev-service-framework/tree/master/schemas/json-schema/data-objects). In that situation, you just have to set in your Hyperty Descriptor the Catalogue URL that points to the data schema (see below).
+  This is optional in case you are reusing existing [data schemas](https://github.com/reTHINK-project/dev-service-framework/tree/master/schemas/json-schema/data-objects). In that situation, you just have to set in your Hyperty Descriptor the Catalogue URL that points to the data schema (see below).
 
-3. Complete your Hyperty Descriptor by editing `dev-hyperty-toolkit\resources\descriptors\Hyperties.json`:
+2. You can Complete your Hyperty Descriptor by editing the file with sufix ***name-of-hyperty.hy.json** where you have the hyperty source code;
 
-4. To test your Hyperty, you need to:
+3. To test your Hyperty, you need to move the dev-hyperty (or where is located your source code) folder and:
 
- - expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
+ - move to *"examples"* folder and expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
 
- - In case your Hyperty exposes an API to be used by a Web App, you should move to "examples" folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
+ - In case your Hyperty exposes an API to be used by a Web App, you should move to *"examples"* folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
 
 ### Cloud and Local development environment
 
@@ -185,12 +183,12 @@ The toolkit is pre-configured to use **hybroker.rethink.ptinovacao.pt** cloud de
  - on windows - **windows/system32/drivers/etc/hosts**
  - on unix system - **/etc/hosts**
 
-**NOTE:** You need open this file with administration permission
+**NOTE:** You need open this file with administration permission and add this:
 
- ```
- 127.0.0.1   hybroker.rethink.ptinovacao.pt
- 127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
- ```
+```shell
+127.0.0.1   hybroker.rethink.ptinovacao.pt
+127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
+```
 
 #### Local Development Environment
 
@@ -242,6 +240,20 @@ The same happens with JSON-Schemas that are added / updated in the DataSchemas.j
 The following Gulp Tasks are provided:
 
 #### <a id="serve">gulp serve</a> or <a id="serve">npm run start:dev</a>
+
+If you are a **linux** user read this:
+> Use CAP_NET_BIND_SERVICE to grant low-numbered port access to a process.
+
+> With this you can grant permanent access to a specific binary to bind to low-numbered ports via the setcap command:
+
+> After doing this, /path/to/binary will be able to bind to low-numbered ports.
+
+You should execute this command once, this will prevent you need start the server with `sudo`:
+ ```shell
+ sudo setcap CAP_NET_BIND_SERVICE=+eip /path/to/binary/node
+ ```
+
+***NOTE: you can see more information on [superuser.com](http://superuser.com/questions/710253/allow-non-root-process-to-bind-to-port-80-and-443)***
 
 This task will:
 
