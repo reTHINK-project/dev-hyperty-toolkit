@@ -12,27 +12,35 @@ let domain = config.domain;
 let runtimeLoader;
 let loading = false;
 
-console.log('Configuration file before:', config);
+// Hack to convert the environment variables from docker to a boolean;
+// without this the config.development is equal to 'true';
+let development = JSON.parse(config.development);
 
-if (config.development) {
+console.log('Configuration file before:', config, development);
+
+if (development) {
 
   config.domain = window.location.hostname;
   config.runtimeURL = config.runtimeURL.replace(domain, window.location.hostname);
-}
 
-console.log('Configuration file after:', config);
+  console.log('Configuration file in development mode after:', config);
+
+}
 
 rethink.install(config).then(function(result) {
 
   runtimeLoader = result;
-  console.log('Installed:', result, config.development);
 
-  if (config.development) {
+  if (development) {
+
+    console.info('Runtime Installed in development mode:', result, development);
+
     return loadStubs().then((result) => {
       console.log('Stubs load: ', result);
       return getListOfHyperties(domain);
     });
   } else {
+    console.info('Runtime Installed in production mode:', result, development);
     return getListOfHyperties(domain);
   }
 
@@ -85,8 +93,6 @@ function loadStubs() {
           return stub !== 'default';
         });
 
-        console.log(stubs);
-
         if (stubs.length) {
 
           let loadAllStubs = [];
@@ -111,7 +117,7 @@ function loadStubs() {
 function getListOfHyperties(domain) {
 
   let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty/';
-  if (config.development) {
+  if (development) {
     domain = window.location.hostname;
     hypertiesURL = 'https://' + domain + '/.well-known/hyperty/Hyperties.json';
   }
@@ -149,7 +155,7 @@ function loadHyperty(event) {
   console.log('Hyperty Name:', hypertyName);
 
   let hypertyPath = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/hyperty/' + hypertyName;
-  if (config.development) {
+  if (development) {
     domain = window.location.hostname;
     hypertyPath = 'hyperty-catalogue://' + domain + '/.well-known/hyperty/' + hypertyName;
   }

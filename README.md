@@ -40,6 +40,17 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  127.0.0.1   hybroker.rethink.ptinovacao.pt
  127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
  ```
+ to use this development version of a toolkit and make the interoperability working, is mandatory you add this lines to the hosts file:
+
+ ```shell
+ # DT domain
+ 127.0.0.1   rethink.tlabscloud.com
+ 127.0.0.1   catalogue.rethink.tlabscloud.com
+
+ # Quobis domain
+ 127.0.0.1   rethink.quobis.com
+ 127.0.0.1   catalogue.rethink.quobis.com
+ ```
 
  * In Linux is normally available at: `/etc/hosts`
  * In windows is normally available at: `C:\Windows\System32\drivers\etc\hosts`
@@ -49,8 +60,18 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 5. run the local http-server and catalogue with `npm run start:dev`. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
 
 6. Check the following url's to allow the certificates:
- * https://hybroker.rethink.ptinovacao.pt
- * https://catalogue.hybroker.rethink.ptinovacao.pt
+
+ ##### PTInovacão
+  * https://hybroker.rethink.ptinovacao.pt
+  * https://catalogue.hybroker.rethink.ptinovacao.pt
+
+ ##### DT domain
+  * https://rethink.tlabscloud.com
+  * https://catalogue.rethink.tlabscloud.com
+
+ ##### Quobis domain
+  * https://rethink.quobis.com
+  * https://catalogue.rethink.quobis.com
 
 7. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
 
