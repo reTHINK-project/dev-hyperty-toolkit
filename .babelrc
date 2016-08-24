@@ -1,0 +1,9 @@
+{
+  "presets": ["es2015", "stage-3"],
+  "plugins": [
+    "add-module-exports",
+    "syntax-async-functions",
+    "syntax-async-generators",
+    "transform-async-to-generator",
+    "transform-inline-environment-variables"]
+}

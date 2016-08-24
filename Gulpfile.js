@@ -261,7 +261,7 @@ function copyFiles(opts) {
 
 }
 
-gulp.task('watch', function(done) {
+gulp.task('watch', function() {
 
   // add browserSync.reload to the tasks array to make
   // all browsers reload after tasks are complete.
@@ -607,8 +607,7 @@ function transpile(opts) {
     .transform(babel, {
       compact: false,
       sourceMaps: true,
-      presets: ['es2015', 'stage-0'],
-      plugins: ['add-module-exports', 'transform-async-to-generator', 'transform-inline-environment-variables']
+      extends: __dirname + '/.babelrc'
     })
     .bundle()
     .on('error', function(err) {
@@ -889,6 +888,7 @@ function descriptorBase(type) {
   switch (type) {
     case 'hyperty':
       base.hypertyType = [];
+      base.constraints = [];
       break;
 
     case 'runtime':
