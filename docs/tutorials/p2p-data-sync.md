@@ -1,3 +1,5 @@
+ "These Tutorials are for Phase 1!! Most updated version is [here](https://github.com/reTHINK-project/specs/tree/master/tutorials)" 
+=============== 
 P2P Data Synchronisation: Reporter - Observer Model
 ---------------------------------------------------
 
