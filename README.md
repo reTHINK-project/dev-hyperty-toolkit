@@ -2,33 +2,32 @@
 Hyperty Development Toolkit
 -------------------------
 
-This repository provides required tools to develop Hyperties and a few demos. Currently limited to hyperties to be executed in the Browser. Soon NodeJS support will also be added;
+This repository provides required tools to develop Hyperties.
 
--	[Overview](#rethink-framework-overview)
--	[Getting Started](#quick-start)
+-	[Overview](#overview)
+-	[Getting Started](#quick-guide-setup)
 
 ### Overview
 
 reTHINK Project provides a Javascript framework to build and deliver Real Time Communication Microservices in end-user devices (browsers and standalone mobile apps) and in Network edge servers (NodeJS):
 
-* **Hyperty** is similar to an Agent or a Bot that performs tasks on user's behalf, by communicating through P2P Data Synchronisation with other Hyperties. Some examples (see demos), are:
+* **Hyperty** is similar to an Agent or a Bot that performs tasks on user's behalf, by communicating through P2P Data Synchronisation with other Hyperties. Some [examples](https://github.com/reTHINK-project/dev-hyperty) ([see demos](https://hybroker.rethink.ptinovacao.pt/examples/)), are:
 
-  - the Hyperty Connector that uses WebRTC to manage video calls between users;
+  - the [Hyperty Connector](https://github.com/reTHINK-project/dev-hyperty/tree/master/docs/connector) that uses WebRTC to manage video calls between users;
 
-  - the Group Chat Hyperty (name says it all);
+  - the [Group Chat Hyperty](https://github.com/reTHINK-project/dev-hyperty/tree/master/docs/group-chat-manager) (name says it all);
 
-  - the myBracelet Hyperty, is a sensing Hyperty that encapsulates a Bracelet, by collecting and publishing data from it
-
-  - the myContext Hyperty is a Big Data Hyperty that uses data published by different sensing Hyperties (like the myBracelet Hyperty) to infer and calculate more meaningful Contextual data about the user.
+  - the [myBracelet Hyperty](https://github.com/reTHINK-project/dev-hyperty/tree/master/docs/bracelet), is a sensing Hyperty that encapsulates a Bracelet, by collecting and publishing data from it
 
 * **Protocol on-the-fly** is used by Hyperties to support interoperability with other Hyperties from other domains, without requiring federation or standardisation of network protocols;
 * Hyperties are **Trustful**. Hyperties are decoupled from the User Identity, which can be securely asserted by existing IDPs (Identity Provider), when communicating with other Hyperties.
 
-In case you want want to know more details about reTHINK, have a look [here](docs/tutorials/readme.md)
+In case you want want to know more details about reTHINK, have a look on the [full specification](docs/tutorials/readme.md)
 
 ### Quick Guide Setup
 
-To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the steps below. In case you want to use Hyperties in your Application please read [this tutorial](docs/tutorials/development-of-apps.md).
+To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the steps below. In case you want to use Hyperties in your Application please [go here](https://github.com/reTHINK-project/dev-app).
+
 **NOTE for Windows Users:** You should use "Windows PowerShell" and not the standard command line.
 
 1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 2);
@@ -61,7 +60,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 6. Check the following url's to allow the certificates:
 
- ##### PTInovacão
+ ##### Altice Labs
   * https://hybroker.rethink.ptinovacao.pt
   * https://catalogue.hybroker.rethink.ptinovacao.pt
 
@@ -84,7 +83,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 1. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
 
- - a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldOberver.hy.js](/src/hello-world/HelloWorldObserver.hy.js).
+ - a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](https://github.com/reTHINK-project/dev-hyperty/tree/master/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldOberver.hy.js](https://github.com/reTHINK-project/dev-hyperty/tree/master/src/hello-world/HelloWorldObserver.hy.js).
 
  The HelloWorldReporter.hy.js looks like:
 
@@ -158,7 +157,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  }
 ```
 
-  This is optional in case you are reusing existing [data schemas](https://github.com/reTHINK-project/dev-service-framework/tree/master/schemas/json-schema/data-objects). In that situation, you just have to set in your Hyperty Descriptor the Catalogue URL that points to the data schema (see below).
+  This is optional in case you are reusing existing [data schemas](https://github.com/reTHINK-project/specs/tree/master/schemas/json-schema/data-objects). In that situation, you just have to set in your Hyperty Descriptor the Catalogue URL that points to the data schema (see below).
 
 2. You can Complete your Hyperty Descriptor by editing the file with sufix ***name-of-hyperty.hy.json** where you have the hyperty source code;
 
