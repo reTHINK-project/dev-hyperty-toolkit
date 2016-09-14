@@ -22,7 +22,7 @@ reTHINK Project provides a Javascript framework to build and deliver Real Time C
 * **Protocol on-the-fly** is used by Hyperties to support interoperability with other Hyperties from other domains, without requiring federation or standardisation of network protocols;
 * Hyperties are **Trustful**. Hyperties are decoupled from the User Identity, which can be securely asserted by existing IDPs (Identity Provider), when communicating with other Hyperties.
 
-In case you want want to know more details about reTHINK, have a look on the [full specification](docs/tutorials/readme.md)
+In case you want want to know more details about reTHINK, have a look on the [full specification](https://github.com/reTHINK-project/specs/blob/master/README.md)
 
 ### Quick Guide Setup
 
@@ -30,7 +30,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 **NOTE for Windows Users:** You should use "Windows PowerShell" and not the standard command line.
 
-1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 2);
+1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 4);
 
 2. run the command `npm install` (this may take some minutes)
 
@@ -161,11 +161,11 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 2. You can Complete your Hyperty Descriptor by editing the file with sufix ***name-of-hyperty.hy.json** where you have the hyperty source code;
 
-3. To test your Hyperty, you need to move the dev-hyperty (or where is located your source code) folder and:
+3. To test your Hyperty, you need to go to dev-hyperty (or where is located your source code) folder and:
 
- - move to *"examples"* folder and expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
+ - go to *"examples"* folder and expose your Hyperty to Testing Web App by editing *function* [***hypertyDeployed*** on **main.js**](https://github.com/reTHINK-project/dev-hyperty/blob/master/examples/main.js#L21) and add your **hyperty name** and **javascript file name** to the switch cases defined there.
 
- - In case your Hyperty exposes an API to be used by a Web App, you should move to *"examples"* folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
+ - In case your Hyperty exposes an API to be used by a Web App, you should go to *"examples"* folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
 
 ### Cloud and Local development environment
 
