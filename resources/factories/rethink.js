@@ -71,7 +71,7 @@ let runtimeProxy = {
       minibus._onMessage(msg);
       minibus.addListener(from, function(msg) {
         if (!msg.body.hasOwnProperty('code')) {
-          let protostubURL = msg.body.value.runtimeProtoStubURL;
+          let protostubURL = msg.body.value.url;
           let protostubComponent = window.components[protostubURL];
           let protostub = {
             runtimeProtostubURL: protostubURL,

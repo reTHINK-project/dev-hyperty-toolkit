@@ -12,10 +12,9 @@ let domain = config.domain;
 let runtimeLoader;
 let loading = false;
 
-console.log('Configuration file before:', config);
+console.log('Configuration file before:', config, process.env.INTER_DEVELOPMENT);
 
 if (config.development) {
-
   config.domain = window.location.hostname;
   config.runtimeURL = config.runtimeURL.replace(domain, window.location.hostname);
 }
@@ -27,7 +26,7 @@ rethink.install(config).then(function(result) {
   runtimeLoader = result;
   console.log('Installed:', result, config.development);
 
-  if (config.development) {
+  if (process.env.INTER_DEVELOPMENT) {
     return loadStubs().then((result) => {
       console.log('Stubs load: ', result);
       return getListOfHyperties(domain);
