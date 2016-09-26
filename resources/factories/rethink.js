@@ -94,13 +94,13 @@ const rethink = {
 
   install: function({domain, runtimeURL, development}={}) {
 
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
 
       let domain = config.domain;
 
       let catalogue = runtimeFactory.createRuntimeCatalogue(development);
 
-      catalogue.getRuntimeDescriptor(runtimeURL).then(function(descriptor) {
+      catalogue.getRuntimeDescriptor(runtimeURL).then((descriptor) => {
 
         if (descriptor.sourcePackageURL === '/sourcePackage') {
           return descriptor.sourcePackage;
@@ -109,7 +109,7 @@ const rethink = {
         }
 
       })
-      .then(function(sourcePackage) {
+      .then((sourcePackage) => {
 
         window.eval(sourcePackage.sourceCode);
 

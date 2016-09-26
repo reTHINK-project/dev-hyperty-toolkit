@@ -90,7 +90,7 @@ function loadStubs() {
 
           let loadAllStubs = [];
           stubs.forEach((stub) => {
-            loadAllStubs.push(runtimeLoader.requireProtostub('https://' + stub + '/.well-known/protocolstub/' + stub));
+            loadAllStubs.push(runtimeLoader.requireProtostub('hyperty-catalogue://catalogue.' + stub + '/.well-known/protocolstub/' + stub));
           });
 
           Promise.all(loadAllStubs).then((result) => {
@@ -109,11 +109,7 @@ function loadStubs() {
 
 function getListOfHyperties(domain) {
 
-  let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty/';
-  if (config.development) {
-    domain = window.location.hostname;
-    hypertiesURL = 'https://' + domain + '/.well-known/hyperty/Hyperties.json';
-  }
+  let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty';
 
   return new Promise(function(resolve, reject) {
         $.ajax({
@@ -121,9 +117,9 @@ function getListOfHyperties(domain) {
             success: function(result) {
                 let response = [];
                 if (typeof result === 'object') {
-                  Object.keys(result).forEach(function(key) {
-                      response.push(key);
-                    });
+                  result.forEach(function(key) {
+                    response.push(key);
+                  });
                 } else if (typeof result === 'string') {
                   response = JSON.parse(result);
                 }
@@ -150,7 +146,7 @@ function loadHyperty(event) {
   let hypertyPath = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/hyperty/' + hypertyName;
   if (config.development) {
     domain = window.location.hostname;
-    hypertyPath = 'hyperty-catalogue://' + domain + '/.well-known/hyperty/' + hypertyName;
+    hypertyPath = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/hyperty/' + hypertyName;
   }
 
   let $el = $('.main-content .notification');

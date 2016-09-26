@@ -160,13 +160,61 @@ gulp.task('server', function(done) {
     server: {
       baseDir: './',
       middleware: function(req, res, next) {
+
         res.setHeader('Access-Control-Allow-Origin', '*');
+
+        if (req.originalUrl.includes('.well-known')) {
+          if (req.originalUrl.includes('version')) {
+            res.writeHeader(200, {'Content-Type': 'text/plain'});
+            res.write('1.0');
+            res.end();
+          } else {
+            var paths = req.originalUrl.split('/');
+            var type = paths[2];
+            var resource = paths[3];
+
+            var raw;
+            switch (type) {
+              case 'runtime':
+                raw = JSON.parse(fs.readFileSync('./resources/descriptors/Runtimes.json', 'utf8'));
+                break;
+              case 'hyperty':
+                raw = JSON.parse(fs.readFileSync('./resources/descriptors/Hyperties.json', 'utf8'));
+                break;
+              case 'idp-proxy':
+                raw = JSON.parse(fs.readFileSync('./resources/descriptors/IDPProxys.json', 'utf8'));
+                break;
+              case 'protocolstub':
+                raw = JSON.parse(fs.readFileSync('./resources/descriptors/ProtoStubs.json', 'utf8'));
+                break;
+              case 'dataschema':
+                raw = JSON.parse(fs.readFileSync('./resources/descriptors/DataSchemas.json', 'utf8'));
+                break;
+            }
+
+            res.writeHeader(200, {'Content-Type': 'application/json'});
+            if (resource) {
+
+              if (req.originalUrl.includes('cguid')) {
+                res.end(JSON.stringify(raw[resource].cguid));
+              } else {
+                res.end(JSON.stringify(raw[resource], '', 2));
+              }
+
+            } else {
+              var listOfResources = [];
+              for (var key in raw) {
+                if (raw.hasOwnProperty(key)) {
+                  listOfResources.push(key);
+                }
+              }
+              res.end(JSON.stringify(listOfResources, '', 2));
+            }
+          }
+        }
+
         next();
-      },
-      routes: {
-        '/.well-known/runtime': 'node_modules/runtime-browser/bin',
-        '/.well-known/protocolstub': 'resources/descriptors/',
-        '/.well-known/hyperty': 'resources/descriptors/'
+
       }
     }
   }, function(err) {
@@ -265,7 +313,7 @@ gulp.task('watch', function(done) {
   gulp.watch(['system.config.json'], ['main-watch']);
   gulp.watch(['./resources/schemas/**/*.ds.json'], ['schemas'], browserSync.reload);
 
-  gulp.watch(['./server/rethink.js', './examples/main.js'], function() {
+  gulp.watch(['./server/rethink.js', './resources/factories/*.js', './examples/main.js'], function() {
     return gulp.src('./server/rethink.js')
     .pipe(transpile({destination: __dirname + '/dist', debug: true}))
     .resume()
