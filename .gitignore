@@ -20,7 +20,6 @@ dist
 config.json
 src
 examples
-test
 
 resources/tmp
 resources/bundle.js

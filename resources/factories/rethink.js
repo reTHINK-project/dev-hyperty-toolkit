@@ -71,7 +71,7 @@ let runtimeProxy = {
       minibus._onMessage(msg);
       minibus.addListener(from, function(msg) {
         if (!msg.body.hasOwnProperty('code')) {
-          let protostubURL = msg.body.value.url;
+          let protostubURL = msg.body.value.url || msg.body.value.runtimeProtoStubURL;
           let protostubComponent = window.components[protostubURL];
           let protostub = {
             runtimeProtostubURL: protostubURL,
@@ -116,7 +116,7 @@ const rethink = {
         let runtime = new Runtime(runtimeFactory, domain);
         window.runtime = runtime;
 
-        console.log(runtime);
+        console.log('Runtime:', runtime);
 
         minibus.addListener('core:loadHyperty', function(msg) {
           console.log('Load Hyperty: ', msg);
