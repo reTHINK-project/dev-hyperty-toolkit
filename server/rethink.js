@@ -65,7 +65,7 @@ rethink.install(config).then(function(result) {
 function loadStubs() {
 
   domain = window.location.hostname;
-  let protostubsURL = 'https://' + domain + '/.well-known/protocolstub/ProtoStubs.json';
+  let protostubsURL = 'https://' + domain + '/.well-known/protocolstub';
 
   return new Promise(function(resolve, reject) {
     $.ajax({
@@ -73,7 +73,7 @@ function loadStubs() {
       success: function(result) {
         let response = [];
         if (typeof result === 'object') {
-          Object.keys(result).forEach(function(key) {
+          result.forEach(function(key) {
             response.push(key);
           });
         } else if (typeof result === 'string') {
@@ -84,13 +84,11 @@ function loadStubs() {
           return stub !== 'default';
         });
 
-        console.log(stubs);
-
         if (stubs.length) {
 
           let loadAllStubs = [];
           stubs.forEach((stub) => {
-            loadAllStubs.push(runtimeLoader.requireProtostub('hyperty-catalogue://catalogue.' + stub + '/.well-known/protocolstub/' + stub));
+            loadAllStubs.push(runtimeLoader.requireProtostub('hyperty-catalogue://' + stub + '/.well-known/protocolstub/' + stub));
           });
 
           Promise.all(loadAllStubs).then((result) => {

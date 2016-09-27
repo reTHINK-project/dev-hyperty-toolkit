@@ -29,7 +29,7 @@ const runtimeFactory = Object.create({
 
   createRuntimeCatalogue(development) {
     // To avoid cache
-    window.localStorage.clear();
+    // window.localStorage.clear();
 
     if (!this.catalogue)
       this.catalogue = development ? new RuntimeCatalogueLocal(this) : new RuntimeCatalogue(this);
