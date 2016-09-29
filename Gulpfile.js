@@ -103,8 +103,7 @@ gulp.task('src-hyperties', function(done) {
 gulp.task('clean', function() {
   return gulp.src([
     'src',
-    'dist',
-    'examples',
+    'app',
     'resources/descriptors/Hyperties.json',
     'resources/descriptors/DataSchemas.json'], {read: false}).pipe(clean());
 });
@@ -158,7 +157,7 @@ gulp.task('server', function(done) {
     logConnections: logConnections,
     codeSync: codeSync,
     server: {
-      baseDir: './',
+      baseDir: './app',
       middleware: function(req, res, next) {
 
         res.setHeader('Access-Control-Allow-Origin', '*');
@@ -369,9 +368,9 @@ gulp.task('watch', function(done) {
   gulp.watch(['system.config.json'], ['main-watch']);
   gulp.watch(['./resources/schemas/**/*.ds.json'], ['schemas'], browserSync.reload);
 
-  gulp.watch(['./server/rethink.js', './resources/factories/*.js', './examples/main.js'], function() {
+  gulp.watch(['./server/rethink.js', './resources/factories/*.js', './app/main.js'], function() {
     return gulp.src('./server/rethink.js')
-    .pipe(transpile({destination: __dirname + '/dist', debug: true}))
+    .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
     .resume()
     .on('end', function() {
       browserSync.reload();
@@ -423,7 +422,7 @@ gulp.task('watch', function(done) {
 
   gulp.watch([dirname + '/examples/*.html', dirname + '/examples/**/*.hbs'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'examples'}))
+    .pipe(copyFiles({dest: 'app'}))
     .resume()
     .on('end', function() {
       gutil.log('The html templates are copied with success');
@@ -434,8 +433,8 @@ gulp.task('watch', function(done) {
 
   gulp.watch([dirname + '/examples/main.js'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'examples'}))
-    .pipe(transpile({destination: __dirname + '/dist', debug: true}))
+    .pipe(copyFiles({dest: 'app'}))
+    .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
     .resume()
     .on('end', function() {
       gutil.log('The main file was created like a distribution file on /dist');
@@ -446,8 +445,8 @@ gulp.task('watch', function(done) {
 
   gulp.watch([dirname + '/examples/**/*.js', '!' + dirname + '/examples/main.js'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'examples'}))
-    .pipe(transpile({destination: __dirname + '/examples', debug: true}))
+    .pipe(copyFiles({dest: 'app'}))
+    .pipe(transpile({destination: __dirname + '/app', debug: true}))
     .resume()
     .on('end', function() {
       gutil.log('The javascript was copied and converted to es5');
@@ -463,13 +462,13 @@ gulp.task('hyperties-watch', ['hyperties'], browserSync.reload);
 
 gulp.task('js', function() {
 
-  return gulp.src(['./examples/main.js', './server/rethink.js'])
+  return gulp.src(['./app/main.js', './server/rethink.js'])
   .on('end', function() {
-    var fileObject = path.parse('./examples/main.js');
+    var fileObject = path.parse('./app/main.js');
     gutil.log('-----------------------------------------------------------');
     gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
   })
-  .pipe(transpile({destination: __dirname + '/dist', debug: true}))
+  .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
   .on('end', function() {
     gutil.log('The main file was created like a distribution file on /dist');
     gutil.log('-----------------------------------------------------------');
@@ -967,7 +966,7 @@ function copySrc() {
 
 function copyExamples() {
   return gulp.src([dirname + '/examples/**/*'])
-  .pipe(gulp.dest('./examples'));
+  .pipe(gulp.dest('./app'));
 }
 
 function copyHyperties(from, done) {

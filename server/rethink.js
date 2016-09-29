@@ -4,7 +4,7 @@
 import rethink from '../resources/factories/rethink';
 import config from '../config.json';
 
-import { hypertyDeployed, hypertyFail } from '../examples/main';
+import { hypertyDeployed, hypertyFail } from '../app/main';
 
 window.KJUR = {};
 

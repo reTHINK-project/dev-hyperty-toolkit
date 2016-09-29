@@ -1,12 +1,56 @@
 
 Hyperty Development Toolkit
--------------------------
+=========================
 
 This repository provides required tools to develop Hyperties and a few demos. Currently limited to hyperties to be executed in the Browser. Soon NodeJS support will also be added;
 
-[TOC]
 
-### Overview
+- [Change Log](#log)
+- [Overview](#overview)
+- Quick Guide Setup
+  - [Setup with docker and docker-compose](#docker)
+  - [Setup form source code](#code)
+- [First Hyperty Development](#first)
+- Cloud and Local development environment
+  - [Cloud](#cloud)
+  - [Local](#local)
+- [The Repository structure](#repository)
+- [Gulp Tasks](#tasks)
+  - [Start server](#serve)
+  - [Encode components](#encode)
+
+
+
+<a name="log"/>
+
+## Change Log
+
+##### versions
+
+- [x] RuntimeUA | [develop-improves-revised-catalogue](https://github.com/reTHINK-project/dev-runtime-core/tree/develop-improves-revised-catalogue) branch
+- [x] Service Framework | [revised-catalogue](https://github.com/reTHINK-project/dev-service-framework/tree/revised-catalogue) branch
+- [x] message node vertx | [develop](https://github.com/reTHINK-project/dev-msg-node-vertx/tree/develop)
+- [x] domain-registy | [master](https://github.com/reTHINK-project/dev-registry-domain)
+
+##### Improves
+
+- [x] now toolkit run on root, you don't need add the `/examples`
+- [x] toolkit now support the same request as dev-catalogue (in the easy way and limited, the point is not replicate the dev-catalogue).
+      Now we don't need something like, `resources/descriptors/Hyperties.json` you can use the `.../.well-known/hyperty/Connector` eg.
+
+##### Fixes
+
+- [x] [21](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/21) - Alternative Port
+
+- [x] [16](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/16) - Missing dependency: urijs 
+
+- [x] [5](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/5) - if you run the toolkit with [docker](#docker) this issue was solved
+
+      ​
+
+<a name="overview"/>
+
+## Overview
 
 reTHINK Project provides a Javascript framework to build and deliver Real Time Communication Microservices in end-user devices (browsers and standalone mobile apps) and in Network edge servers (NodeJS):
 
@@ -25,9 +69,11 @@ reTHINK Project provides a Javascript framework to build and deliver Real Time C
 
 In case you want want to know more details about reTHINK, have a look [here](docs/tutorials/readme.md)
 
-### Quick Guide Setup
+## Quick Guide Setup
 
-#### With docker and docker-compose
+<a name="docker"/>
+
+### With docker and docker-compose
 
 You can run the toolkit with docker and docker-compose.
 
@@ -65,8 +111,9 @@ You can run the toolkit with docker and docker-compose.
                                   print new container names.
 
 
+<a name="code"/>
 
-#### From source code
+### From source code
 
 To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the steps below. In case you want to use Hyperties in your Application please read [this tutorial](docs/tutorials/development-of-apps.md).
 **NOTE for Windows Users:** You should use "Windows PowerShell" and not the standard command line.
@@ -99,7 +146,9 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 - WebRTC Connector example;
 - Group Chat;
 
-### First Hyperty Development
+<a name="first"/>
+
+## First Hyperty Development
 
 1. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
 
@@ -187,9 +236,11 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 - In case your Hyperty exposes an API to be used by a Web App, you should move to *"examples"* folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
 
-### Cloud and Local development environment
+## Cloud and Local development environment
 
-#### Cloud Development Environment
+<a name="cloud" />
+
+### Cloud Development Environment
 
 The toolkit is pre-configured to use **hybroker.rethink.ptinovacao.pt** cloud development environment. In case you want to use another reTHINK cloud environment the following changes must be done:
 
@@ -209,13 +260,17 @@ The toolkit is pre-configured to use **hybroker.rethink.ptinovacao.pt** cloud de
 127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
 ```
 
-#### Local Development Environment
+<a name="local" />
 
-In case you prefer not to depend on third party services you also have the option to install the full reTHINK environment in you local development environment. In that case follow these guidelines. 
+### Local Development Environment
+
+In case you prefer not to depend on third party services you also have the option to install the full reTHINK environment in you local development environment. In that case follow these guidelines.
 
 **to do:** provide here the link for the installation guide.
 
-### The Repository structure
+<a name="repository" />
+
+## The Repository structure
 
 #### Resources folder
 
@@ -255,11 +310,17 @@ Hyperties.json
 
 The same happens with JSON-Schemas that are added / updated in the DataSchemas.json file.
 
-### Gulp Tasks
+
+
+<a name="tasks" />
+
+## Gulp Tasks
 
 The following Gulp Tasks are provided:
 
-####  gulp serve or  npm run start:dev
+<a name="gulp-serve" />
+
+###  gulp serve or  npm run start:dev
 
 If you are a **linux** user read this:
 > Use CAP_NET_BIND_SERVICE to grant low-numbered port access to a process.
@@ -295,7 +356,9 @@ The [system.config.json](system.config.json) file contains some configuration, j
 
 In both cases, you need to execute like `sudo` or, if you are using windows, open the terminal with **administrator permission**;
 
-#### gulp encode
+<a name="gulp-encode" />
+
+### gulp encode
 
 This task will:
 
