@@ -1,7 +1,7 @@
 {
   "develop" : {
     "development": true,
-    "runtimeURL": "hyperty-catalogue://hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime",
+    "runtimeURL": "hyperty-catalogue://catalogue.hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime",
     "domain": "hybroker.rethink.ptinovacao.pt"
   },
   "production" : {

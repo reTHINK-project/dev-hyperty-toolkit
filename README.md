@@ -4,8 +4,7 @@ Hyperty Development Toolkit
 
 This repository provides required tools to develop Hyperties and a few demos. Currently limited to hyperties to be executed in the Browser. Soon NodeJS support will also be added;
 
--	[Overview](#rethink-framework-overview)
--	[Getting Started](#quick-start)
+[TOC]
 
 ### Overview
 
@@ -28,6 +27,47 @@ In case you want want to know more details about reTHINK, have a look [here](doc
 
 ### Quick Guide Setup
 
+#### With docker and docker-compose
+
+You can run the toolkit with docker and docker-compose.
+
+1. install docker - you could know more information [here](https://docs.docker.com/engine/installation/)
+
+2. install docker-compose - you could know more information [here](https://docs.docker.com/compose/install/), if you are using **windows** or **Mac OS** you can install docker-toolbox, see [here](https://docs.docker.com/toolbox/overview/)
+
+3. You can configure the service on [docker-compose.yml]() file
+
+   **IP** - by default the service run on ip 172.18.0.32 on port 443
+
+   **ENVIRONMENT VARIABLES**
+
+   ​    by default the environment variables are these, but you should configure for yours:
+
+   >       - DEVELOPMENT=true
+   >       - RUNTIME_URL=hyperty-catalogue://hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime
+   >       - DOMAIN=hybroker.rethink.ptinovacao.pt
+   >       - HYPERTY_REPO=/tmp/dev-hyperty
+
+   **VOLUMES** - define here is your dev-hyperty repository
+
+   > ../dev-hyperty:/tmp/dev-hyperty | **note** if you need, change only the first part of configuration;
+
+4. After all instalation process and configuration, go to your **command line** and run:
+
+   `docker-compose up -d hyperty-toolkit`
+
+   ​
+       Usage: up [options] [SERVICE...]
+
+       Options:
+
+       -d                         Detached mode: Run containers in the background,
+                                  print new container names.
+
+
+
+#### From source code
+
 To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the steps below. In case you want to use Hyperties in your Application please read [this tutorial](docs/tutorials/development-of-apps.md).
 **NOTE for Windows Users:** You should use "Windows PowerShell" and not the standard command line.
 
@@ -36,38 +76,38 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 2. run the command `npm install` (this may take some minutes)
 
 3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
- ```shell
+```shell
  127.0.0.1   hybroker.rethink.ptinovacao.pt
  127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
- ```
+```
 
- * In Linux is normally available at: `/etc/hosts`
- * In windows is normally available at: `C:\Windows\System32\drivers\etc\hosts`
+* In Linux is normally available at: `/etc/hosts`
+* In windows is normally available at: `C:\Windows\System32\drivers\etc\hosts`
 
 4. Create the folder thet will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use somethinf else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
 
 5. run the local http-server and catalogue with `npm run start:dev`. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
 
 6. Check the following url's to allow the certificates:
- * https://hybroker.rethink.ptinovacao.pt
- * https://catalogue.hybroker.rethink.ptinovacao.pt
+* https://hybroker.rethink.ptinovacao.pt
+* https://catalogue.hybroker.rethink.ptinovacao.pt
 
 7. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
 
- - Hello World Reporter;
- - Hello World Observer that observes changes made by the first Hello World Reporter;
- - WebRTC Connector example;
- - Group Chat;
+- Hello World Reporter;
+- Hello World Observer that observes changes made by the first Hello World Reporter;
+- WebRTC Connector example;
+- Group Chat;
 
 ### First Hyperty Development
 
 1. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
 
- - a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldOberver.hy.js](/src/hello-world/HelloWorldObserver.hy.js).
+- a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldOberver.hy.js](/src/hello-world/HelloWorldObserver.hy.js).
 
  The HelloWorldReporter.hy.js looks like:
 
- ```javascript
+```javascript
  // This is the Hello World Reporter who owns and reports changes done in the Hello Data Object.
 
  // The `hello()` function is used to create the Hello Data Object
@@ -98,11 +138,11 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  helloObjtReporter.data.hello = "Bye!!";
 
  // This change  will be received by the Observer:
- ```
+```
 
   The Hello World Observer (which is the Hyperty observing changes on the Hello Data Object performed by the Hello World Reporter) looks like :
 
- ```javascript
+```javascript
  // This is the Hello World Observer who subscribes the Hello Data Object to be synched with it.
 
   syncher.subscribe(_this._objectDescURL, event.url).then(function(helloObjtObserver) {
@@ -117,9 +157,9 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  });
 ```
 
- - a ".ds.json" containing the JSON-Schema describing data objects handled by your Hyperty e.g. HelloWorldDataSchema.ds.json:
+- a ".ds.json" containing the JSON-Schema describing data objects handled by your Hyperty e.g. HelloWorldDataSchema.ds.json:
 
- ```json
+```json
  {
  	"$schema": "http://json-schema.org/draft-04/schema#",
  	"id": "HelloObject",
@@ -143,9 +183,9 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 3. To test your Hyperty, you need to move the dev-hyperty (or where is located your source code) folder and:
 
- - move to *"examples"* folder and expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
+- move to *"examples"* folder and expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
 
- - In case your Hyperty exposes an API to be used by a Web App, you should move to *"examples"* folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
+- In case your Hyperty exposes an API to be used by a Web App, you should move to *"examples"* folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
 
 ### Cloud and Local development environment
 
@@ -159,8 +199,8 @@ The toolkit is pre-configured to use **hybroker.rethink.ptinovacao.pt** cloud de
 
 - change your **hosts** file located:
 
- - on windows - **windows/system32/drivers/etc/hosts**
- - on unix system - **/etc/hosts**
+- on windows - **windows/system32/drivers/etc/hosts**
+- on unix system - **/etc/hosts**
 
 **NOTE:** You need open this file with administration permission and add this:
 
@@ -171,12 +211,13 @@ The toolkit is pre-configured to use **hybroker.rethink.ptinovacao.pt** cloud de
 
 #### Local Development Environment
 
-In case you prefer not to depend on third party services you also have the option to install the full reTHINK environment in you local development environment. In that case follow these guidelines. **to do:** provide here the link for the installation guide.
+In case you prefer not to depend on third party services you also have the option to install the full reTHINK environment in you local development environment. In that case follow these guidelines. 
+
+**to do:** provide here the link for the installation guide.
 
 ### The Repository structure
 
-
-#### **resources** folder
+#### Resources folder
 
 This folder contains all files to be served by the Local Development Catalogue. The Local Development Catalogue avoids the provisioning of your hyperty to a [remote catalogue](https://github.com/reTHINK-project/dev-catalogue);
 
@@ -218,7 +259,7 @@ The same happens with JSON-Schemas that are added / updated in the DataSchemas.j
 
 The following Gulp Tasks are provided:
 
-#### <a id="serve">gulp serve</a> or <a id="serve">npm run start:dev</a>
+####  gulp serve or  npm run start:dev
 
 If you are a **linux** user read this:
 > Use CAP_NET_BIND_SERVICE to grant low-numbered port access to a process.
@@ -228,9 +269,9 @@ If you are a **linux** user read this:
 > After doing this, /path/to/binary will be able to bind to low-numbered ports.
 
 You should execute this command once, this will prevent you need start the server with `sudo`:
- ```shell
+```shell
  sudo setcap CAP_NET_BIND_SERVICE=+eip /path/to/binary/node
- ```
+```
 
 ***NOTE: you can see more information on [superuser.com](http://superuser.com/questions/710253/allow-non-root-process-to-bind-to-port-80-and-443)***
 
@@ -239,7 +280,7 @@ This task will:
   1. create a local server;
   2. compile your hyperties to "local catalogue";
   3. make a distribution file on dist folder;
-  3. reload your browser, with last changes;
+  4. reload your browser, with last changes;
 
 ```shell
 # working with develop environment
@@ -254,7 +295,7 @@ The [system.config.json](system.config.json) file contains some configuration, j
 
 In both cases, you need to execute like `sudo` or, if you are using windows, open the terminal with **administrator permission**;
 
-#### <a id="encode">gulp encode</a>
+#### gulp encode
 
 This task will:
 

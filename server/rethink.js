@@ -14,7 +14,7 @@ let loading = false;
 
 console.log('Configuration file before:', config, process.env.INTER_DEVELOPMENT);
 
-if (config.development) {
+if (process.env.INTER_DEVELOPMENT) {
   config.domain = window.location.hostname;
   config.runtimeURL = config.runtimeURL.replace(domain, window.location.hostname);
 }
