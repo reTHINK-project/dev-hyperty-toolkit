@@ -705,6 +705,7 @@ function transpile(opts) {
     if (opts.standalone) args.standalone = opts.standalone;
 
     var filename = opts.filename || fileObject.base;
+    var _this = this;
 
     return browserify(args)
     .transform(babel, {
@@ -716,7 +717,7 @@ function transpile(opts) {
     .bundle()
     .on('error', function(err) {
       gutil.log(gutil.colors.red(err));
-      this.emit('end');
+      _this.emit('end');
     })
     .pipe(source(filename))
     .pipe(gulp.dest(opts.destination))
