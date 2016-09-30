@@ -135,8 +135,8 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
 ```
 
- * In Linux is normally available at: `/etc/hosts`
- * In windows is normally available at: `C:\Windows\System32\drivers\etc\hosts`
+ - In Linux is normally available at: `/etc/hosts`
+ - In windows is normally available at: `C:\Windows\System32\drivers\etc\hosts`
 
 4. Create the folder thet will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use somethinf else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
 
