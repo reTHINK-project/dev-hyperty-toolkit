@@ -2,6 +2,7 @@
 // Generated on Wed Mar 16 2016 17:55:36 GMT+0000 (WET)
 
 var fs = require('fs');
+var systemConfig = require('./config.json');
 
 module.exports = function(config) {
 
@@ -22,6 +23,15 @@ module.exports = function(config) {
       { pattern: 'resources/descriptors/Hyperties.json', watched: false, included: false, served: true, nocache: false },
       { pattern: 'resources/descriptors/DataSchemas.json', watched: false, included: false, served: true, nocache: false },
       'test/**/*.spec.js'
+    ],
+
+    plugins: [
+     'karma-mocha',
+     'karma-browserify',
+     'karma-mocha-reporter',
+     'karma-chrome-launcher',
+     'karma-phantomjs-launcher',
+     'karma-babel-preprocessor'
     ],
 
     // list of files to exclude
@@ -46,10 +56,7 @@ module.exports = function(config) {
     reporters: ['mocha'],
 
     // host name
-    hostname: 'hybroker.rethink.ptinovacao.pt',
-
-    // web server port
-    port: 443,
+    hostname: systemConfig.domain,
 
     protocol: 'https',
 
@@ -58,11 +65,11 @@ module.exports = function(config) {
       cert: fs.readFileSync('rethink-certificate.cert', 'utf8')
     },
 
-    proxyValidateSSL: false,
-
-    proxies: {
-      '/resources/descriptors/': '/base/resources/descriptors/'
+    proxy: {
+      '/.well-known/': 'https://' + systemConfig.domain + '/'
     },
+
+    proxyValidateSSL: false,
 
     customHeaders: [{
       name: 'Access-Control-Allow-Origin',
@@ -70,7 +77,7 @@ module.exports = function(config) {
     }],
 
     client: {
-      captureConsole: true
+      captureConsole: false
     },
 
     // enable / disable colors in the output (reporters and logs)
@@ -85,7 +92,19 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['CustomChrome'],
+
+    // you can define custom flags
+    customLaunchers: {
+      CustomChrome: {
+        base: 'Chrome',
+        flags: [
+          '--disable-web-security',
+          '--ignore-certificate-errors'
+        ],
+        debug: false
+      }
+    },
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits

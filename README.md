@@ -20,7 +20,6 @@ This repository provides required tools to develop Hyperties and a few demos. Cu
   - [Encode components](#encode)
 
 
-
 <a name="log"/>
 
 ## Change Log
@@ -34,19 +33,16 @@ This repository provides required tools to develop Hyperties and a few demos. Cu
 
 ##### Improves
 
-- [x] now toolkit run on root, you don't need add the `/examples`
+- [x] now toolkit run on root, you don't need add the `/examples`;
 - [x] toolkit now support the same request as dev-catalogue (in the easy way and limited, the point is not replicate the dev-catalogue).
-      Now we don't need something like, `resources/descriptors/Hyperties.json` you can use the `.../.well-known/hyperty/Connector` eg.
+  Now we don't need something like, `resources/descriptors/Hyperties.json` you can use the `/.well-known/hyperty/Connector` eg.
 
 ##### Fixes
 
 - [x] [21](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/21) - Alternative Port
-
-- [x] [16](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/16) - Missing dependency: urijs 
-
+- [x] [16](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/16) - Missing dependency: urijs
 - [x] [5](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/5) - if you run the toolkit with [docker](#docker) this issue was solved
-
-      ​
+​
 
 <a name="overview"/>
 

@@ -62,9 +62,9 @@ describe('Install Runtime', function() {
     window.runtime.identityModule.getIdentityAssertion.restore();
   });
 
-  it.skip('should load an stub', (done) => {
+  it('should load an stub', (done) => {
 
-    let stub = 'https://' + config.domain + '/.well-known/protocolstub/default';
+    let stub = config.domain;
 
     expect(runtimeLoader.requireProtostub(stub).then((result) => {
       msgNodeAddress = result.url;
@@ -74,7 +74,7 @@ describe('Install Runtime', function() {
 
   });
 
-  it.skip('should load multiple times the same protostub', (done) => {
+  it('should load multiple times the same protostub', (done) => {
 
     for (let i = 0; i < 2; i++) {
       let stub = 'https://' + config.domain + '/.well-known/protocolstub/default';
@@ -85,7 +85,7 @@ describe('Install Runtime', function() {
 
   });
 
-  it.skip('should load diferent protostub', (done) => {
+  it('should load diferent protostub', (done) => {
 
     let stubList = [
       'https://rethink.tlabscloud.com/.well-known/protocolstub/default',
@@ -100,20 +100,22 @@ describe('Install Runtime', function() {
 
   });
 
-  it.skip('should load hyperty', function(done) {
+  it('should load hyperty', function(done) {
 
-    let hyperty = 'https://' + config.domain + '/.well-known/hyperty/Connector';
+    let hyperty = 'https://catalogue.' + config.domain + '/.well-known/hyperty/Connector';
 
     expect(runtimeLoader.requireHyperty(hyperty).then((result) => {
       console.log('HYPERTY: ', result);
       runtimeHyperty = result;
+    }).catch((error) => {
+      console.log('Error:', error);
     }))
     .to.be.fulfilled
     .and.notify(done);
 
   });
 
-  it.skip('should load multiple hyperties', function(done) {
+  it('should load multiple hyperties', function(done) {
     this.timeout(100000);
 
     let hyperties = [
@@ -129,7 +131,7 @@ describe('Install Runtime', function() {
 
   });
 
-  it.skip('should send multiple read messages', function(done) {
+  it('should send multiple read messages', function(done) {
 
     let seq = 0;
     let time = 100;
