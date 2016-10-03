@@ -35,14 +35,14 @@ This repository provides required tools to develop Hyperties and a few demos. Cu
 
 - [x] now toolkit run on root, you don't need add the `/examples`;
 - [x] toolkit now support the same request as dev-catalogue (in the easy way and limited, the point is not replicate the dev-catalogue).
-  Now we don't need something like, `resources/descriptors/Hyperties.json` you can use the `/.well-known/hyperty/Connector` eg.
+      Now we don't need something like, `resources/descriptors/Hyperties.json` you can use the `/.well-known/hyperty/Connector` eg.
 
 ##### Fixes
 
 - [x] [21](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/21) - Alternative Port
 - [x] [16](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/16) - Missing dependency: urijs
 - [x] [5](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/5) - if you run the toolkit with [docker](#docker) this issue was solved
-​
+      ​
 
 <a name="overview"/>
 
@@ -96,16 +96,37 @@ You can run the toolkit with docker and docker-compose.
 
 4. After all instalation process and configuration, go to your **command line** and run:
 
-   `docker-compose up -d hyperty-toolkit`
+   `docker-compose up hyperty-toolkit`
+
+   ```reStructuredText
+   Usage: docker-compose up [options] [SERVICE...]
+   OPTIONS: 
+   	-d 				   Detached mode: Run containers in the background,
+                          print new container names.
+   ```
+
+5. open your **hosts** file an add the following configuration:
+
+   ```shell
+   172.18.0.32 hybroker.rethink.ptinovacao.pt
+   172.18.0.32 catalogue.hybroker.rethink.ptinovacao.pt
+   ```
+
+   **note:** more information related with hosts file [here](#cloud)
 
    ​
-       Usage: up [options] [SERVICE...]
 
-       Options:
+6. Some usefull commands
 
-       -d                         Detached mode: Run containers in the background,
-                                  print new container names.
+   `docker-compose logs -f hyperty-toolkit ` - to see all the logs of service
 
+   `docker-compose build hyperty-toolkit` - to rebuild the service
+
+   `docker images` - list all images
+
+   `docker rmi <id>` - remove image with <id>;
+
+   ​
 
 <a name="code"/>
 
