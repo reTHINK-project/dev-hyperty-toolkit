@@ -40,7 +40,9 @@ This repository provides required tools to develop Hyperties and a few demos. Cu
 ##### Fixes
 
 - [x] [21](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/21) - Alternative Port
+
 - [x] [16](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/16) - Missing dependency: urijs
+
 - [x] [5](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/5) - if you run the toolkit with [docker](#docker) this issue was solved
       ​
 
@@ -73,9 +75,9 @@ In case you want want to know more details about reTHINK, have a look [here](doc
 
 You can run the toolkit with docker and docker-compose.
 
-1. install docker - you could know more information [here](https://docs.docker.com/engine/installation/)
+1. install docker - see [here](https://docs.docker.com/engine/installation/)
 
-2. install docker-compose - you could know more information [here](https://docs.docker.com/compose/install/), if you are using **windows** or **Mac OS** you can install docker-toolbox, see [here](https://docs.docker.com/toolbox/overview/)
+2. install docker-compose - see [here](https://docs.docker.com/compose/install/), if you are using **windows** or **Mac OS** you can install docker-toolbox, see [here](https://docs.docker.com/toolbox/overview/)
 
 3. You can configure the service on [docker-compose.yml]() file
 
@@ -83,11 +85,18 @@ You can run the toolkit with docker and docker-compose.
 
    **ENVIRONMENT VARIABLES**
 
-   ​    by default the environment variables are these, but you should configure for yours:
+   ​    by default the environment variables are:
 
-   >       - DEVELOPMENT=true
+   **Toolkit develoment mode** - `true` when used in a local development environment, `false` when used at the backend.
+   >       `- DEVELOPMENT=true`
+
+   **RUNTIME_URL** - where the Runtime is loaded from
    >       - RUNTIME_URL=hyperty-catalogue://hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime
+
+   **Domain** - the domain where Message Node and Domain Registry services are hosted
    >       - DOMAIN=hybroker.rethink.ptinovacao.pt
+
+   **Hyperty Repo** - variable with the Hyperty source code repository.
    >       - HYPERTY_REPO=/tmp/dev-hyperty
 
    **VOLUMES** - define here is your dev-hyperty repository
@@ -100,7 +109,7 @@ You can run the toolkit with docker and docker-compose.
 
    ```reStructuredText
    Usage: docker-compose up [options] [SERVICE...]
-   OPTIONS: 
+   OPTIONS:
    	-d 				   Detached mode: Run containers in the background,
                           print new container names.
    ```
@@ -145,23 +154,19 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
 ```
 
-* In Linux is normally available at: `/etc/hosts`
-* In windows is normally available at: `C:\Windows\System32\drivers\etc\hosts`
+  * In Linux is normally available at: `/etc/hosts`
+  * In windows is normally available at: `C:\Windows\System32\drivers\etc\hosts`
 
 4. Create the folder thet will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use somethinf else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
 
 5. run the local http-server and catalogue with `npm run start:dev`. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
 
 6. Check the following url's to allow the certificates:
-* https://hybroker.rethink.ptinovacao.pt
-* https://catalogue.hybroker.rethink.ptinovacao.pt
 
-7. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
+ * https://hybroker.rethink.ptinovacao.pt
+ * https://catalogue.hybroker.rethink.ptinovacao.pt
 
-- Hello World Reporter;
-- Hello World Observer that observes changes made by the first Hello World Reporter;
-- WebRTC Connector example;
-- Group Chat;
+7. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute.
 
 <a name="first"/>
 
