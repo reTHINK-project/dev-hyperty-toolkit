@@ -66,7 +66,7 @@ let runtimeProxy = {
       minibus._onMessage(msg);
       minibus.addListener(from, function(msg) {
         if (!msg.body.hasOwnProperty('code')) {
-          let protostubURL = msg.body.value.runtimeProtoStubURL;
+          let protostubURL = msg.body.value.url || msg.body.value.runtimeProtoStubURL;
           let protostubComponent = window.components[protostubURL];
           let protostub = {
             runtimeProtostubURL: protostubURL,
@@ -89,13 +89,13 @@ const rethink = {
 
   install: function({domain, runtimeURL, development}={}) {
 
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
 
       console.log('Install configuration: ', development, domain, runtimeURL);
 
       let catalogue = runtimeFactory.createRuntimeCatalogue(development);
 
-      catalogue.getRuntimeDescriptor(runtimeURL).then(function(descriptor) {
+      catalogue.getRuntimeDescriptor(runtimeURL).then((descriptor) => {
 
         if (descriptor.sourcePackageURL === '/sourcePackage') {
           return descriptor.sourcePackage;
@@ -104,7 +104,7 @@ const rethink = {
         }
 
       })
-      .then(function(sourcePackage) {
+      .then((sourcePackage) => {
 
         window.eval(sourcePackage.sourceCode);
 

@@ -103,13 +103,13 @@ gulp.task('src-hyperties', function(done) {
 gulp.task('clean', function() {
   return gulp.src([
     'src',
-    'dist',
-    'examples',
+    'app',
     'resources/descriptors/Hyperties.json',
     'resources/descriptors/DataSchemas.json'], {read: false}).pipe(clean());
 });
 
 gulp.task('copy-src', copySrc);
+gulp.task('copy-assets', copyAssets);
 gulp.task('copy-examples', copyExamples);
 
 // use default task to launch Browsersync and watch JS files
@@ -158,15 +158,90 @@ gulp.task('server', function(done) {
     logConnections: logConnections,
     codeSync: codeSync,
     server: {
-      baseDir: './',
+      baseDir: './app',
       middleware: function(req, res, next) {
+
         res.setHeader('Access-Control-Allow-Origin', '*');
+
+        var paths;
+
+        if (req.originalUrl.includes('.well-known')) {
+
+          paths = req.originalUrl.split('/');
+          var type = paths[2];
+          var resource = paths[3];
+
+          if (req.originalUrl.includes('sourcepackage')) {
+            paths = req.originalUrl.split('/');
+            var cguid = Number(paths[3]);
+            var idType = cguid.toString().substring(0, 1);
+            var sourcePackage;
+            var selectedObject;
+            var resourceObject;
+
+            switch (idType) {
+              case '1':
+                resourceObject = getResources('hyperty');
+                selectedObject = filterResource(resourceObject, cguid);
+                sourcePackage = resourceObject[selectedObject].sourcePackage;
+                break;
+
+              case '2':
+                resourceObject = getResources('dataschema');
+                selectedObject = filterResource(resourceObject, cguid);
+                sourcePackage = resourceObject[selectedObject].sourcePackage;
+                break;
+
+              case '3':
+                sourcePackage = getResources('runtime');
+                selectedObject = filterResource(resourceObject, cguid);
+                sourcePackage = resourceObject[selectedObject].sourcePackage;
+                break;
+
+              case '4':
+                resourceObject = getResources('protocolstub');
+                selectedObject = filterResource(resourceObject, cguid);
+                sourcePackage = resourceObject[selectedObject].sourcePackage;
+                break;
+              case '5':
+                sourcePackage = getResources('idp-proxy');
+                selectedObject = filterResource(resourceObject, cguid);
+                sourcePackage = resourceObject[selectedObject].sourcePackage;
+                break;
+            }
+
+            res.writeHeader(200, {'Content-Type': 'application/json'});
+            res.end(JSON.stringify(sourcePackage));
+
+          } else {
+
+            var raw = getResources(type);
+
+            res.writeHeader(200, {'Content-Type': 'application/json'});
+            if (resource) {
+
+              if (req.originalUrl.includes('cguid')) {
+                res.end(JSON.stringify(Number(raw[resource].cguid), '', 2));
+              } else if (req.originalUrl.includes('version')) {
+                res.end(JSON.stringify(Number(raw[resource].version), '', 2));
+              } else {
+                res.end(JSON.stringify(raw[resource], '', 2));
+              }
+
+            } else {
+              var listOfResources = [];
+              for (var key in raw) {
+                if (raw.hasOwnProperty(key)) {
+                  listOfResources.push(key);
+                }
+              }
+              res.end(JSON.stringify(listOfResources, '', 2));
+            }
+          }
+        }
+
         next();
-      },
-      routes: {
-        '/.well-known/runtime': 'node_modules/runtime-browser/bin',
-        '/.well-known/protocolstub': 'resources/descriptors/',
-        '/.well-known/hyperty': 'resources/descriptors/'
+
       }
     }
   }, function(err) {
@@ -181,6 +256,35 @@ gulp.task('server', function(done) {
   });
 
 });
+
+function getResources(type) {
+  var raw;
+  switch (type) {
+    case 'runtime':
+      raw = JSON.parse(fs.readFileSync('./resources/descriptors/Runtimes.json', 'utf8'));
+      break;
+    case 'hyperty':
+      raw = JSON.parse(fs.readFileSync('./resources/descriptors/Hyperties.json', 'utf8'));
+      break;
+    case 'idp-proxy':
+      raw = JSON.parse(fs.readFileSync('./resources/descriptors/IDPProxys.json', 'utf8'));
+      break;
+    case 'protocolstub':
+      raw = JSON.parse(fs.readFileSync('./resources/descriptors/ProtoStubs.json', 'utf8'));
+      break;
+    case 'dataschema':
+      raw = JSON.parse(fs.readFileSync('./resources/descriptors/DataSchemas.json', 'utf8'));
+      break;
+  }
+
+  return raw;
+}
+
+function filterResource(resource, key) {
+  return Object.keys(resource).filter(function(a) {
+    return resource[a].cguid === key;
+  })[0];
+}
 
 gulp.task('environment', function() {
 
@@ -268,9 +372,9 @@ gulp.task('watch', function() {
   gulp.watch(['system.config.json'], ['main-watch']);
   gulp.watch(['./resources/schemas/**/*.ds.json'], ['schemas'], browserSync.reload);
 
-  gulp.watch(['./server/rethink.js', './examples/main.js'], function() {
+  gulp.watch(['./server/rethink.js', './resources/factories/*.js', './app/main.js'], function() {
     return gulp.src('./server/rethink.js')
-    .pipe(transpile({destination: __dirname + '/dist', debug: true}))
+    .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
     .resume()
     .on('end', function() {
       browserSync.reload();
@@ -281,7 +385,9 @@ gulp.task('watch', function() {
     var fileObject = path.parse(event.path);
     return gulp.src([fileObject.dir + '/*.hy.js'])
     .pipe(convertHyperty())
+    .resume()
     .on('end', function() {
+      console.log('testes');
       browserSync.reload();
     });
   });
@@ -320,7 +426,7 @@ gulp.task('watch', function() {
 
   gulp.watch([dirname + '/examples/*.html', dirname + '/examples/**/*.hbs'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'examples'}))
+    .pipe(copyFiles({dest: 'app'}))
     .resume()
     .on('end', function() {
       gutil.log('The html templates are copied with success');
@@ -331,8 +437,8 @@ gulp.task('watch', function() {
 
   gulp.watch([dirname + '/examples/main.js'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'examples'}))
-    .pipe(transpile({destination: __dirname + '/dist', debug: true}))
+    .pipe(copyFiles({dest: 'app'}))
+    .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
     .resume()
     .on('end', function() {
       gutil.log('The main file was created like a distribution file on /dist');
@@ -343,8 +449,8 @@ gulp.task('watch', function() {
 
   gulp.watch([dirname + '/examples/**/*.js', '!' + dirname + '/examples/main.js'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'examples'}))
-    .pipe(transpile({destination: __dirname + '/examples', debug: true}))
+    .pipe(copyFiles({dest: 'app'}))
+    .pipe(transpile({destination: __dirname + '/app', debug: true}))
     .resume()
     .on('end', function() {
       gutil.log('The javascript was copied and converted to es5');
@@ -360,13 +466,13 @@ gulp.task('hyperties-watch', ['hyperties'], browserSync.reload);
 
 gulp.task('js', function() {
 
-  return gulp.src(['./examples/main.js', './server/rethink.js'])
+  return gulp.src(['./app/main.js', './server/rethink.js'])
   .on('end', function() {
-    var fileObject = path.parse('./examples/main.js');
+    var fileObject = path.parse('./app/main.js');
     gutil.log('-----------------------------------------------------------');
     gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
   })
-  .pipe(transpile({destination: __dirname + '/dist', debug: true}))
+  .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
   .on('end', function() {
     gutil.log('The main file was created like a distribution file on /dist');
     gutil.log('-----------------------------------------------------------');
@@ -602,6 +708,7 @@ function transpile(opts) {
     if (opts.standalone) args.standalone = opts.standalone;
 
     var filename = opts.filename || fileObject.base;
+    var _this = this;
 
     return browserify(args)
     .transform(babel, {
@@ -612,7 +719,7 @@ function transpile(opts) {
     .bundle()
     .on('error', function(err) {
       gutil.log(gutil.colors.red(err));
-      this.emit('end');
+      _this.emit('end');
     })
     .pipe(source(filename))
     .pipe(gulp.dest(opts.destination))
@@ -747,7 +854,12 @@ function encode(opts) {
     });
 
     json[value].type = opts.descriptor;
-    json[value].version = '0.1';
+
+    // json[value].version = 0.1;
+    if (json[value].version) {
+      json[value].version = Number(json[value].version) + 0.1;
+    }
+
     json[value].description = checkValues('description', 'Description of ' + filename, json[value]);
     json[value].objectName = checkValues('objectName', filename, json[value]);
 
@@ -838,6 +950,11 @@ function getEnvironment() {
     environment = argv.dev ? 'develop' : 'production';
   }
 
+  if (argv['inter-dev']) {
+    environment = argv['inter-dev'] ? 'develop' : 'production';
+    process.env.INTER_DEVELOPMENT = 'inter-develop';
+  }
+
   if (process.env.hasOwnProperty('DEVELOPMENT')) {
     environment = process.env.DEVELOPMENT === 'true' ? 'develop' : 'production';
   }
@@ -850,9 +967,14 @@ function copySrc() {
   .pipe(gulp.dest('./src'));
 }
 
+function copyAssets() {
+  return gulp.src(['./server/assets/*.png', './server/assets/*.ico'])
+  .pipe(gulp.dest('./app/assets'));
+}
+
 function copyExamples() {
   return gulp.src([dirname + '/examples/**/*'])
-  .pipe(gulp.dest('./examples'));
+  .pipe(gulp.dest('./app'));
 }
 
 function copyHyperties(from, done) {
@@ -860,9 +982,9 @@ function copyHyperties(from, done) {
     dirname = from;
     var environment = getEnvironment();
     if (environment !== 'production') {
-      runSequence('copy-src', 'copy-examples', done);
+      runSequence('copy-src', 'copy-examples', 'copy-assets', done);
     } else {
-      runSequence('copy-examples', done);
+      runSequence('copy-examples', 'copy-assets', done);
     }
   }
 }

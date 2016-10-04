@@ -18,7 +18,7 @@ RUN npm install && npm update
 COPY . /toolkit/
 
 # Start the gulp server task
-ENTRYPOINT npm start
+ENTRYPOINT npm run start:dev
 
 # Expose HTTPS Port
 EXPOSE 443
