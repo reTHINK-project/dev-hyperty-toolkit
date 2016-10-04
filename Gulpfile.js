@@ -338,11 +338,22 @@ function copyFiles(opts) {
       dest = opts.dest;
     }
 
-    var dirPath = fileObject.dir.substring(fileObject.dir.indexOf(dest));
+    console.log('dirname: ', dirname);
+    console.log('dest: ', dest);
+    console.log('__dirname: ', __dirname);
+    console.log('fileObject dir: ', fileObject.dir);
+
+    var indexOfDest = fileObject.dir.indexOf(dest);
+    var dirPath = fileObject.dir.substring();
+    if (indexOfDest !== -1) {
+      dirPath = fileObject.dir.substring(indexOfDest);
+    } else {
+      dirPath = dest + fileObject.dir.substring(fileObject.dir.lastIndexOf('/'));
+    }
+
     var dir = __dirname + '/' + dirPath;
 
-    console.log(dirPath, dir, dirPath.includes(__dirname));
-    if (dirPath.indexOf(__dirname) !== -1) {
+    if (dirPath.indexOf(dirname) !== -1) {
       dir = dirPath;
     }
 
