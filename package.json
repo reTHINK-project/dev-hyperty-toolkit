@@ -7,8 +7,7 @@
     "test": "karma start",
     "preinstall": "npm install -g http-server karma-cli gulp-cli",
     "start": "gulp serve",
-    "start:dev": "gulp serve --dev",
-    "start:inter-dev": "gulp serve --inter-dev"
+    "start:dev": "gulp serve --dev"
   },
   "repository": {
     "type": "git",
@@ -38,6 +37,7 @@
     "browserify": "^13.0.1",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
+    "concurrently": "^3.1.0",
     "expect": "^1.20.2",
     "expect.js": "^0.3.1",
     "gulp": "^3.9.1",

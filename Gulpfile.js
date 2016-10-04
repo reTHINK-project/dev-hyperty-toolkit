@@ -950,11 +950,6 @@ function getEnvironment() {
     environment = argv.dev ? 'develop' : 'production';
   }
 
-  if (argv['inter-dev']) {
-    environment = argv['inter-dev'] ? 'develop' : 'production';
-    process.env.INTER_DEVELOPMENT = 'inter-develop';
-  }
-
   if (process.env.hasOwnProperty('DEVELOPMENT')) {
     environment = process.env.DEVELOPMENT === 'true' ? 'develop' : 'production';
   }
