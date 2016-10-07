@@ -132,10 +132,8 @@ gulp.task('server', function(done) {
     minify = true;
     logLevel = 'info';
     notify = false;
-    logConnections = false;
     injectChanges = false;
     ui = false;
-    logFileChanges = false;
   }
 
   // Serve files from the root of this project
@@ -162,6 +160,10 @@ gulp.task('server', function(done) {
       middleware: function(req, res, next) {
 
         res.setHeader('Access-Control-Allow-Origin', '*');
+
+        if (environment === 'production') {
+          return next();
+        }
 
         var paths;
 
