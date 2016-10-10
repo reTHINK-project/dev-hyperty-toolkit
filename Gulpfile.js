@@ -173,7 +173,16 @@ gulp.task('server', function(done) {
           var type = paths[2];
           var resource = paths[3];
 
-          if (req.originalUrl.includes('sourcepackage')) {
+          if (req.originalUrl.includes('index.html') || req.originalUrl.includes('.js')) {
+            if (req.originalUrl.includes('index.html')) {
+              res.writeHeader(200, {'Content-Type': 'text/html'});
+              res.end(fs.readFileSync('node_modules/runtime-browser/bin/index.html', 'utf8'));
+            } else {
+              res.writeHeader(200, {'Content-Type': 'application/javascript'});
+              res.end(fs.readFileSync('node_modules/runtime-browser/bin/' + resource, 'utf8'));
+            }
+
+          } else if (req.originalUrl.includes('sourcepackage')) {
             paths = req.originalUrl.split('/');
             var cguid = Number(paths[3]);
             var idType = cguid.toString().substring(0, 1);
