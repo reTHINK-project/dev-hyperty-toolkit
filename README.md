@@ -39,17 +39,6 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  127.0.0.1   hybroker.rethink.ptinovacao.pt
  127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
  ```
- to use this development version of a toolkit and make the interoperability working, is mandatory you add this lines to the hosts file:
-
- ```shell
- # DT domain
- 127.0.0.1   rethink.tlabscloud.com
- 127.0.0.1   catalogue.rethink.tlabscloud.com
-
- # Quobis domain
- 127.0.0.1   rethink.quobis.com
- 127.0.0.1   catalogue.rethink.quobis.com
- ```
 
  * In Linux is normally available at: `/etc/hosts`
  * In windows is normally available at: `C:\Windows\System32\drivers\etc\hosts`
@@ -64,15 +53,8 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
   * https://hybroker.rethink.ptinovacao.pt
   * https://catalogue.hybroker.rethink.ptinovacao.pt
 
- ##### DT domain
-  * https://rethink.tlabscloud.com
-  * https://catalogue.rethink.tlabscloud.com
 
- ##### Quobis domain
-  * https://rethink.quobis.com
-  * https://catalogue.rethink.quobis.com
-
-7. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute. Currently you may find there four demos:
+7. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute including:
 
  - Hello World Reporter;
  - Hello World Observer that observes changes made by the first Hello World Reporter;
@@ -83,7 +65,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 1. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
 
- - a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](https://github.com/reTHINK-project/dev-hyperty/tree/master/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldOberver.hy.js](https://github.com/reTHINK-project/dev-hyperty/tree/master/src/hello-world/HelloWorldObserver.hy.js).
+ - a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](https://github.com/reTHINK-project/dev-hyperty/tree/master/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldObserver.hy.js](https://github.com/reTHINK-project/dev-hyperty/tree/master/src/hello-world/HelloWorldObserver.hy.js).
 
  The HelloWorldReporter.hy.js looks like:
 
