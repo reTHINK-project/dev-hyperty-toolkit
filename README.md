@@ -35,9 +35,14 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 2. run the command `npm install` (this may take some minutes)
 
 3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
+
  ```shell
  127.0.0.1   hybroker.rethink.ptinovacao.pt
  127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
+ 127.0.0.1   rethink.tlabscloud.com
+ 127.0.0.1   catalogue.rethink.tlabscloud.com
+ 127.0.0.1  rethink.quobis.com
+ 127.0.0.1  catalogue.rethink.quobis.com
  ```
 
  * In Linux is normally available at: `/etc/hosts`
@@ -53,6 +58,13 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
   * https://hybroker.rethink.ptinovacao.pt
   * https://catalogue.hybroker.rethink.ptinovacao.pt
 
+  ##### TLabs
+   * https://rethink.tlabscloud.com
+   * https://catalogue.rethink.tlabscloud.com
+
+   ##### TLabs
+    * https://rethink.quobis.com
+    * https://catalogue.rethink.quobis.com
 
 7. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute including:
 
