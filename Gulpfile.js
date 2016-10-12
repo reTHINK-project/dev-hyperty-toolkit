@@ -349,10 +349,10 @@ function copyFiles(opts) {
       dest = opts.dest;
     }
 
-    console.log('dirname: ', dirname);
-    console.log('dest: ', dest);
-    console.log('__dirname: ', __dirname);
-    console.log('fileObject dir: ', fileObject.dir);
+    // console.log('dirname: ', dirname);
+    // console.log('dest: ', dest);
+    // console.log('__dirname: ', __dirname);
+    // console.log('fileObject dir: ', fileObject.dir);
 
     var indexOfDest = fileObject.dir.indexOf(dest);
     var dirPath = fileObject.dir.substring();

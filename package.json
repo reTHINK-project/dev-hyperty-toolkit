@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/reTHINK-project/dev-hyperty-toolkit#readme",
   "dependencies": {
-    "runtime-browser": "github:rethink-project/dev-runtime-browser",
+    "runtime-browser": "github:rethink-project/dev-runtime-browser#develop-policies",
     "service-framework": "github:rethink-project/dev-service-framework#develop"
   },
   "devDependencies": {
