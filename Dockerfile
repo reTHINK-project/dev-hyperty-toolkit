@@ -12,7 +12,7 @@ ENV PATH=/toolkit/node_modules/.bin:$PATH
 COPY package.json /toolkit/
 
 # Install app dependencies
-RUN npm install && npm update
+RUN npm install
 
 # Copy all structure
 COPY . /toolkit/
