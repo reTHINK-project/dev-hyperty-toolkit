@@ -136,6 +136,21 @@ gulp.task('server', function(done) {
     ui = false;
   }
 
+  var server = {
+    baseDir: './app'
+  };
+
+  console.log(environment);
+
+  if (environment === 'develop') {
+    server.middleware = devMiddleware;
+  } else {
+    server.middleware = middleware;
+    server.routes = {
+      '/.well-known/runtime': 'node_modules/runtime-browser/bin'
+    };
+  }
+
   // Serve files from the root of this project
   browserSync.init({
     open: false,
@@ -155,106 +170,7 @@ gulp.task('server', function(done) {
     },
     logConnections: logConnections,
     codeSync: codeSync,
-    server: {
-      baseDir: './app',
-      middleware: function(req, res, next) {
-
-        res.setHeader('Access-Control-Allow-Origin', '*');
-
-        if (environment === 'production') {
-          return next();
-        }
-
-        var paths;
-
-        if (req.originalUrl.includes('.well-known')) {
-
-          paths = req.originalUrl.split('/');
-          var type = paths[2];
-          var resource = paths[3];
-
-          if (req.originalUrl.includes('index.html') || req.originalUrl.includes('.js')) {
-            if (req.originalUrl.includes('index.html')) {
-              res.writeHeader(200, {'Content-Type': 'text/html'});
-              res.end(fs.readFileSync('node_modules/runtime-browser/bin/index.html', 'utf8'));
-            } else {
-              res.writeHeader(200, {'Content-Type': 'application/javascript'});
-              res.end(fs.readFileSync('node_modules/runtime-browser/bin/' + resource, 'utf8'));
-            }
-
-          } else if (req.originalUrl.includes('sourcepackage')) {
-            paths = req.originalUrl.split('/');
-            var cguid = Number(paths[3]);
-            var idType = cguid.toString().substring(0, 1);
-            var sourcePackage;
-            var selectedObject;
-            var resourceObject;
-
-            switch (idType) {
-              case '1':
-                resourceObject = getResources('hyperty');
-                selectedObject = filterResource(resourceObject, cguid);
-                sourcePackage = resourceObject[selectedObject].sourcePackage;
-                break;
-
-              case '2':
-                resourceObject = getResources('dataschema');
-                selectedObject = filterResource(resourceObject, cguid);
-                sourcePackage = resourceObject[selectedObject].sourcePackage;
-                break;
-
-              case '3':
-                sourcePackage = getResources('runtime');
-                selectedObject = filterResource(resourceObject, cguid);
-                sourcePackage = resourceObject[selectedObject].sourcePackage;
-                break;
-
-              case '4':
-                resourceObject = getResources('protocolstub');
-                selectedObject = filterResource(resourceObject, cguid);
-                sourcePackage = resourceObject[selectedObject].sourcePackage;
-                break;
-              case '5':
-                sourcePackage = getResources('idp-proxy');
-                selectedObject = filterResource(resourceObject, cguid);
-                sourcePackage = resourceObject[selectedObject].sourcePackage;
-                break;
-            }
-
-            res.writeHeader(200, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify(sourcePackage));
-
-          } else {
-
-            var raw = getResources(type);
-
-            res.writeHeader(200, {'Content-Type': 'application/json'});
-            if (resource) {
-
-              if (req.originalUrl.includes('cguid')) {
-                res.end(JSON.stringify(Number(raw[resource].cguid), '', 2));
-              } else if (req.originalUrl.includes('version')) {
-                res.end(JSON.stringify(Number(raw[resource].version), '', 2));
-              } else {
-                res.end(JSON.stringify(raw[resource], '', 2));
-              }
-
-            } else {
-              var listOfResources = [];
-              for (var key in raw) {
-                if (raw.hasOwnProperty(key)) {
-                  listOfResources.push(key);
-                }
-              }
-              res.end(JSON.stringify(listOfResources, '', 2));
-            }
-          }
-        }
-
-        next();
-
-      }
-    }
+    server: server
   }, function(err) {
     if (err) {
       gutil.log('Check the documentation on Gulp Task.');
@@ -267,6 +183,103 @@ gulp.task('server', function(done) {
   });
 
 });
+
+function middleware(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  return next();
+}
+
+function devMiddleware(req, res, next) {
+  var paths;
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  if (req.originalUrl.includes('.well-known')) {
+
+    paths = req.originalUrl.split('/');
+    var type = paths[2];
+    var resource = paths[3];
+
+    if (req.originalUrl.includes('index.html') || req.originalUrl.includes('.js')) {
+      if (req.originalUrl.includes('index.html')) {
+        res.writeHeader(200, {'Content-Type': 'text/html'});
+        res.end(fs.readFileSync('node_modules/runtime-browser/bin/index.html', 'utf8'));
+      } else {
+        res.writeHeader(200, {'Content-Type': 'application/javascript'});
+        res.end(fs.readFileSync('node_modules/runtime-browser/bin/' + resource, 'utf8'));
+      }
+
+    } else if (req.originalUrl.includes('sourcepackage')) {
+      paths = req.originalUrl.split('/');
+      var cguid = Number(paths[3]);
+      var idType = cguid.toString().substring(0, 1);
+      var sourcePackage;
+      var selectedObject;
+      var resourceObject;
+
+      switch (idType) {
+        case '1':
+          resourceObject = getResources('hyperty');
+          selectedObject = filterResource(resourceObject, cguid);
+          sourcePackage = resourceObject[selectedObject].sourcePackage;
+          break;
+
+        case '2':
+          resourceObject = getResources('dataschema');
+          selectedObject = filterResource(resourceObject, cguid);
+          sourcePackage = resourceObject[selectedObject].sourcePackage;
+          break;
+
+        case '3':
+          sourcePackage = getResources('runtime');
+          selectedObject = filterResource(resourceObject, cguid);
+          sourcePackage = resourceObject[selectedObject].sourcePackage;
+          break;
+
+        case '4':
+          resourceObject = getResources('protocolstub');
+          selectedObject = filterResource(resourceObject, cguid);
+          sourcePackage = resourceObject[selectedObject].sourcePackage;
+          break;
+        case '5':
+          sourcePackage = getResources('idp-proxy');
+          selectedObject = filterResource(resourceObject, cguid);
+          sourcePackage = resourceObject[selectedObject].sourcePackage;
+          break;
+      }
+
+      res.writeHeader(200, {'Content-Type': 'application/json'});
+      res.end(JSON.stringify(sourcePackage));
+
+    } else {
+
+      var raw = getResources(type);
+
+      res.writeHeader(200, {'Content-Type': 'application/json'});
+      if (resource) {
+
+        if (req.originalUrl.includes('cguid')) {
+          res.end(JSON.stringify(Number(raw[resource].cguid), '', 2));
+        } else if (req.originalUrl.includes('version')) {
+          res.end(JSON.stringify(Number(raw[resource].version), '', 2));
+        } else {
+          res.end(JSON.stringify(raw[resource], '', 2));
+        }
+
+      } else {
+        var listOfResources = [];
+        for (var key in raw) {
+          if (raw.hasOwnProperty(key)) {
+            listOfResources.push(key);
+          }
+        }
+        res.end(JSON.stringify(listOfResources, '', 2));
+      }
+    }
+  }
+
+  next();
+
+}
 
 function getResources(type) {
   var raw;
