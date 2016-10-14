@@ -91,10 +91,10 @@ You can run the toolkit with docker and docker-compose.
    >       `- DEVELOPMENT=true`
 
    **RUNTIME_URL** - where the Runtime is loaded from
-   >       - RUNTIME_URL=hyperty-catalogue://hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime
+   >       - RUNTIME_URL=hyperty-catalogue://hysmart.rethink.ptinovacao.pt/.well-known/runtime/Runtime
 
    **Domain** - the domain where Message Node and Domain Registry services are hosted
-   >       - DOMAIN=hybroker.rethink.ptinovacao.pt
+   >       - DOMAIN=hysmart.rethink.ptinovacao.pt
 
    **Hyperty Repo** - variable with the Hyperty source code repository.
    >       - HYPERTY_REPO=/tmp/dev-hyperty
@@ -117,8 +117,8 @@ You can run the toolkit with docker and docker-compose.
 5. open your **hosts** file an add the following configuration:
 
    ```shell
-   172.18.0.32 hybroker.rethink.ptinovacao.pt
-   172.18.0.32 catalogue.hybroker.rethink.ptinovacao.pt
+   172.18.0.32 hysmart.rethink.ptinovacao.pt
+   172.18.0.32 catalogue.hysmart.rethink.ptinovacao.pt
    ```
 
    **note:** more information related with hosts file [here](#cloud)
@@ -150,8 +150,8 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
 ```shell
- 127.0.0.1   hybroker.rethink.ptinovacao.pt
- 127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
+ 127.0.0.1   hysmart.rethink.ptinovacao.pt
+ 127.0.0.1   catalogue.hysmart.rethink.ptinovacao.pt
 ```
 
   * In Linux is normally available at: `/etc/hosts`
@@ -163,10 +163,10 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 6. Check the following url's to allow the certificates:
 
- * https://hybroker.rethink.ptinovacao.pt
- * https://catalogue.hybroker.rethink.ptinovacao.pt
+ * https://hysmart.rethink.ptinovacao.pt
+ * https://catalogue.hysmart.rethink.ptinovacao.pt
 
-7. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute.
+7. Open `https://hysmart.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute.
 
 <a name="first"/>
 
@@ -264,7 +264,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 ### Cloud Development Environment
 
-The toolkit is pre-configured to use **hybroker.rethink.ptinovacao.pt** cloud development environment. In case you want to use another reTHINK cloud environment the following changes must be done:
+The toolkit is pre-configured to use **hysmart.rethink.ptinovacao.pt** cloud development environment. In case you want to use another reTHINK cloud environment the following changes must be done:
 
 - set the cloud development environment domain at [system.config.json](system.config.json)
 
@@ -278,8 +278,8 @@ The toolkit is pre-configured to use **hybroker.rethink.ptinovacao.pt** cloud de
 **NOTE:** You need open this file with administration permission and add this:
 
 ```shell
-127.0.0.1   hybroker.rethink.ptinovacao.pt
-127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
+127.0.0.1   hysmart.rethink.ptinovacao.pt
+127.0.0.1   catalogue.hysmart.rethink.ptinovacao.pt
 ```
 
 <a name="local" />
