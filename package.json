@@ -22,7 +22,6 @@
   "dependencies": {
     "runtime-core": "github:rethink-project/dev-runtime-core#develop",
     "service-framework": "github:rethink-project/dev-service-framework#develop",
-    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "babel-plugin-add-module-exports": "^0.2.1",
@@ -69,6 +68,7 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.7.0",
+    "underscore": "^1.8.3",
     "webrtc-adapter-test": "^0.2.5",
     "yargs": "^4.4.0"
   }

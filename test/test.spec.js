@@ -88,8 +88,8 @@ describe('Install Runtime', function() {
   it('should load diferent protostub', (done) => {
 
     let stubList = [
-      'https://rethink.tlabscloud.com/.well-known/protocolstub/default',
-      'https://rethink.quobis.com/.well-known/protocolstub/default'
+      'https://catalogue.rethink.tlabscloud.com/.well-known/protocolstub/default',
+      'https://catalogue.rethink.quobis.com/.well-known/protocolstub/default'
     ];
 
     stubList.forEach((stub) => {
@@ -101,6 +101,8 @@ describe('Install Runtime', function() {
   });
 
   it('should load hyperty', function(done) {
+
+    this.timeout(100000);
 
     let hyperty = 'https://catalogue.' + config.domain + '/.well-known/hyperty/Connector';
 
