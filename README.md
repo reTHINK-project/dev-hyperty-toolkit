@@ -2,7 +2,7 @@
 Hyperty Development Toolkit
 =========================
 
-This repository provides required tools to develop Hyperties.
+This repository provides required tools to develop Hyperties and a few demos. Currently limited to hyperties to be executed in the Browser. Soon NodeJS support will also be added;
 
 
 - [Change Log](#log)
@@ -52,18 +52,20 @@ This repository provides required tools to develop Hyperties.
 
 reTHINK Project provides a Javascript framework to build and deliver Real Time Communication Microservices in end-user devices (browsers and standalone mobile apps) and in Network edge servers (NodeJS):
 
-* **Hyperty** is similar to an Agent or a Bot that performs tasks on user's behalf, by communicating through P2P Data Synchronisation with other Hyperties. Some [examples](https://github.com/reTHINK-project/dev-hyperty) ([see demos](https://hybroker.rethink.ptinovacao.pt/examples/)), are:
+* **Hyperty** is similar to an Agent or a Bot that performs tasks on user's behalf, by communicating through P2P Data Synchronisation with other Hyperties. Some examples (see demos), are:
 
-  - the [Hyperty Connector](https://github.com/reTHINK-project/dev-hyperty/tree/master/docs/connector) that uses WebRTC to manage video calls between users;
+  - the Hyperty Connector that uses WebRTC to manage video calls between users;
 
-  - the [Group Chat Hyperty](https://github.com/reTHINK-project/dev-hyperty/tree/master/docs/group-chat-manager) (name says it all);
+  - the Group Chat Hyperty (name says it all);
 
-  - the [myBracelet Hyperty](https://github.com/reTHINK-project/dev-hyperty/tree/master/docs/bracelet), is a sensing Hyperty that encapsulates a Bracelet, by collecting and publishing data from it
+  - the myBracelet Hyperty, is a sensing Hyperty that encapsulates a Bracelet, by collecting and publishing data from it
+
+  - the myContext Hyperty is a Big Data Hyperty that uses data published by different sensing Hyperties (like the myBracelet Hyperty) to infer and calculate more meaningful Contextual data about the user.
 
 * **Protocol on-the-fly** is used by Hyperties to support interoperability with other Hyperties from other domains, without requiring federation or standardisation of network protocols;
 * Hyperties are **Trustful**. Hyperties are decoupled from the User Identity, which can be securely asserted by existing IDPs (Identity Provider), when communicating with other Hyperties.
 
-In case you want want to know more details about reTHINK, have a look on the [full specification](https://github.com/reTHINK-project/specs/blob/master/README.md)
+In case you want want to know more details about reTHINK, have a look [here](docs/tutorials/readme.md)
 
 ## Quick Guide Setup
 
@@ -89,10 +91,10 @@ You can run the toolkit with docker and docker-compose.
    >       `- DEVELOPMENT=true`
 
    **RUNTIME_URL** - where the Runtime is loaded from
-   >       - RUNTIME_URL=hyperty-catalogue://hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime
+   >       - RUNTIME_URL=hyperty-catalogue://hysmart.rethink.ptinovacao.pt/.well-known/runtime/Runtime
 
    **Domain** - the domain where Message Node and Domain Registry services are hosted
-   >       - DOMAIN=hybroker.rethink.ptinovacao.pt
+   >       - DOMAIN=hysmart.rethink.ptinovacao.pt
 
    **Hyperty Repo** - variable with the Hyperty source code repository.
    >       - HYPERTY_REPO=/tmp/dev-hyperty
@@ -115,8 +117,8 @@ You can run the toolkit with docker and docker-compose.
 5. open your **hosts** file an add the following configuration:
 
    ```shell
-   172.18.0.32 hybroker.rethink.ptinovacao.pt
-   172.18.0.32 catalogue.hybroker.rethink.ptinovacao.pt
+   172.18.0.32 hysmart.rethink.ptinovacao.pt
+   172.18.0.32 catalogue.hysmart.rethink.ptinovacao.pt
    ```
 
    **note:** more information related with hosts file [here](#cloud)
@@ -139,18 +141,17 @@ You can run the toolkit with docker and docker-compose.
 
 ### From source code
 
-To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the steps below. In case you want to use Hyperties in your Application please [go here](https://github.com/reTHINK-project/dev-app).
-
+To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the steps below. In case you want to use Hyperties in your Application please read [this tutorial](docs/tutorials/development-of-apps.md).
 **NOTE for Windows Users:** You should use "Windows PowerShell" and not the standard command line.
 
-1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 4);
+1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 2);
 
 2. run the command `npm install` (this may take some minutes)
 
 3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
 ```shell
- 127.0.0.1   hybroker.rethink.ptinovacao.pt
- 127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
+ 127.0.0.1   hysmart.rethink.ptinovacao.pt
+ 127.0.0.1   catalogue.hysmart.rethink.ptinovacao.pt
 ```
 
   * In Linux is normally available at: `/etc/hosts`
@@ -162,10 +163,10 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 6. Check the following url's to allow the certificates:
 
- * https://hybroker.rethink.ptinovacao.pt
- * https://catalogue.hybroker.rethink.ptinovacao.pt
+ * https://hysmart.rethink.ptinovacao.pt
+ * https://catalogue.hysmart.rethink.ptinovacao.pt
 
-7. Open `https://hybroker.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute.
+7. Open `https://hysmart.rethink.ptinovacao.pt` with your favorite browser and select your Hyperty to execute.
 
 <a name="first"/>
 
@@ -247,11 +248,11 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  }
 ```
 
-  This is optional in case you are reusing existing [data schemas](https://github.com/reTHINK-project/specs/tree/master/schemas/json-schema/data-objects). In that situation, you just have to set in your Hyperty Descriptor the Catalogue URL that points to the data schema (see below).
+  This is optional in case you are reusing existing [data schemas](https://github.com/reTHINK-project/dev-service-framework/tree/master/schemas/json-schema/data-objects). In that situation, you just have to set in your Hyperty Descriptor the Catalogue URL that points to the data schema (see below).
 
 2. You can Complete your Hyperty Descriptor by editing the file with sufix ***name-of-hyperty.hy.json** where you have the hyperty source code;
 
-3. To test your Hyperty, you need to go to dev-hyperty (or where is located your source code) folder and:
+3. To test your Hyperty, you need to move the dev-hyperty (or where is located your source code) folder and:
 
 - move to *"examples"* folder and expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
 
@@ -263,7 +264,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 ### Cloud Development Environment
 
-The toolkit is pre-configured to use **hybroker.rethink.ptinovacao.pt** cloud development environment. In case you want to use another reTHINK cloud environment the following changes must be done:
+The toolkit is pre-configured to use **hysmart.rethink.ptinovacao.pt** cloud development environment. In case you want to use another reTHINK cloud environment the following changes must be done:
 
 - set the cloud development environment domain at [system.config.json](system.config.json)
 
@@ -277,8 +278,8 @@ The toolkit is pre-configured to use **hybroker.rethink.ptinovacao.pt** cloud de
 **NOTE:** You need open this file with administration permission and add this:
 
 ```shell
-127.0.0.1   hybroker.rethink.ptinovacao.pt
-127.0.0.1   catalogue.hybroker.rethink.ptinovacao.pt
+127.0.0.1   hysmart.rethink.ptinovacao.pt
+127.0.0.1   catalogue.hysmart.rethink.ptinovacao.pt
 ```
 
 <a name="local" />
