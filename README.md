@@ -5,7 +5,6 @@ Hyperty Development Toolkit
 This repository provides required tools to develop Hyperties and a few demos. Currently limited to hyperties to be executed in the Browser. Soon NodeJS support will also be added;
 
 
-- [Change Log](#log)
 - [Overview](#overview)
 - Quick Guide Setup
   - [Setup with docker and docker-compose](#docker)
@@ -18,33 +17,6 @@ This repository provides required tools to develop Hyperties and a few demos. Cu
 - [Gulp Tasks](#tasks)
   - [Start server](#serve)
   - [Encode components](#encode)
-
-
-<a name="log"/>
-
-## Change Log
-
-##### versions
-
-- [x] RuntimeUA | [develop-improves-revised-catalogue](https://github.com/reTHINK-project/dev-runtime-core/tree/develop-improves-revised-catalogue) branch
-- [x] Service Framework | [revised-catalogue](https://github.com/reTHINK-project/dev-service-framework/tree/revised-catalogue) branch
-- [x] message node vertx | [develop](https://github.com/reTHINK-project/dev-msg-node-vertx/tree/develop)
-- [x] domain-registy | [master](https://github.com/reTHINK-project/dev-registry-domain)
-
-##### Improves
-
-- [x] now toolkit run on root, you don't need add the `/examples`;
-- [x] toolkit now support the same request as dev-catalogue (in the easy way and limited, the point is not replicate the dev-catalogue).
-      Now we don't need something like, `resources/descriptors/Hyperties.json` you can use the `/.well-known/hyperty/Connector` eg.
-
-##### Fixes
-
-- [x] [21](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/21) - Alternative Port
-
-- [x] [16](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/16) - Missing dependency: urijs
-
-- [x] [5](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/5) - if you run the toolkit with [docker](#docker) this issue was solved
-      ​
 
 <a name="overview"/>
 
