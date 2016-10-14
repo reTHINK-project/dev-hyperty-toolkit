@@ -71,5 +71,5 @@
     "webrtc-adapter-test": "^0.2.5",
     "underscore": "^1.8.3",
     "yargs": "^4.4.0"
-}
+  }
 }
