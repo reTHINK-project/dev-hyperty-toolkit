@@ -1,12 +1,12 @@
 {
   "develop" : {
     "development": true,
-    "runtimeURL": "hyperty-catalogue://hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime",
-    "domain": "hybroker.rethink.ptinovacao.pt"
+    "runtimeURL": "hyperty-catalogue://catalogue.hysmart.rethink.ptinovacao.pt/.well-known/runtime/Runtime",
+    "domain": "hysmart.rethink.ptinovacao.pt"
   },
   "production" : {
     "development": false,
-    "runtimeURL": "hyperty-catalogue://catalogue.hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime",
-    "domain": "hybroker.rethink.ptinovacao.pt"
+    "runtimeURL": "hyperty-catalogue://catalogue.hysmart.rethink.ptinovacao.pt/.well-known/runtime/Runtime",
+    "domain": "hysmart.rethink.ptinovacao.pt"
   }
 }

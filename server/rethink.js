@@ -4,7 +4,7 @@
 import rethink from 'runtime-browser/bin/rethink';
 import config from '../config.json';
 
-import { hypertyDeployed, hypertyFail } from '../examples/main';
+import { hypertyDeployed, hypertyFail } from '../app/main';
 
 window.KJUR = {};
 
@@ -12,37 +12,16 @@ let domain = config.domain;
 let runtimeLoader;
 let loading = false;
 
-// Hack to convert the environment variables from docker to a boolean;
-// without this the config.development is equal to 'true';
-let development = JSON.parse(config.development);
+console.log('Configuration file before:', config);
 
-console.log('Configuration file before:', config, development);
-
-if (development) {
-
-  config.domain = window.location.hostname;
-  config.runtimeURL = config.runtimeURL.replace(domain, window.location.hostname);
-
-  console.log('Configuration file in development mode after:', config);
-
-}
+// To avoid cache
+// window.localStorage.clear();
 
 rethink.install(config).then(function(result) {
 
   runtimeLoader = result;
 
-  if (development) {
-
-    console.info('Runtime Installed in development mode:', result, development);
-
-    return loadStubs().then((result) => {
-      console.log('Stubs load: ', result);
-      return getListOfHyperties(domain);
-    });
-  } else {
-    console.info('Runtime Installed in production mode:', result, development);
-    return getListOfHyperties(domain);
-  }
+  return getListOfHyperties(domain);
 
 }).then(function(hyperties) {
 
@@ -73,8 +52,7 @@ rethink.install(config).then(function(result) {
 
 function loadStubs() {
 
-  domain = window.location.hostname;
-  let protostubsURL = 'https://' + domain + '/.well-known/protocolstub/ProtoStubs.json';
+  let protostubsURL = 'https://catalogue.' + domain + '/.well-known/protocolstub';
 
   return new Promise(function(resolve, reject) {
     $.ajax({
@@ -82,7 +60,7 @@ function loadStubs() {
       success: function(result) {
         let response = [];
         if (typeof result === 'object') {
-          Object.keys(result).forEach(function(key) {
+          result.forEach(function(key) {
             response.push(key);
           });
         } else if (typeof result === 'string') {
@@ -97,7 +75,7 @@ function loadStubs() {
 
           let loadAllStubs = [];
           stubs.forEach((stub) => {
-            loadAllStubs.push(runtimeLoader.requireProtostub('https://' + stub + '/.well-known/protocolstub/' + stub));
+            loadAllStubs.push(runtimeLoader.requireProtostub('hyperty-catalogue://' + stub + '/.well-known/protocolstub/' + stub));
           });
 
           Promise.all(loadAllStubs).then((result) => {
@@ -116,11 +94,7 @@ function loadStubs() {
 
 function getListOfHyperties(domain) {
 
-  let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty/';
-  if (development) {
-    domain = window.location.hostname;
-    hypertiesURL = 'https://' + domain + '/.well-known/hyperty/Hyperties.json';
-  }
+  let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty';
 
   return new Promise(function(resolve, reject) {
         $.ajax({
@@ -128,9 +102,9 @@ function getListOfHyperties(domain) {
             success: function(result) {
                 let response = [];
                 if (typeof result === 'object') {
-                  Object.keys(result).forEach(function(key) {
-                      response.push(key);
-                    });
+                  result.forEach(function(key) {
+                    response.push(key);
+                  });
                 } else if (typeof result === 'string') {
                   response = JSON.parse(result);
                 }
@@ -155,10 +129,6 @@ function loadHyperty(event) {
   console.log('Hyperty Name:', hypertyName);
 
   let hypertyPath = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/hyperty/' + hypertyName;
-  if (development) {
-    domain = window.location.hostname;
-    hypertyPath = 'hyperty-catalogue://' + domain + '/.well-known/hyperty/' + hypertyName;
-  }
 
   let $el = $('.main-content .notification');
   $el.empty();

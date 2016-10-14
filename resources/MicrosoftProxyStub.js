@@ -1,5 +1,3 @@
-let identities = {};
-let nIdentity = 0;
 
 let microsoftInfo = {
   clientID:              '7e2f3589-4b38-4b1c-a321-c9251de00ef2',
@@ -9,6 +7,32 @@ let microsoftInfo = {
   scope:                 'openid',
   mode:                  'fragment'
 };
+
+/*
+INSTRUCTIONS TO ADD ANOTHER DOMAINS TO BE AUTHORISED
+
+How to change information (using the rethinkProject2020@outlook.com account):
+user: rethinkProject2020@outlook.com
+pass: 45%asd34!zD2&
+
+other test accounts:
+user: openidtest10@outlook.com
+pass: testOpenID10
+
+1º https://portal.azure.com/ -> example
+2º go to the left side bar -> more services -> Azure active directory
+3º open a small box on the rigth saying "App registrations".
+4º on right of the page -> "rethink Project" -> redirect URIs
+5º Add the URI to be authorised for the requests.
+
+TO ADD MORE USERS THAT ARE ALLOW TO MADE REQUEST (maybe because is a trial account, it is required  to add users to the list of the users that can make requests for the OIDC )
+
+1º https://portal.azure.com/ -> example
+2º go to the left side bar -> more services -> Azure active directory
+3º open a small box on the middle saying "Users and groups".
+4º on right of the page -> "All users" -> top button " + add"
+5º fill with the information and click create
+*/
 
 /**
 * Identity Provider Proxy
@@ -59,11 +83,15 @@ let idp = {
       } else {
 
         //later verify the token and use the information from the JWT
-        let hintSplited = hint.split('.');
+
+        let token = hint.split('/');
+        let tokenSplited = token[3];
+
+        let hintSplited = tokenSplited.split('.');
 
         let idToken = JSON.parse(atob(hintSplited[1]));
 
-        let idpBundle = {domain: 'google.com', protocol: 'OIDC'};
+        let idpBundle = {domain: 'microsoft.com', protocol: 'OIDC'};
         let identityBundle = {assertion: hintSplited[1], idp: idpBundle, infoToken: idToken};
 
         resolve(identityBundle);
