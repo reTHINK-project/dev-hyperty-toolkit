@@ -11,7 +11,6 @@ var babel = require('babelify');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var through = require('through2');
-var Base64 = require('js-base64').Base64;
 var prompt = require('gulp-prompt');
 var gutil = require('gulp-util');
 var runSequence = require('run-sequence');
@@ -713,7 +712,7 @@ function encode(opts) {
     var contents = fs.readFileSync(file.path, 'utf8');
     var type = '';
 
-    var encoded = Base64.encode(contents);
+    var encoded = new Buffer(contents).toString('base64');
     var value = 'default';
     var filename = fileObject.name;
 
@@ -854,6 +853,11 @@ function copySrc() {
 
   var hyperties = filterHyperties(getEnvironment());
 
+  // copy utils folder
+  gulp.src([dirname + '/src/utils/*'])
+    .pipe(gulp.dest('./src/utils'));
+
+  // copy each folder of filter directories
   hyperties.forEach(function(folder) {
     return gulp.src([dirname + '/src/' + folder + '/*'])
       .pipe(gulp.dest('./src/' + folder));

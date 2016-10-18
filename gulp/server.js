@@ -34,7 +34,6 @@ module.exports = function server(done) {
     baseDir: './app'
   };
 
-  console.log(stage);
   if (stage === 'develop') {
     server.middleware = devMiddleware;
   } else {
@@ -50,6 +49,7 @@ module.exports = function server(done) {
     online: false,
     timestamps: timestamps,
     logLevel: logLevel,
+    cors: true,
     logFileChanges: logFileChanges,
     port: 443,
     minify: minify,
@@ -89,8 +89,10 @@ function devMiddleware(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   if (req.originalUrl.includes('.well-known')) {
-
-    paths = req.originalUrl.split('/');
+    var path = req.originalUrl;
+    var pathIndex = path.indexOf('.well-known');
+    if (pathIndex !== -1) { path = path.substr(pathIndex - 1); }
+    paths = path.split('/');
     var type = paths[2];
     var resource = paths[3];
 
@@ -104,7 +106,7 @@ function devMiddleware(req, res, next) {
       }
 
     } else if (req.originalUrl.includes('sourcepackage')) {
-      paths = req.originalUrl.split('/');
+      // paths = req.originalUrl.split('/');
       var cguid = Number(paths[3]);
       var idType = cguid.toString().substring(0, 1);
       var sourcePackage;
@@ -146,7 +148,6 @@ function devMiddleware(req, res, next) {
       res.end(JSON.stringify(sourcePackage));
 
     } else {
-
       var raw = getResources(type);
 
       res.writeHeader(200, {'Content-Type': 'application/json'});
