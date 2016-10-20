@@ -20,7 +20,7 @@ var dirname = __dirname;
 
 var getEnvironment = require('./gulp/environment');
 var getStage = require('./gulp/stage');
-
+var generateGUID = require('./gulp/guid');
 var server = require('./gulp/server');
 var browserSync = require('browser-sync');
 
@@ -732,23 +732,23 @@ function encode(opts) {
     switch (opts.descriptor) {
       case 'Hyperties':
         type = 'hyperty';
-        cguid = 10001;
+        cguid = generateGUID(1);
         break;
       case 'DataSchemas':
         type = 'dataschema';
-        cguid = 20001;
+        cguid = generateGUID(2);
         break;
       case 'Runtimes':
         type = 'runtime';
-        cguid = 30001;
+        cguid = generateGUID(3);
         break;
       case 'ProtoStubs':
         type = 'protostub';
-        cguid = 40001;
+        cguid = generateGUID(4);
         break;
       case 'IDPProxys':
         type = 'idp-proxy';
-        cguid = 50001;
+        cguid = generateGUID(5);
         break;
     }
 
