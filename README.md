@@ -48,27 +48,6 @@ In case you want want to know more details about reTHINK, have a look on the [fu
 
 ### From source code
 
-**NOTE:** by default the npm is the tool used to install modules, but you can use other tool like npm to try to speed up the instalation process, called [yarn](https://yarnpkg.com/).
-
-
-
-Install yarn:
-
-- on windows: https://yarnpkg.com/en/docs/install#windows-tab
-- on linux: https://yarnpkg.com/en/docs/install#linux-tab
-- on macOS: https://yarnpkg.com/en/docs/install#mac-tab
-
-
-
-The command are identical to the npm:
-
-- install modules: yarn install
-- uninstall modules: yarn remove
-
-You can see more command here: https://yarnpkg.com/en/docs/cli/
-
-
-
 To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the steps below. In case you want to use Hyperties in your Application please read [this tutorial](docs/tutorials/development-of-apps.md).
 **NOTE for Windows Users:** You should use "Windows PowerShell" and not the standard command line.
 
@@ -88,7 +67,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 4. Create the folder thet will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use somethinf else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
 
-5. run the local http-server and catalogue with `npm run start:dev`. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
+5. run the local http-server and catalogue with `npm run start:browser`. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in previous step  to contain your hyperty source.
 
 6. Check the following url's to allow the certificates:
 
@@ -98,9 +77,28 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 7. Open `https://hysmart.rethink.ptinovacao.pt` with your favorite browser and select your Hyperty to execute.
 
+
+#### Yarn Package Manager
+
+By default the npm is the tool used to install modules, but you can also use [yarn](https://yarnpkg.com/) that in some platforms can speedup the toolkit installation.
+
+Install yarn:
+
+- on windows: https://yarnpkg.com/en/docs/install#windows-tab
+- on linux: https://yarnpkg.com/en/docs/install#linux-tab
+- on macOS: https://yarnpkg.com/en/docs/install#mac-tab
+
+The command is identical to the npm:
+
+- install modules: yarn install
+- uninstall modules: yarn remove
+
+You can see more command here: https://yarnpkg.com/en/docs/cli/
+
+
 ### With docker and docker-compose
 
-You can run the toolkit with docker and docker-compose.
+In case you already have docker installed you can use it together with docker-compose.
 
 1. install docker - see [here](https://docs.docker.com/engine/installation/)
 
