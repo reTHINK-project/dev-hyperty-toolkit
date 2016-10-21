@@ -15,6 +15,7 @@ node_modules
 
 *.komodoproject
 
+*.lock
 
 dist
 config.json

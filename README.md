@@ -5,11 +5,10 @@ Hyperty Development Toolkit
 This repository provides required tools to develop Hyperties and a few demos. Currently limited to hyperties to be executed in the Browser. Soon NodeJS support will also be added;
 
 
-- [Change Log](#log)
 - [Overview](#overview)
 - Quick Guide Setup
-  - [Setup with docker and docker-compose](#docker)
   - [Setup form source code](#code)
+  - [Setup with docker and docker-compose](#docker)
 - [First Hyperty Development](#first)
 - Cloud and Local development environment
   - [Cloud](#cloud)
@@ -19,57 +18,85 @@ This repository provides required tools to develop Hyperties and a few demos. Cu
   - [Start server](#serve)
   - [Encode components](#encode)
 
-
-<a name="log"/>
-
-## Change Log
-
-##### versions
-
-- [x] RuntimeUA | [develop-improves-revised-catalogue](https://github.com/reTHINK-project/dev-runtime-core/tree/develop-improves-revised-catalogue) branch
-- [x] Service Framework | [revised-catalogue](https://github.com/reTHINK-project/dev-service-framework/tree/revised-catalogue) branch
-- [x] message node vertx | [develop](https://github.com/reTHINK-project/dev-msg-node-vertx/tree/develop)
-- [x] domain-registy | [master](https://github.com/reTHINK-project/dev-registry-domain)
-
-##### Improves
-
-- [x] now toolkit run on root, you don't need add the `/examples`;
-- [x] toolkit now support the same request as dev-catalogue (in the easy way and limited, the point is not replicate the dev-catalogue).
-      Now we don't need something like, `resources/descriptors/Hyperties.json` you can use the `/.well-known/hyperty/Connector` eg.
-
-##### Fixes
-
-- [x] [21](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/21) - Alternative Port
-
-- [x] [16](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/16) - Missing dependency: urijs
-
-- [x] [5](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues/5) - if you run the toolkit with [docker](#docker) this issue was solved
-      ​
-
 <a name="overview"/>
 
 ## Overview
 
 reTHINK Project provides a Javascript framework to build and deliver Real Time Communication Microservices in end-user devices (browsers and standalone mobile apps) and in Network edge servers (NodeJS):
 
-* **Hyperty** is similar to an Agent or a Bot that performs tasks on user's behalf, by communicating through P2P Data Synchronisation with other Hyperties. Some examples (see demos), are:
+* **Hyperty** is similar to an Agent or a Bot that performs tasks on user's behalf, by communicating through P2P Data Synchronisation with other Hyperties. Some [examples](https://github.com/reTHINK-project/dev-hyperty) ([see demos](https://hybroker.rethink.ptinovacao.pt/examples/)), are:
 
-  - the Hyperty Connector that uses WebRTC to manage video calls between users;
+  - the [Hyperty Connector](https://github.com/reTHINK-project/dev-hyperty/tree/master/docs/connector) that uses WebRTC to manage video calls between users;
 
-  - the Group Chat Hyperty (name says it all);
+  - the [Group Chat Hyperty](https://github.com/reTHINK-project/dev-hyperty/tree/master/docs/group-chat-manager) (name says it all);
 
-  - the myBracelet Hyperty, is a sensing Hyperty that encapsulates a Bracelet, by collecting and publishing data from it
+  - the [myBracelet Hyperty](https://github.com/reTHINK-project/dev-hyperty/tree/master/docs/bracelet), is a sensing Hyperty that encapsulates a Bracelet, by collecting and publishing data from it
 
   - the myContext Hyperty is a Big Data Hyperty that uses data published by different sensing Hyperties (like the myBracelet Hyperty) to infer and calculate more meaningful Contextual data about the user.
 
 * **Protocol on-the-fly** is used by Hyperties to support interoperability with other Hyperties from other domains, without requiring federation or standardisation of network protocols;
 * Hyperties are **Trustful**. Hyperties are decoupled from the User Identity, which can be securely asserted by existing IDPs (Identity Provider), when communicating with other Hyperties.
 
-In case you want want to know more details about reTHINK, have a look [here](docs/tutorials/readme.md)
+In case you want want to know more details about reTHINK, have a look on the [full specification](https://github.com/reTHINK-project/specs/blob/master/README.md)
 
 ## Quick Guide Setup
 
 <a name="docker"/>
+
+
+<a name="code"/>
+
+### From source code
+
+**NOTE:** by default the npm is the tool used to install modules, but you can use other tool like npm to try to speed up the instalation process, called [yarn](https://yarnpkg.com/).
+
+
+
+Install yarn:
+
+- on windows: https://yarnpkg.com/en/docs/install#windows-tab
+- on linux: https://yarnpkg.com/en/docs/install#linux-tab
+- on macOS: https://yarnpkg.com/en/docs/install#mac-tab
+
+
+
+The command are identical to the npm:
+
+- install modules: yarn install
+- uninstall modules: yarn remove
+
+You can see more command here: https://yarnpkg.com/en/docs/cli/
+
+
+
+To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the steps below. In case you want to use Hyperties in your Application please read [this tutorial](docs/tutorials/development-of-apps.md).
+**NOTE for Windows Users:** You should use "Windows PowerShell" and not the standard command line.
+
+1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 2);
+
+2. run the command `npm install` (this may take some minutes)
+
+3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
+
+```shell
+ 127.0.0.1   hysmart.rethink.ptinovacao.pt
+ 127.0.0.1   catalogue.hysmart.rethink.ptinovacao.pt
+```
+
+* In Linux is normally available at: `/etc/hosts`
+* In windows is normally available at: `C:\Windows\System32\drivers\etc\hosts`
+
+4. Create the folder thet will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use somethinf else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
+
+5. run the local http-server and catalogue with `npm run start:dev`. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
+
+6. Check the following url's to allow the certificates:
+
+
+* https://hysmart.rethink.ptinovacao.pt
+* https://catalogue.hysmart.rethink.ptinovacao.pt
+
+7. Open `https://hysmart.rethink.ptinovacao.pt` with your favorite browser and select your Hyperty to execute.
 
 ### With docker and docker-compose
 
@@ -137,44 +164,14 @@ You can run the toolkit with docker and docker-compose.
 
    ​
 
-<a name="code"/>
-
-### From source code
-
-To setup the Hyperty development (starter project), make sure you have nodeJS available in your environment, perform the steps below. In case you want to use Hyperties in your Application please read [this tutorial](docs/tutorials/development-of-apps.md).
-**NOTE for Windows Users:** You should use "Windows PowerShell" and not the standard command line.
-
-1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 2);
-
-2. run the command `npm install` (this may take some minutes)
-
-3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
-```shell
- 127.0.0.1   hysmart.rethink.ptinovacao.pt
- 127.0.0.1   catalogue.hysmart.rethink.ptinovacao.pt
-```
-
-  * In Linux is normally available at: `/etc/hosts`
-  * In windows is normally available at: `C:\Windows\System32\drivers\etc\hosts`
-
-4. Create the folder thet will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use somethinf else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
-
-5. run the local http-server and catalogue with `npm run start:dev`. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
-
-6. Check the following url's to allow the certificates:
-
- * https://hysmart.rethink.ptinovacao.pt
- * https://catalogue.hysmart.rethink.ptinovacao.pt
-
-7. Open `https://hysmart.rethink.ptinovacao.pt/examples/` with your favorite browser and select your Hyperty to execute.
-
 <a name="first"/>
 
 ## First Hyperty Development
 
 1. move to *src* folder and create a folder for your hyperty project e.g. "hello-world". In each folder you should create two types of files:
 
-- a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldOberver.hy.js](/src/hello-world/HelloWorldObserver.hy.js).
+- a ".hy.js" containing your Hyperty classes. For example, the [HelloWorldReporter.hy.js](https://github.com/reTHINK-project/dev-hyperty/tree/master/src/hello-world/HelloWorldReporter.hy.js) owns and reports changes to the Hello Data Object that will be received by the [HelloWorldObserver.hy.js](https://github.com/reTHINK-project/dev-hyperty/tree/master/src/hello-world/HelloWorldObserver.hy.js).
+
 
  The HelloWorldReporter.hy.js looks like:
 
@@ -248,17 +245,17 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
  }
 ```
 
-  This is optional in case you are reusing existing [data schemas](https://github.com/reTHINK-project/dev-service-framework/tree/master/schemas/json-schema/data-objects). In that situation, you just have to set in your Hyperty Descriptor the Catalogue URL that points to the data schema (see below).
+  This is optional in case you are reusing existing [data schemas](https://github.com/reTHINK-project/specs/tree/master/schemas/json-schema/data-objects). In that situation, you just have to set in your Hyperty Descriptor the Catalogue URL that points to the data schema (see below).
 
 2. You can Complete your Hyperty Descriptor by editing the file with sufix ***name-of-hyperty.hy.json** where you have the hyperty source code;
 
-3. To test your Hyperty, you need to move the dev-hyperty (or where is located your source code) folder and:
+3. To test your Hyperty, you need to go to dev-hyperty (or where is located your source code) folder and:
 
-- move to *"examples"* folder and expose your Hyperty to Testing Web App by editing *function* ***hypertyDeployed*** on **main.js** and add your **hyperty name** and **javascript file name** to the switch cases defined there.
+- go to *"examples"* folder and expose your Hyperty to Testing Web App by editing *function* [***hypertyDeployed*** on **main.js**](https://github.com/reTHINK-project/dev-hyperty/blob/master/examples/main.js#L21) and add your **hyperty name** and **javascript file name** to the switch cases defined there.
 
-- In case your Hyperty exposes an API to be used by a Web App, you should move to *"examples"* folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
+- In case your Hyperty exposes an API to be used by a Web App, you should go to *"examples"* folder and create a folder containing your testing App HTML templates using [Handlebars](http://handlebarsjs.com/).
 
-## Cloud and Local development environment
+### Cloud and Local development environment
 
 <a name="cloud" />
 

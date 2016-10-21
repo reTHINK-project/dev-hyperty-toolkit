@@ -77,7 +77,7 @@ describe('Install Runtime', function() {
   it('should load multiple times the same protostub', (done) => {
 
     for (let i = 0; i < 2; i++) {
-      let stub = 'https://' + config.domain + '/.well-known/protocolstub/default';
+      let stub = 'https://catalogue.' + config.domain + '/.well-known/protocolstub/default';
       expect(runtimeLoader.requireProtostub(stub))
       .to.be.fulfilled
       .and.notify(done);
@@ -121,8 +121,8 @@ describe('Install Runtime', function() {
     this.timeout(100000);
 
     let hyperties = [
-      'https://' + config.domain + '/.well-known/hyperty/GroupChatManager',
-      'https://' + config.domain + '/.well-known/hyperty/Connector'
+      'https://catalogue.' + config.domain + '/.well-known/hyperty/GroupChatManager',
+      'https://catalogue.' + config.domain + '/.well-known/hyperty/Connector'
     ];
 
     hyperties.forEach((hyperty) => {
