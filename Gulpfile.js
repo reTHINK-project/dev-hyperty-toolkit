@@ -70,22 +70,22 @@ gulp.task('checkDataSchemas', function() {
 
 gulp.task('src-hyperties', function(done) {
 
-  var path;
+  var srcPath;
   if (process.env.HYPERTY_REPO) {
 
-    path = '../' + process.env.HYPERTY_REPO;
+    srcPath = path.join('../', process.env.HYPERTY_REPO);
 
-    fs.stat(path, function(error) {
+    fs.stat(srcPath, function(error) {
       if (error) {
         console.log('ERROR:', error);
         return error;
       }
 
-      copyHyperties(path, done);
+      copyHyperties(srcPath, done);
     });
 
   } else {
-    var parentDirs = fs.readdirSync('../');
+    var parentDirs = fs.readdirSync(path.resolve('../'));
     gulp.src('./', {buffer:false})
       .pipe(prompt.prompt([{
         type: 'list',
@@ -94,8 +94,8 @@ gulp.task('src-hyperties', function(done) {
         choices: parentDirs
       }
     ], function(res) {
-      path = '../' + res.folders;
-      copyHyperties(path, done);
+      srcPath = path.join('../', res.folders);
+      copyHyperties(srcPath, done);
     }));
 
   }
@@ -526,12 +526,12 @@ function getDirectories(srcpath) {
 
 function filterHyperties(environment) {
 
-  var filePath = dirname + '/src/';
+  var filePath = path.resolve(dirname + '/src/');
   var hypertyFolder = getDirectories(filePath);
   var hyperties = [];
 
   hypertyFolder.forEach(function(folder) {
-    readFiles(folder + '/', '.hy.json').forEach(function(fileObject) {
+    readFiles(path.join(folder, '/'), '.hy.json').forEach(function(fileObject) {
       hyperties.push(fileObject);
     });
   });
