@@ -1,7 +1,7 @@
 import SandboxBrowser from '../sandboxes/SandboxBrowser';
 import AppSandboxBrowser from '../sandboxes/AppSandboxBrowser';
 import Request from '../browser/Request';
-import {RuntimeCatalogue, RuntimeCatalogueLocal} from 'service-framework/dist/RuntimeCatalogue';
+import {RuntimeCatalogue} from 'service-framework/dist/RuntimeCatalogue';
 import PersistenceManager from 'service-framework/dist/PersistenceManager';
 
 const runtimeFactory = Object.create({
@@ -30,7 +30,7 @@ const runtimeFactory = Object.create({
   createRuntimeCatalogue(development) {
 
     if (!this.catalogue)
-      this.catalogue = development ? new RuntimeCatalogueLocal(this) : new RuntimeCatalogue(this);
+      this.catalogue = new RuntimeCatalogue(this);
 
     return this.catalogue;
   }
