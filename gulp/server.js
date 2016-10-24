@@ -6,6 +6,9 @@ var browserSync = require('browser-sync').create('Toolkit');
 
 module.exports = browserSync;
 
+var bsServer;
+var serverStatus;
+
 module.exports = function server(done) {
 
   var stage = getStage();
@@ -44,7 +47,7 @@ module.exports = function server(done) {
   }
 
   // Serve files from the root of this project
-  browserSync.init({
+  bsServer = browserSync.init({
     open: false,
     online: false,
     timestamps: timestamps,
@@ -71,11 +74,34 @@ module.exports = function server(done) {
       done(err);
     }
 
+    if (serverStatus === 'open') {
+      browserSync.exit();
+
+      gutil.log('|******************************************************************************|');
+      gutil.log('|                                                                              |');
+      gutil.log('|                         THE TOOLKIT WILL STOP RUNNING.                       |');
+      gutil.log('|              CHECK IF YOU HAVE OTHER SEVICE RUNNING ON PORT 443.             |');
+      gutil.log('|                                                                              |');
+      gutil.log('|******************************************************************************|');
+
+      return false;
+    }
+
     browserSync.reload();
     done();
   });
 
+  checkStatus();
+
 };
+
+function checkStatus() {
+  bsServer.utils.portscanner.checkPortStatus(443, {}, function(err, status) {
+    if (err) throw Error(err);
+
+    serverStatus = status;
+  });
+}
 
 function middleware(req, res, next) {
   gutil.log(req.originalUrl);
