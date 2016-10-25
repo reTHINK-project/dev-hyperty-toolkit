@@ -1,8 +1,8 @@
+// jshint varstmt: false
 // Karma configuration
 // Generated on Wed Mar 16 2016 17:55:36 GMT+0000 (WET)
 
 var fs = require('fs');
-var systemConfig = require('./config.json');
 
 module.exports = function(config) {
 
@@ -55,18 +55,11 @@ module.exports = function(config) {
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['mocha'],
 
-    // host name
-    hostname: systemConfig.domain,
-
     protocol: 'https',
 
     httpsServerOptions: {
       key: fs.readFileSync('rethink-certificate.key', 'utf8'),
       cert: fs.readFileSync('rethink-certificate.cert', 'utf8')
-    },
-
-    proxy: {
-      '/.well-known/': 'https://' + systemConfig.domain + '/'
     },
 
     proxyValidateSSL: false,

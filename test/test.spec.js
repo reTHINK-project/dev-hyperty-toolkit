@@ -2,6 +2,8 @@ import chai from 'chai';
 import sinon from 'sinon';
 import chaiAsPromised from 'chai-as-promised';
 
+import configs from '../config.json';
+
 let expect = chai.expect;
 
 chai.use(chaiAsPromised);
@@ -10,12 +12,7 @@ import rethink from '../resources/factories/rethink';
 
 describe('Install Runtime', function() {
 
-  let config = {
-    development: false,
-    runtimeURL: 'hyperty-catalogue://catalogue.hybroker.rethink.ptinovacao.pt/.well-known/runtime/Runtime',
-    domain: 'hybroker.rethink.ptinovacao.pt'
-  };
-  let runtime;
+  let config = configs;
   let runtimeLoader;
   let msgNodeAddress;
   let runtimeHyperty;
@@ -200,7 +197,7 @@ describe('Install Runtime', function() {
 
     this.timeout(1000 * (limit + 2));
 
-    let msgTo = 'domain://msg-node.hybroker.rethink.ptinovacao.pt/hyperty-address-allocation';
+    let msgTo = 'domain://msg-node.' + config.domain + '/hyperty-address-allocation';
     let msgFrom = window.runtime.registry.registryURL;
 
     let msg = {
