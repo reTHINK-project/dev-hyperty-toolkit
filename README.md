@@ -55,45 +55,17 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 2. run the command `npm install` (this may take some minutes)
 
-3. to avoid the installation of reTHINK back-end (Messaging Node and Domain Registry), add the lines to your hosts file:
+3. Create the folder that will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use something else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
 
-```shell
- 127.0.0.1   hysmart.rethink.ptinovacao.pt
- 127.0.0.1   catalogue.hysmart.rethink.ptinovacao.pt
-```
+4. run the local http-server and catalogue with `npm run start:browser`. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in previous step  to contain your hyperty source.
 
-* In Linux is normally available at: `/etc/hosts`
-* In windows is normally available at: `C:\Windows\System32\drivers\etc\hosts`
-
-4. Create the folder thet will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use somethinf else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
-
-5. run the local http-server and catalogue with `npm run start:browser`. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in previous step  to contain your hyperty source.
-
-6. Check the following url's to allow the certificates:
+5. Check the following url's to allow the certificates:
 
 
-* https://hysmart.rethink.ptinovacao.pt
-* https://catalogue.hysmart.rethink.ptinovacao.pt
+* https://localhost
+* https://catalogue.localhost
 
-7. Open `https://hysmart.rethink.ptinovacao.pt` with your favorite browser and select your Hyperty to execute.
-
-
-#### Yarn Package Manager
-
-By default the npm is the tool used to install modules, but you can also use [yarn](https://yarnpkg.com/) that in some platforms can speedup the toolkit installation.
-
-Install yarn:
-
-- on windows: https://yarnpkg.com/en/docs/install#windows-tab
-- on linux: https://yarnpkg.com/en/docs/install#linux-tab
-- on macOS: https://yarnpkg.com/en/docs/install#mac-tab
-
-The command is identical to the npm:
-
-- install modules: yarn install
-- uninstall modules: yarn remove
-
-You can see more command here: https://yarnpkg.com/en/docs/cli/
+6. Open `https://localhost` with your favorite browser and select your Hyperty to execute.
 
 
 ### With docker and docker-compose
@@ -119,7 +91,7 @@ In case you already have docker installed you can use it together with docker-co
    >       - RUNTIME_URL=hyperty-catalogue://hysmart.rethink.ptinovacao.pt/.well-known/runtime/Runtime
 
    **Domain** - the domain where Message Node and Domain Registry services are hosted
-   >       - DOMAIN=hysmart.rethink.ptinovacao.pt
+   >       - DOMAIN=localhost
 
    **Hyperty Repo** - variable with the Hyperty source code repository.
    >       - HYPERTY_REPO=/tmp/dev-hyperty
@@ -139,18 +111,7 @@ In case you already have docker installed you can use it together with docker-co
                           print new container names.
    ```
 
-5. open your **hosts** file an add the following configuration:
-
-   ```shell
-   172.18.0.32 hysmart.rethink.ptinovacao.pt
-   172.18.0.32 catalogue.hysmart.rethink.ptinovacao.pt
-   ```
-
-   **note:** more information related with hosts file [here](#cloud)
-
-   ​
-
-6. Some usefull commands
+5. Some usefull commands
 
    `docker-compose logs -f hyperty-toolkit ` - to see all the logs of service
 
@@ -236,6 +197,9 @@ In case you already have docker installed you can use it together with docker-co
  		"scheme": {
  			"constant": "hello"
  		},
+    "constraints": {
+      "browser": true
+    },
  		"hello": {
  			"type": "string"
  		}
@@ -261,21 +225,8 @@ In case you already have docker installed you can use it together with docker-co
 
 The toolkit is pre-configured to use **hysmart.rethink.ptinovacao.pt** cloud development environment. In case you want to use another reTHINK cloud environment the following changes must be done:
 
-- set the cloud development environment domain at [system.config.json](system.config.json)
-
 - [provision the ProtoStub](#gulp-encode) to be used to connect to the new development domain in Local Catalogue
 
-- change your **hosts** file located:
-
-- on windows - **windows/system32/drivers/etc/hosts**
-- on unix system - **/etc/hosts**
-
-**NOTE:** You need open this file with administration permission and add this:
-
-```shell
-127.0.0.1   hysmart.rethink.ptinovacao.pt
-127.0.0.1   catalogue.hysmart.rethink.ptinovacao.pt
-```
 
 <a name="local" />
 
