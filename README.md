@@ -2,7 +2,7 @@
 Hyperty Development Toolkit
 =========================
 
-This repository provides required tools to develop Hyperties and a few demos. Currently limited to hyperties to be executed in the Browser. Soon NodeJS support will also be added;
+This repository provides required tools to develop Hyperties and a few demos. Currently the toolkit can be used to develop hyperties to be executed in the Browser or in the NodeJS;
 
 
 - [Overview](#overview)
@@ -57,7 +57,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 3. Create the folder that will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use something else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
 
-4. run the local http-server and catalogue with `npm run start:browser`. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in previous step  to contain your hyperty source.
+4. run the local http-server and catalogue with `npm run start:browser` or `npm run start:node` in case you are developing Hyperties for NodeJS. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in previous step  to contain your hyperty source.
 
 5. Check the following url's to allow the certificates:
 
@@ -253,31 +253,23 @@ When you save the Hyperty, the process automatically converts it from ES6 to ES5
 Hyperties.json
 ```json
 {
-  "Hello": {
-    "sourcePackage": {
-      "sourceCode":  "SGVsbG8=",
-      "sourceCodeClassname": "Hello",
-      "encoding": "base64",
-      "signature": ""
-    },
-    "cguid": 1,
-    "type": "Hyperties",
-    "version": "0.1",
-    "description": "Description of Hello",
-    "objectName": "Hello",
-    "configuration": {},
-    "sourcePackageURL": "/sourcePackage",
-    "language": "javascript",
-    "signature": "",
-    "messageSchemas": "",
-    "dataObjects": [],
-    "accessControlPolicy": "somePolicy"
-  }
+  "language": "javascript",
+  "signature": "",
+  "configuration": {},
+  "constraints": {
+    "browser": true,
+    "node": true
+  },
+  "hypertyType": [
+    "hello"
+  ],
+  "dataObjects": [
+    "https://catalogue.hybroker.rethink.ptinovacao.pt/.well-known/dataschema/HelloWorldDataSchema"
+  ]
 }
 ```
 
 The same happens with JSON-Schemas that are added / updated in the DataSchemas.json file.
-
 
 
 <a name="tasks" />
