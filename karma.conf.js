@@ -29,9 +29,7 @@ module.exports = function(config) {
      'karma-mocha',
      'karma-browserify',
      'karma-mocha-reporter',
-     'karma-chrome-launcher',
-     'karma-phantomjs-launcher',
-     'karma-babel-preprocessor'
+     'karma-chrome-launcher'
     ],
 
     // list of files to exclude
