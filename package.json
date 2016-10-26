@@ -6,7 +6,7 @@
   "scripts": {
     "test": "karma start",
     "start": "gulp serve",
-    "start:dev": "gulp serve --dev",
+    "start:dev": "gulp serve --dev --browser",
     "start:browser": "gulp serve --dev --browser",
     "start:node": "gulp serve --dev --node"
   },
