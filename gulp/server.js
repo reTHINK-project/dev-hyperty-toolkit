@@ -180,7 +180,7 @@ function devMiddleware(req, res, next) {
       if (resource) {
 
         if (req.originalUrl.includes('cguid')) {
-          res.end(raw[resource].cguid, '', 2);
+          res.end(JSON.stringify(raw[resource].cguid), '', 2);
         } else if (req.originalUrl.includes('version')) {
           res.end(JSON.stringify(Number(raw[resource].version), '', 2));
         } else {

@@ -2,6 +2,7 @@ import SandboxBrowser from '../sandboxes/SandboxBrowser';
 import AppSandboxBrowser from '../sandboxes/AppSandboxBrowser';
 import Request from '../browser/Request';
 import {RuntimeCatalogue} from 'service-framework/dist/RuntimeCatalogue';
+import PersistenceManager from 'service-framework/dist/PersistenceManager';
 import storageManager from './storageManager.fake';
 
 const runtimeFactory = Object.create({
@@ -24,6 +25,11 @@ const runtimeFactory = Object.create({
 
   storageManager() {
     return storageManager;
+  },
+
+  persistenceManager() {
+    let localStorage = window.localStorage;
+    return new PersistenceManager(localStorage);
   },
 
   createRuntimeCatalogue(development) {

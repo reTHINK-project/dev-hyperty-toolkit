@@ -20,16 +20,19 @@ const storageManager = {
       .first()
       .then(object => {
         return object.value;
+      }).catch(error => {
+        return undefined;
       });
   },
 
   getVersion: (key) => {
+    console.log('get version:', key);
     return db.objects.where('key')
       .equals(key)
       .first()
       .then(object => {
         return object.version;
-      });
+      })
   },
 
   delete: (key) => {
