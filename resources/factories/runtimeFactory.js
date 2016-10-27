@@ -3,7 +3,9 @@ import AppSandboxBrowser from '../sandboxes/AppSandboxBrowser';
 import Request from '../browser/Request';
 import {RuntimeCatalogue} from 'service-framework/dist/RuntimeCatalogue';
 import PersistenceManager from 'service-framework/dist/PersistenceManager';
-import StorageManager from 'service-framework/dist/StorageManager';
+import StorageManagerFake from './StorageManagerFake';
+
+// import Dexie from 'dexie';
 
 const runtimeFactory = Object.create({
   createSandbox() {
@@ -24,7 +26,10 @@ const runtimeFactory = Object.create({
   },
 
   storageManager() {
-    return new StorageManager();
+    // const db = new Dexie('cache');
+    // const storeName = 'objects';
+
+    return new StorageManagerFake();
   },
 
   persistenceManager() {

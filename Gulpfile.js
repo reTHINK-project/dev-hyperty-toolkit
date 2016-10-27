@@ -18,11 +18,10 @@ var browserSync = require('browser-sync');
 
 var getEnvironment = require('./gulp/environment');
 var getStage = require('./gulp/stage');
-
 var server = require('./gulp/server');
-
 var descriptorBase = require('./gulp/descriptors').descriptorBase;
 var encode = require('./gulp/descriptors').encode;
+var walk = require('./gulp/walk');
 
 var systemConfig = require('./system.config.json');
 var dirname = __dirname;
@@ -57,10 +56,10 @@ gulp.task('checkHyperties', function() {
 gulp.task('checkDataSchemas', function() {
 
   try {
-    var stats = fs.lstatSync(__dirname + '/resources/descriptors/DataSchemas.json');
+    var stats = fs.lstatSync(path.resolve(__dirname + '/resources/descriptors/DataSchemas.json'));
     console.log(stats.isFile());
   } catch (e) {
-    fs.writeFile(__dirname + '/resources/descriptors/DataSchemas.json', '{}', (err) => {
+    fs.writeFile(path.resolve(__dirname + '/resources/descriptors/DataSchemas.json'), '{}', (err) => {
       if (err) throw new Error(err);
       return true;
     });
@@ -73,7 +72,7 @@ gulp.task('src-hyperties', function(done) {
   var srcPath;
   if (process.env.HYPERTY_REPO) {
 
-    srcPath = path.join('../', process.env.HYPERTY_REPO);
+    srcPath = path.resolve(path.join('../', process.env.HYPERTY_REPO));
 
     fs.stat(srcPath, function(error) {
       if (error) {
@@ -122,10 +121,10 @@ gulp.task('stage', function() {
   var stage = getStage();
   var configuration = systemConfig[stage];
 
-  console.log(process.env.DEVELOPMENT, process.env.DOMAIN);
-  console.log(configuration, stage);
+  // console.log(configuration, stage);
 
   if (process.env.DEVELOPMENT && process.env.DOMAIN) {
+    // console.log(process.env.DEVELOPMENT, process.env.DOMAIN);
 
     if (process.env.DEVELOPMENT) {
       configuration.development = process.env.DEVELOPMENT;
@@ -512,21 +511,6 @@ function readFiles(dirname, file) {
   });
 }
 
-function walk(rootdir, callback, subdir) {
-  var abspath = subdir ? path.join(rootdir, subdir) : rootdir;
-
-  console.log('ABS:', abspath);
-
-  fs.readdirSync(abspath).forEach(function(filename) {
-    var filepath = path.join(abspath, filename);
-    if (fs.statSync(filepath).isDirectory()) {
-      walk(rootdir, callback, path.normalize(path.join(subdir || '', filename || '')));
-    } else {
-      callback(path.resolve(filepath), rootdir, subdir, filename);
-    }
-  });
-}
-
 function filterHyperties(environment) {
 
   var filePath = path.resolve(dirname + '/src/');
@@ -720,7 +704,7 @@ function copySrc() {
   var filesToBeCopied = [];
   var filesToBeExcluded = [];
   hyperties.forEach(function(hyperty) {
-    var selectedHyperty = path.parse(dirname + '/src' + hyperty.dir + '/' + hyperty.filename);
+    var selectedHyperty = path.parse(path.resolve(dirname + '/src' + hyperty.dir + '/' + hyperty.filename));
 
     walk(path.resolve(dirname + '/src' + hyperty.dir), function(filepath) {
       var fileObject = path.parse(filepath);
