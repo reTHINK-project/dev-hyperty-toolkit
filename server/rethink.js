@@ -50,48 +50,6 @@ rethink.install(config).then(function(result) {
   console.error(reason);
 });
 
-function loadStubs() {
-
-  let protostubsURL = 'https://catalogue.' + domain + '/.well-known/protocolstub';
-
-  return new Promise(function(resolve, reject) {
-    $.ajax({
-      url: protostubsURL,
-      success: function(result) {
-        let response = [];
-        if (typeof result === 'object') {
-          result.forEach(function(key) {
-            response.push(key);
-          });
-        } else if (typeof result === 'string') {
-          response = JSON.parse(result);
-        }
-
-        let stubs = response.filter((stub) => {
-          return stub !== 'default';
-        });
-
-        if (stubs.length) {
-
-          let loadAllStubs = [];
-          stubs.forEach((stub) => {
-            loadAllStubs.push(runtimeLoader.requireProtostub('hyperty-catalogue://' + stub + '/.well-known/protocolstub/' + stub));
-          });
-
-          Promise.all(loadAllStubs).then((result) => {
-            resolve(result);
-          }).catch(reason => reject(reason));
-        }
-
-      },
-      fail: function(reason) {
-        reject(reason);
-        notification(reason, 'warn');
-      }
-    });
-  });
-}
-
 function getListOfHyperties(domain) {
 
   let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty';
@@ -108,6 +66,8 @@ function getListOfHyperties(domain) {
                 } else if (typeof result === 'string') {
                   response = JSON.parse(result);
                 }
+
+                response.sort();
                 resolve(response);
               },
             fail: function(reason) {

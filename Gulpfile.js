@@ -504,7 +504,6 @@ function convertHyperty() {
 
 function readFiles(dirname, file) {
   var files = fs.readdirSync(dirname);
-
   return files.filter(function(filename) {
     return filename.includes(file);
   }).map(function(filename) {
@@ -513,27 +512,29 @@ function readFiles(dirname, file) {
   });
 }
 
-function getDirectories(srcpath) {
-  var folders = fs.readdirSync(srcpath);
-
-  return folders.map(function(file) {
-    return path.join(srcpath, file);
-  }).filter(function(file) {
-    return fs.statSync(file).isDirectory();
+function walk(rootdir, callback, subdir) {
+  var abspath = subdir ? path.join(rootdir, subdir) : rootdir;
+  fs.readdirSync(abspath).forEach(function(filename) {
+    var filepath = path.join(abspath, filename);
+    if (fs.statSync(filepath).isDirectory()) {
+      walk(rootdir, callback, path.normalize(path.join(subdir || '', filename || '')));
+    } else {
+      callback(path.normalize(filepath), rootdir, subdir, filename);
+    }
   });
-
 }
 
 function filterHyperties(environment) {
 
   var filePath = path.resolve(dirname + '/src/');
-  var hypertyFolder = getDirectories(filePath);
   var hyperties = [];
 
-  hypertyFolder.forEach(function(folder) {
-    readFiles(path.join(folder, '/'), '.hy.json').forEach(function(fileObject) {
-      hyperties.push(fileObject);
-    });
+  walk(filePath, function(filepath, rootdir, subdir, filename) {
+    if (filename.includes('.hy.json')) {
+      readFiles(path.join(rootdir, '/', subdir, '/'), filename).forEach(function(fileObject) {
+        hyperties.push(fileObject);
+      });
+    }
   });
 
   return hyperties.filter(function(file) {
@@ -547,7 +548,7 @@ function filterHyperties(environment) {
     }).map(function(file) {
       var dir = path.parse(file.folder + file.filename).dir;
       var folder = dir.replace(filePath, '');
-      return folder;
+      return {dir: folder, filename: file.filename};
     });
 }
 
@@ -708,9 +709,32 @@ function copySrc() {
     .pipe(gulp.dest('./src/utils'));
 
   // copy each folder of filter directories
-  hyperties.forEach(function(folder) {
-    return gulp.src([dirname + '/src/' + folder + '/*'])
-      .pipe(gulp.dest('./src/' + folder));
+  var filesToBeCopied = [];
+  var filesToBeExcluded = [];
+  hyperties.forEach(function(hyperty) {
+    var selectedHyperty = path.parse(dirname + '/src' + hyperty.dir + '/' + hyperty.filename);
+
+    walk(dirname + '/src' + hyperty.dir, function(filepath) {
+      var fileObject = path.parse(filepath);
+      if (fileObject.name.includes(selectedHyperty.name) ||
+          fileObject.ext === '.js' && fileObject.ext === '.json' ||
+          !fileObject.name.includes('.hy')
+          ) {
+        filesToBeCopied.push(filepath);
+      } else {
+        filesToBeExcluded.push('!' + filepath);
+      }
+    });
+  });
+
+  filesToBeCopied.concat(filesToBeExcluded);
+
+  filesToBeCopied.forEach(function(file) {
+    var fileObject = path.parse(file);
+    var directory = fileObject.dir.substr(fileObject.dir.indexOf('/src/'));
+    return gulp.src(file)
+      .pipe(gulp.dest('.' + directory));
+
   });
 
 }
