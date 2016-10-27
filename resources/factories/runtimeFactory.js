@@ -3,7 +3,7 @@ import AppSandboxBrowser from '../sandboxes/AppSandboxBrowser';
 import Request from '../browser/Request';
 import {RuntimeCatalogue} from 'service-framework/dist/RuntimeCatalogue';
 import PersistenceManager from 'service-framework/dist/PersistenceManager';
-import storageManager from './storageManager.fake';
+import StorageManager from 'service-framework/dist/StorageManager';
 
 const runtimeFactory = Object.create({
   createSandbox() {
@@ -24,7 +24,7 @@ const runtimeFactory = Object.create({
   },
 
   storageManager() {
-    return storageManager;
+    return new StorageManager();
   },
 
   persistenceManager() {
