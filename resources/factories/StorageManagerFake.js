@@ -1,9 +1,8 @@
-import StorageManager from 'service-framework/dist/StorageManager';
+// import StorageManager from 'service-framework/dist/StorageManager';
 
-class StorageManagerFake extends StorageManager {
+class StorageManagerFake {
 
   constructor() {
-    super();
 
     let store = new Map();
     this.store = store;

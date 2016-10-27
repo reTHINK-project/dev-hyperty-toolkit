@@ -29,7 +29,7 @@ const runtimeFactory = Object.create({
     // const db = new Dexie('cache');
     // const storeName = 'objects';
 
-    return new StorageManagerFake();
+    return new StorageManagerFake('a', 'b');
   },
 
   persistenceManager() {
