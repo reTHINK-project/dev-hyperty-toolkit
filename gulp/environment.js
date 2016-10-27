@@ -6,12 +6,8 @@ var getEnvironment = function() {
 
   var environment = 'browser';
 
-  if (argv.browser) {
-    environment = 'browser';
-  }
-
-  if (argv.node) {
-    environment = 'node';
+  if (argv.ENVIRONMENT) {
+    environment = argv.ENVIRONMENT;
   }
 
   if (process.env.hasOwnProperty('ENVIRONMENT')) {

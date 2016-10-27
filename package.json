@@ -6,9 +6,10 @@
   "scripts": {
     "test": "karma start",
     "start": "gulp serve",
-    "start:dev": "gulp serve --dev --browser",
-    "start:browser": "gulp serve --dev --browser",
-    "start:node": "gulp serve --dev --node"
+    "start:dev": "gulp serve --dev --ENVIRONMENT=browser",
+    "start:browser": "gulp serve --dev --ENVIRONMENT=browser",
+    "start:node": "gulp serve --dev --ENVIRONMENT=node",
+    "start:all": "gulp serve --dev --ENVIRONMENT=all"
   },
   "repository": {
     "type": "git",

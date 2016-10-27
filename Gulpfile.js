@@ -544,7 +544,12 @@ function filterHyperties(environment) {
       } catch (e) {
         temp = file.content;
       }
-      return temp.hasOwnProperty('constraints') && temp.constraints.hasOwnProperty(environment) && temp.constraints[environment];
+
+      if (environment !== 'all') {
+        return temp.hasOwnProperty('constraints') && temp.constraints.hasOwnProperty(environment) && temp.constraints[environment];
+      } else {
+        return true;
+      }
     }).map(function(file) {
       var dir = path.parse(file.folder + file.filename).dir;
       var folder = dir.replace(filePath, '');
@@ -599,7 +604,7 @@ function transpile(opts) {
 
     var environment = getEnvironment();
     if (environment === 'browser' || environment === 'node' && !filename.includes('.hy.js')) {
-      console.log('Convert ' + filename + ' to be used on browser');
+      gutil.log('Converting ' + filename + ' to be used on browser');
       return browserify(args)
         .transform(babel, {
           compact: false,
@@ -620,7 +625,7 @@ function transpile(opts) {
         });
 
     } else {
-      console.log('Convert ' + filename + ' to be used on node');
+      gutil.log('Converting ' + filename + ' to be used on node');
       return browserify(file.path, {
         standalone: 'activate'
       })
