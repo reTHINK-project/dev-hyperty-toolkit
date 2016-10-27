@@ -722,9 +722,7 @@ function copySrc() {
     walk(dirname + '/src' + hyperty.dir, function(filepath) {
       var fileObject = path.parse(filepath);
       if (fileObject.name.includes(selectedHyperty.name) ||
-          fileObject.ext === '.js' && fileObject.ext === '.json' ||
-          !fileObject.name.includes('.hy')
-          ) {
+          fileObject.ext === '.js' && fileObject.ext === '.json' || !fileObject.name.includes('.hy')) {
         filesToBeCopied.push(filepath);
       } else {
         filesToBeExcluded.push('!' + filepath);
