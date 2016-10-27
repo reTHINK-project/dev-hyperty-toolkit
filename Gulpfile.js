@@ -719,7 +719,7 @@ function copySrc() {
   hyperties.forEach(function(hyperty) {
     var selectedHyperty = path.parse(dirname + '/src' + hyperty.dir + '/' + hyperty.filename);
 
-    walk(dirname + '/src' + hyperty.dir, function(filepath) {
+    walk(path.resolve(dirname + '/src' + hyperty.dir), function(filepath) {
       var fileObject = path.parse(filepath);
       if (fileObject.name.includes(selectedHyperty.name) ||
           fileObject.ext === '.js' && fileObject.ext === '.json' || !fileObject.name.includes('.hy')) {
