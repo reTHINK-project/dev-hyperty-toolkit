@@ -28,7 +28,6 @@ const runtimeFactory = Object.create({
   },
 
   storageManager() {
-
     // Using the implementation of Service Framework
     // Dexie is the IndexDB Wrapper
     const db = new Dexie('cache');
