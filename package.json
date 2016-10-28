@@ -23,7 +23,7 @@
   "homepage": "https://github.com/reTHINK-project/dev-hyperty-toolkit#readme",
   "dependencies": {
     "runtime-core": "github:rethink-project/dev-runtime-core#develop",
-    "service-framework": "github:rethink-project/dev-service-framework#develop-catalogue-storagemanager"
+    "service-framework": "github:rethink-project/dev-service-framework#develop"
   },
   "devDependencies": {
     "babel-plugin-add-module-exports": "^0.2.1",
