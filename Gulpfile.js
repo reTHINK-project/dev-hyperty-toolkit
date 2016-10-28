@@ -590,7 +590,7 @@ function transpile(opts) {
     var _this = this;
 
     var environment = getEnvironment();
-    if (environment === 'browser' || environment === 'node' && !filename.includes('.hy.js')) {
+    if (environment === 'browser' || environment === 'all'  || environment === 'node' && !filename.includes('.hy.js')) {
       gutil.log('Converting ' + filename + ' to be used on browser');
       return browserify(args)
         .transform(babel, {
