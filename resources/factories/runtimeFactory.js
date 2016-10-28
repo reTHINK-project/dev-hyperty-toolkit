@@ -3,9 +3,11 @@ import AppSandboxBrowser from '../sandboxes/AppSandboxBrowser';
 import Request from '../browser/Request';
 import {RuntimeCatalogue} from 'service-framework/dist/RuntimeCatalogue';
 import PersistenceManager from 'service-framework/dist/PersistenceManager';
-import StorageManagerFake from './StorageManagerFake';
+import StorageManager from 'service-framework/dist/StorageManager';
 
-// import Dexie from 'dexie';
+// import StorageManagerFake from './StorageManagerFake';
+
+import Dexie from 'dexie';
 
 const runtimeFactory = Object.create({
   createSandbox() {
@@ -26,10 +28,15 @@ const runtimeFactory = Object.create({
   },
 
   storageManager() {
-    // const db = new Dexie('cache');
-    // const storeName = 'objects';
 
-    return new StorageManagerFake('a', 'b');
+    // Using the implementation of Service Framework
+    // Dexie is the IndexDB Wrapper
+    const db = new Dexie('cache');
+    const storeName = 'objects';
+
+    return new StorageManager(db, storeName);
+
+    // return new StorageManagerFake('a', 'b');
   },
 
   persistenceManager() {
