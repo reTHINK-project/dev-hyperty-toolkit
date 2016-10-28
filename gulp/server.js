@@ -44,6 +44,14 @@ module.exports = function server(done) {
     server.routes = {
       '/.well-known/runtime': 'node_modules/runtime-browser/bin'
     };
+
+    gutil.log('|******************************************************************************|');
+    gutil.log('|                                                                              |');
+    gutil.log('|                     THE TOOLKIT IS IN PRODUCTION MODE                        |');
+    gutil.log('|       THE LOCAL CATALOGUE WAS NOT ACCESSIBLE, WILL BE USED THE REMOTE        |');
+    gutil.log('|                     BASED ON YOUR CONFIGURATION FILE                         |');
+    gutil.log('|                                                                              |');
+    gutil.log('|******************************************************************************|');
   }
 
   // Serve files from the root of this project
