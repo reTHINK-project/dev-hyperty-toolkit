@@ -121,6 +121,8 @@ gulp.task('stage', function() {
   var stage = getStage();
   var configuration = systemConfig[stage];
 
+  // console.log(configuration, stage);
+
   if (process.env.DEVELOPMENT && process.env.DOMAIN) {
     // console.log(process.env.DEVELOPMENT, process.env.DOMAIN);
 
