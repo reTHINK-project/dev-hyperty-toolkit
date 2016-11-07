@@ -31,13 +31,13 @@ cd dev-hyperty-toolkit
 npm install
 ```
 
-### Browser developer
+### To develop Hyperties for Browsers
 ```shell
 # run the toolkit for browser and select where is the dev-hyperty repository
 npm run start:browser
 
 ```
-### Nodejs developer
+### To develop Hyperties for Nodejs
 ```shell
 # or toolkit for nodejs and select where is the dev-hyperty repository
 npm run start:node
