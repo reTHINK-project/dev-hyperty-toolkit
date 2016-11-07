@@ -6,7 +6,7 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": 50001,
+    "cguid": "5-7a6d643f-a45c-0dbc-ab07-21ea45e4f1850",
     "type": "IDPProxys",
     "version": "0.1",
     "description": "Description of OrangeProxyStub",
@@ -27,7 +27,7 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": 50002,
+    "cguid": "5-7a6d643f-a45c-0dbc-ab07-21ea45e4f1851",
     "type": "IDPProxys",
     "version": 0.2,
     "description": "Description of MicrosoftProxyStub",
@@ -48,9 +48,9 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": 50003,
+    "cguid": "5-7a6d643f-a45c-0dbc-ab07-21ea45e4f1852",
     "type": "IDPProxys",
-    "version": "0.1",
+    "version": 0.2,
     "description": "Description of IdpProxyStub",
     "objectName": "IdpProxyStub",
     "configuration": {},

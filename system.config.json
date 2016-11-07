@@ -1,8 +1,8 @@
 {
   "develop" : {
     "development": true,
-    "runtimeURL": "hyperty-catalogue://catalogue.hysmart.rethink.ptinovacao.pt/.well-known/runtime/Runtime",
-    "domain": "hysmart.rethink.ptinovacao.pt"
+    "runtimeURL": "hyperty-catalogue://catalogue.localhost/.well-known/runtime/Runtime",
+    "domain": "localhost"
   },
   "production" : {
     "development": false,

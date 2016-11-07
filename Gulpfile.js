@@ -1,36 +1,37 @@
 // jshint varstmt: false
 
-// var pkg = require('./package.json');
 var gulp = require('gulp');
 var fs = require('fs');
 var path = require('path');
-var _ = require('underscore');
-
-var browserSync = require('browser-sync').create('Toolkit');
 
 var _ = require('lodash');
 var babel = require('babelify');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var through = require('through2');
-var Base64 = require('js-base64').Base64;
 var prompt = require('gulp-prompt');
 var gutil = require('gulp-util');
-var argv = require('yargs').argv;
 var runSequence = require('run-sequence');
 var gulpif = require('gulp-if');
 var clean = require('gulp-clean');
-var dirname = __dirname;
+var browserSync = require('browser-sync');
+
+var getEnvironment = require('./gulp/environment');
+var getStage = require('./gulp/stage');
+var server = require('./gulp/server');
+var descriptorBase = require('./gulp/descriptors').descriptorBase;
+var encode = require('./gulp/descriptors').encode;
+var walk = require('./gulp/walk');
 
 var systemConfig = require('./system.config.json');
-
+var dirname = __dirname;
 var extensions = ['.js', '.json'];
 
 gulp.task('serve', function(done) {
 
-  var environment = getEnvironment();
-  var sequence = ['environment', 'clean', 'checkHyperties', 'checkDataSchemas', 'src-hyperties', 'descriptor', 'schemas', 'js', 'hyperties', 'server'];
-  if (environment !== 'production') {
+  var stage = getStage();
+  var sequence = ['stage', 'clean', 'checkHyperties', 'checkDataSchemas', 'src-hyperties', 'descriptor', 'schemas', 'js', 'hyperties', 'server'];
+  if (stage !== 'production') {
     sequence.push('watch');
   }
 
@@ -55,10 +56,10 @@ gulp.task('checkHyperties', function() {
 gulp.task('checkDataSchemas', function() {
 
   try {
-    var stats = fs.lstatSync(__dirname + '/resources/descriptors/DataSchemas.json');
+    var stats = fs.lstatSync(path.resolve(__dirname + '/resources/descriptors/DataSchemas.json'));
     console.log(stats.isFile());
   } catch (e) {
-    fs.writeFile(__dirname + '/resources/descriptors/DataSchemas.json', '{}', (err) => {
+    fs.writeFile(path.resolve(__dirname + '/resources/descriptors/DataSchemas.json'), '{}', (err) => {
       if (err) throw new Error(err);
       return true;
     });
@@ -68,22 +69,22 @@ gulp.task('checkDataSchemas', function() {
 
 gulp.task('src-hyperties', function(done) {
 
-  var path;
+  var srcPath;
   if (process.env.HYPERTY_REPO) {
 
-    path = '../' + process.env.HYPERTY_REPO;
+    srcPath = path.resolve(path.join('../', process.env.HYPERTY_REPO));
 
-    fs.stat(path, function(error) {
+    fs.stat(srcPath, function(error) {
       if (error) {
         console.log('ERROR:', error);
         return error;
       }
 
-      copyHyperties(path, done);
+      copyHyperties(srcPath, done);
     });
 
   } else {
-    var parentDirs = fs.readdirSync('../');
+    var parentDirs = fs.readdirSync(path.resolve('../'));
     gulp.src('./', {buffer:false})
       .pipe(prompt.prompt([{
         type: 'list',
@@ -92,8 +93,8 @@ gulp.task('src-hyperties', function(done) {
         choices: parentDirs
       }
     ], function(res) {
-      path = '../' + res.folders;
-      copyHyperties(path, done);
+      srcPath = path.join('../', res.folders);
+      copyHyperties(srcPath, done);
     }));
 
   }
@@ -113,212 +114,17 @@ gulp.task('copy-assets', copyAssets);
 gulp.task('copy-examples', copyExamples);
 
 // use default task to launch Browsersync and watch JS files
-gulp.task('server', function(done) {
+gulp.task('server', server);
 
-  var environment = getEnvironment();
-  var timestamps = true;
+gulp.task('stage', function() {
 
-  var codeSync = true;
-  var minify = false;
-  var logLevel = 'info';
-  var notify = true;
-  var logConnections = true;
-  var injectChanges = true;
-  var ui = {};
-  var logFileChanges = true;
+  var stage = getStage();
+  var configuration = systemConfig[stage];
 
-  if (environment === 'production') {
-    codeSync = false;
-    minify = true;
-    logLevel = 'info';
-    notify = false;
-    injectChanges = false;
-    ui = false;
-  }
-
-  var server = {
-    baseDir: './app'
-  };
-
-  console.log(environment);
-
-  if (environment === 'develop') {
-    server.middleware = devMiddleware;
-  } else {
-    server.middleware = middleware;
-    server.routes = {
-      '/.well-known/runtime': 'node_modules/runtime-browser/bin'
-    };
-  }
-
-  // Serve files from the root of this project
-  browserSync.init({
-    open: false,
-    online: false,
-    timestamps: timestamps,
-    logLevel: logLevel,
-    logFileChanges: logFileChanges,
-    port: 443,
-    minify: minify,
-    notify: notify,
-    ui: ui,
-    injectChanges: injectChanges,
-    ghostMode: false,
-    https: {
-      key: 'rethink-certificate.key',
-      cert: 'rethink-certificate.cert'
-    },
-    logConnections: logConnections,
-    codeSync: codeSync,
-    server: server
-  }, function(err) {
-    if (err) {
-      gutil.log('Check the documentation on Gulp Task.');
-      gutil.log('Or open an issue here https://github.com/reTHINK-project/dev-hyperty-toolkit/issues');
-      done(err);
-    }
-
-    browserSync.reload();
-    done();
-  });
-
-});
-
-function middleware(req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  return next();
-}
-
-function devMiddleware(req, res, next) {
-  var paths;
-  res.setHeader('Access-Control-Allow-Origin', '*');
-
-  if (req.originalUrl.includes('.well-known')) {
-
-    paths = req.originalUrl.split('/');
-    var type = paths[2];
-    var resource = paths[3];
-
-    if (req.originalUrl.includes('index.html') || req.originalUrl.includes('.js')) {
-      if (req.originalUrl.includes('index.html')) {
-        res.writeHeader(200, {'Content-Type': 'text/html'});
-        res.end(fs.readFileSync('node_modules/runtime-browser/bin/index.html', 'utf8'));
-      } else {
-        res.writeHeader(200, {'Content-Type': 'application/javascript'});
-        res.end(fs.readFileSync('node_modules/runtime-browser/bin/' + resource, 'utf8'));
-      }
-
-    } else if (req.originalUrl.includes('sourcepackage')) {
-      paths = req.originalUrl.split('/');
-      var cguid = Number(paths[3]);
-      var idType = cguid.toString().substring(0, 1);
-      var sourcePackage;
-      var selectedObject;
-      var resourceObject;
-
-      switch (idType) {
-        case '1':
-          resourceObject = getResources('hyperty');
-          selectedObject = filterResource(resourceObject, cguid);
-          sourcePackage = resourceObject[selectedObject].sourcePackage;
-          break;
-
-        case '2':
-          resourceObject = getResources('dataschema');
-          selectedObject = filterResource(resourceObject, cguid);
-          sourcePackage = resourceObject[selectedObject].sourcePackage;
-          break;
-
-        case '3':
-          sourcePackage = getResources('runtime');
-          selectedObject = filterResource(resourceObject, cguid);
-          sourcePackage = resourceObject[selectedObject].sourcePackage;
-          break;
-
-        case '4':
-          resourceObject = getResources('protocolstub');
-          selectedObject = filterResource(resourceObject, cguid);
-          sourcePackage = resourceObject[selectedObject].sourcePackage;
-          break;
-        case '5':
-          sourcePackage = getResources('idp-proxy');
-          selectedObject = filterResource(resourceObject, cguid);
-          sourcePackage = resourceObject[selectedObject].sourcePackage;
-          break;
-      }
-
-      res.writeHeader(200, {'Content-Type': 'application/json'});
-      res.end(JSON.stringify(sourcePackage));
-
-    } else {
-
-      var raw = getResources(type);
-
-      res.writeHeader(200, {'Content-Type': 'application/json'});
-      if (resource) {
-
-        if (req.originalUrl.includes('cguid')) {
-          res.end(JSON.stringify(Number(raw[resource].cguid), '', 2));
-        } else if (req.originalUrl.includes('version')) {
-          res.end(JSON.stringify(Number(raw[resource].version), '', 2));
-        } else {
-          res.end(JSON.stringify(raw[resource], '', 2));
-        }
-
-      } else {
-        var listOfResources = [];
-        for (var key in raw) {
-          if (raw.hasOwnProperty(key)) {
-            listOfResources.push(key);
-          }
-        }
-        res.end(JSON.stringify(listOfResources, '', 2));
-      }
-    }
-  }
-
-  next();
-
-}
-
-function getResources(type) {
-  var raw;
-  switch (type) {
-    case 'runtime':
-      raw = JSON.parse(fs.readFileSync('./resources/descriptors/Runtimes.json', 'utf8'));
-      break;
-    case 'hyperty':
-      raw = JSON.parse(fs.readFileSync('./resources/descriptors/Hyperties.json', 'utf8'));
-      break;
-    case 'idp-proxy':
-      raw = JSON.parse(fs.readFileSync('./resources/descriptors/IDPProxys.json', 'utf8'));
-      break;
-    case 'protocolstub':
-      raw = JSON.parse(fs.readFileSync('./resources/descriptors/ProtoStubs.json', 'utf8'));
-      break;
-    case 'dataschema':
-      raw = JSON.parse(fs.readFileSync('./resources/descriptors/DataSchemas.json', 'utf8'));
-      break;
-  }
-
-  return raw;
-}
-
-function filterResource(resource, key) {
-  return Object.keys(resource).filter(function(a) {
-    return resource[a].cguid === key;
-  })[0];
-}
-
-gulp.task('environment', function() {
-
-  var environment = getEnvironment();
-  var configuration = systemConfig[environment];
-
-  console.log(process.env.DEVELOPMENT, process.env.DOMAIN);
-  console.log(configuration, environment);
+  // console.log(configuration, stage);
 
   if (process.env.DEVELOPMENT && process.env.DOMAIN) {
+    // console.log(process.env.DEVELOPMENT, process.env.DOMAIN);
 
     if (process.env.DEVELOPMENT) {
       configuration.development = process.env.DEVELOPMENT;
@@ -339,14 +145,14 @@ gulp.task('environment', function() {
     console.log('export DEVELOPMENT=true|false\nexport DOMAIN=<your domain>\nexport RUNTIME_URL=<runtime location> (optional)');
     gutil.log(gutil.colors.yellow('For default the settings applied are in the system.config.json file'));
 
-    configuration = systemConfig[environment];
+    configuration = systemConfig[stage];
   }
 
   return gulp.src('./')
   .pipe(createFile('config.json', new Buffer(JSON.stringify(configuration, null, 2))))
   .pipe(gulp.dest('./'))
   .on('end', function() {
-    gutil.log('You are in the ' + environment + ' mode');
+    gutil.log('You are in the ' + stage + ' mode');
     gutil.log('Your configuration \n', JSON.stringify(configuration, null, 2));
   });
 
@@ -361,11 +167,6 @@ function copyFiles(opts) {
     if (opts && opts.dest) {
       dest = opts.dest;
     }
-
-    // console.log('dirname: ', dirname);
-    // console.log('dest: ', dest);
-    // console.log('__dirname: ', __dirname);
-    // console.log('fileObject dir: ', fileObject.dir);
 
     var indexOfDest = fileObject.dir.indexOf(dest);
     var dirPath = fileObject.dir.substring();
@@ -422,7 +223,6 @@ gulp.task('watch', function() {
     .pipe(convertHyperty())
     .resume()
     .on('end', function() {
-      console.log('testes');
       browserSync.reload();
     });
   });
@@ -664,7 +464,7 @@ function createDescriptor() {
     data[nameOfHyperty] = updated;
 
     var newChunk = _.clone(chunk);
-    newChunk.path = './descriptors/Hyperties.json';
+    newChunk.path = path.resolve('./descriptors/Hyperties.json');
     newChunk.contents = new Buffer(JSON.stringify(data, null, 2));
     gutil.log('Initial Configuration');
     gutil.log(JSON.stringify(preconfig, null, 2));
@@ -701,6 +501,49 @@ function convertHyperty() {
 
 }
 
+function readFiles(dirname, file) {
+  var files = fs.readdirSync(dirname);
+  return files.filter(function(filename) {
+    return filename.includes(file);
+  }).map(function(filename) {
+    var content = fs.readFileSync(dirname + filename, 'utf-8');
+    return {filename: filename, folder: dirname, content: content};
+  });
+}
+
+function filterHyperties(environment) {
+
+  var filePath = path.resolve(dirname + '/src/');
+  var hyperties = [];
+
+  walk(filePath, function(filepath, rootdir, subdir, filename) {
+    if (filename.includes('.hy.json')) {
+      readFiles(path.join(rootdir, '/', subdir, '/'), filename).forEach(function(fileObject) {
+        hyperties.push(fileObject);
+      });
+    }
+  });
+
+  return hyperties.filter(function(file) {
+      var temp;
+      try {
+        temp = JSON.parse(file.content);
+      } catch (e) {
+        temp = file.content;
+      }
+
+      if (environment !== 'all') {
+        return temp.hasOwnProperty('constraints') && temp.constraints.hasOwnProperty(environment) && temp.constraints[environment];
+      } else {
+        return true;
+      }
+    }).map(function(file) {
+      var dir = path.parse(file.folder + file.filename).dir;
+      var folder = dir.replace(filePath, '');
+      return {dir: folder, filename: file.filename};
+    });
+}
+
 function convertSchema() {
 
   return through.obj(function(chunk, enc, done) {
@@ -726,14 +569,15 @@ function convertSchema() {
 
 function transpile(opts) {
 
+  // Return for browser
   return through.obj(function(file, enc, cb) {
 
     var fileObject = path.parse(file.path);
-    var environment = getEnvironment();
+    var stage = getStage();
     var args = {};
 
     var compact = false;
-    if (environment === 'production') {
+    if (stage === 'production') {
       compact = true;
     }
 
@@ -745,24 +589,45 @@ function transpile(opts) {
     var filename = opts.filename || fileObject.base;
     var _this = this;
 
-    return browserify(args)
-    .transform(babel, {
-      compact: false,
-      sourceMaps: true,
-      extends: __dirname + '/.babelrc'
-    })
-    .bundle()
-    .on('error', function(err) {
-      gutil.log(gutil.colors.red(err));
-      _this.emit('end');
-    })
-    .pipe(source(filename))
-    .pipe(gulp.dest(opts.destination))
-    .on('end', function() {
-      file.contents = fs.readFileSync(opts.destination + '/' + fileObject.base);
-      file.path = opts.destination + '/' + fileObject.base;
-      cb(null, file);
-    });
+    var environment = getEnvironment();
+    if (environment === 'browser' || environment === 'all'  || environment === 'node' && !filename.includes('.hy.js')) {
+      gutil.log('Converting ' + filename + ' to be used on browser');
+      return browserify(args)
+        .transform(babel, {
+          compact: false,
+          sourceMaps: true,
+          extends: __dirname + '/.babelrc'
+        })
+        .bundle()
+        .on('error', function(err) {
+          gutil.log(gutil.colors.red(err));
+          _this.emit('end');
+        })
+        .pipe(source(filename))
+        .pipe(gulp.dest(opts.destination))
+        .on('end', function() {
+          file.contents = fs.readFileSync(opts.destination + '/' + fileObject.base);
+          file.path = opts.destination + '/' + fileObject.base;
+          cb(null, file);
+        });
+
+    } else {
+      gutil.log('Converting ' + filename + ' to be used on node');
+      return browserify(file.path, {
+        standalone: 'activate'
+      })
+        .transform(babel, {
+          presets: ['es2015']
+        })
+        .bundle()
+        .pipe(source(filename))
+        .pipe(gulp.dest(opts.destination))
+        .on('end', function() {
+          file.contents = fs.readFileSync(opts.destination + '/' + fileObject.base);
+          file.path = opts.destination + '/' + fileObject.base;
+          cb(null, file);
+        });
+    }
 
   });
 
@@ -818,156 +683,6 @@ function resource(opts) {
 
 }
 
-function encode(opts) {
-
-  opts = _.extend({}, opts || {});
-
-  return through.obj(function(file, enc, cb) {
-
-    if (file.isNull()) {
-      return cb(null, file);
-    }
-
-    if (file.isStream()) {
-      return cb(new Error('Streaming not supported'));
-    }
-
-    gutil.log('Encode: ', file.path);
-
-    var fileObject = path.parse(file.path);
-    var descriptor = fs.readFileSync('resources/descriptors/' + opts.descriptor + '.json', 'utf8');
-    var json = JSON.parse(descriptor);
-    var contents = fs.readFileSync(file.path, 'utf8');
-    var type = '';
-
-    var encoded = Base64.encode(contents);
-    var value = 'default';
-    var filename = fileObject.name;
-
-    if (fileObject.name.indexOf('.hy') !== -1) {
-      filename = fileObject.name.replace('.hy', '');
-    } else if (fileObject.name.indexOf('.ds') !== -1) {
-      filename = fileObject.name.replace('.ds', '');
-    }
-
-    if (opts.isDefault) {
-      value = 'default';
-    } else {
-      value = opts.name || filename;
-    }
-
-    var cguid = 0;
-    switch (opts.descriptor) {
-      case 'Hyperties':
-        type = 'hyperty';
-        cguid = 10001;
-        break;
-      case 'DataSchemas':
-        type = 'dataschema';
-        cguid = 20001;
-        break;
-      case 'Runtimes':
-        type = 'runtime';
-        cguid = 30001;
-        break;
-      case 'ProtoStubs':
-        type = 'protostub';
-        cguid = 40001;
-        break;
-      case 'IDPProxys':
-        type = 'idp-proxy';
-        cguid = 50001;
-        break;
-    }
-
-    if (!json.hasOwnProperty(value)) {
-      json[value] = descriptorBase();
-    }
-
-    Object.keys(json).map(function(key, index) {
-      json[key].cguid = cguid + index;
-    });
-
-    json[value].type = opts.descriptor;
-
-    // json[value].version = 0.1;
-    if (json[value].version) {
-      json[value].version = Number(json[value].version) + 0.1;
-    }
-
-    json[value].description = checkValues('description', 'Description of ' + filename, json[value]);
-    json[value].objectName = checkValues('objectName', filename, json[value]);
-
-    if (opts.descriptor !== 'Hyperties') {
-      if (opts.configuration) {
-        if (_.isEmpty(opts.configuration) && json[value].hasOwnProperty('configuration')) {
-          opts.configuration = json[value].configuration;
-        }
-        json[value].configuration = opts.configuration;
-        gutil.log('setting configuration: ', opts.configuration);
-      }
-    } else {
-      json[value].configuration = checkValues('configuration', {}, json[value]);
-    }
-
-    if (opts.descriptor === 'Runtimes') {
-      json[value].runtimeType = 'browser';
-      json[value].hypertyCapabilities = {
-        mic: true,
-        camera: true,
-        sensor: false,
-        webrtc: true,
-        ortc: true
-      };
-      json[value].protocolCapabilities = {
-        http: true,
-        https: true,
-        ws: true,
-        wss: true,
-        coap: false,
-        datachannel: false
-      };
-    }
-
-    if (opts.descriptor === 'Hyperties') {
-      json[value].hypertyType = checkValues('hypertyType', [], json[value]);
-      delete json[value].type;
-    }
-
-    if (opts.descriptor === 'ProtoStubs' || opts.descriptor === 'IDPProxys') {
-      json[value].constraints = '';
-    }
-
-    if (!json[value].sourcePackageURL) {
-      json[value].sourcePackageURL = '/sourcePackage';
-    }
-
-    if (json[value].sourcePackage) {
-      json[value].sourcePackage.sourceCode = encoded;
-      json[value].sourcePackage.sourceCodeClassname = filename;
-      json[value].sourcePackage.encoding = 'base64';
-      json[value].sourcePackage.signature = '';
-    }
-
-    json[value].signature = checkValues('signature', '', json[value]);
-    json[value].messageSchemas = checkValues('messageSchemas', '', json[value]);
-
-    if (!json[value].dataObjects) {
-      json[value].dataObjects = checkValues('dataObjects', [], json[value]);
-    }
-
-    json[value].accessControlPolicy = checkValues('accessControlPolicy', 'somePolicy', json[value]);
-
-    var newDescriptor = new Buffer(JSON.stringify(json, null, 2));
-    cb(null, newDescriptor);
-
-  });
-}
-
-function checkValues(property, value, object) {
-  return _.isEmpty(object[property]) ? value : object[property];
-}
-
 function createFile(path, contents) {
 
   return through({ objectMode: true}, function(chunk, enc, cb) {
@@ -977,24 +692,41 @@ function createFile(path, contents) {
 
 }
 
-function getEnvironment() {
-
-  var environment = 'production';
-
-  if (argv.dev) {
-    environment = argv.dev ? 'develop' : 'production';
-  }
-
-  if (process.env.hasOwnProperty('DEVELOPMENT')) {
-    environment = process.env.DEVELOPMENT === 'true' ? 'develop' : 'production';
-  }
-
-  return environment;
-}
-
 function copySrc() {
-  return gulp.src([dirname + '/src/**/*'])
-  .pipe(gulp.dest('./src'));
+
+  var hyperties = filterHyperties(getEnvironment());
+
+  // copy utils folder
+  gulp.src([dirname + '/src/utils/*'])
+    .pipe(gulp.dest('./src/utils'));
+
+  // copy each folder of filter directories
+  var filesToBeCopied = [];
+  var filesToBeExcluded = [];
+  hyperties.forEach(function(hyperty) {
+    var selectedHyperty = path.parse(path.resolve(dirname + '/src' + hyperty.dir + '/' + hyperty.filename));
+
+    walk(path.resolve(dirname + '/src' + hyperty.dir), function(filepath) {
+      var fileObject = path.parse(filepath);
+      if (fileObject.name.includes(selectedHyperty.name) ||
+          fileObject.ext === '.js' && fileObject.ext === '.json' || !fileObject.name.includes('.hy')) {
+        filesToBeCopied.push(filepath);
+      } else {
+        filesToBeExcluded.push('!' + filepath);
+      }
+    });
+  });
+
+  filesToBeCopied.concat(filesToBeExcluded);
+
+  filesToBeCopied.forEach(function(file) {
+    var fileObject = path.parse(file);
+    var directory = fileObject.dir.substr(fileObject.dir.indexOf('/src/'));
+    return gulp.src(file)
+      .pipe(gulp.dest('.' + directory));
+
+  });
+
 }
 
 function copyAssets() {
@@ -1010,67 +742,11 @@ function copyExamples() {
 function copyHyperties(from, done) {
   if (from) {
     dirname = from;
-    var environment = getEnvironment();
-    if (environment !== 'production') {
+    var stage = getStage();
+    if (stage !== 'production') {
       runSequence('copy-src', 'copy-examples', 'copy-assets', done);
     } else {
       runSequence('copy-examples', 'copy-assets', done);
     }
   }
-}
-
-function descriptorBase(type) {
-
-  var base = {};
-
-  base.sourcePackage = {};
-  base.sourcePackage.sourceCode = '';
-  base.sourcePackage.sourceCodeClassname = '';
-  base.sourcePackage.encoding = 'base64';
-  base.sourcePackage.signature = '';
-
-  // Source Package configuration
-  base.sourcePackageURL = '/sourcePackage';
-
-  base.cguid = '';
-  base.version = '0.1';
-  base.description = '';
-  base.language = 'Javascript';
-
-  switch (type) {
-    case 'hyperty':
-      base.hypertyType = [];
-      base.constraints = [];
-      break;
-
-    case 'runtime':
-      base.type = '';
-      base.runtimeType = 'browser';
-      base.hypertyCapabilities = {};
-      base.protocolCapabilities = {};
-      break;
-
-    case 'protocolstub':
-    case 'idp-proxy':
-      base.type = '';
-      base.constraints = '';
-      break;
-
-    case 'dataschema':
-      base.language = 'JSON-Schema';
-      break;
-
-    default:
-      base.type = '';
-      break;
-  }
-
-  base.objectName = '';
-  base.configuration = {};
-  base.messageSchemas = '';
-
-  base.signature = '';
-  base.accessControlPolicy = 'somePolicy';
-
-  return base;
 }
