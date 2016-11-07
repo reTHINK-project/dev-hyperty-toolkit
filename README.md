@@ -17,10 +17,26 @@ See the [Wiki](https://github.com/reTHINK-project/dev-hyperty-toolkit/wiki) for 
 
 To run the toolkit do the following:
 
+If you want run with runtime-core
 ```shell
-# clone the toolkit repository
+# clone the toolkit repository with the stable branches
+git clone https://github.com/reTHINK-project/dev-hyperty-toolkit.git
+
+# clone the toolkit repository with the develop branches
+git clone --branch=develop https://github.com/reTHINK-project/dev-hyperty-toolkit.git
+```
+
+If you want run with runtime-browser or runtime-nodejs
+```shell
+# clone the toolkit repository with the stable releases
 git clone --branch=runtimes https://github.com/reTHINK-project/dev-hyperty-toolkit.git
 
+# clone the toolkit repository with the develop branches
+git clone --branch=runtimes-develop https://github.com/reTHINK-project/dev-hyperty-toolkit.git
+```
+for both case above:
+
+```shell
 # clone the dev-hyperty repository
 git clone https://github.com/reTHINK-project/dev-hyperty.git
 
