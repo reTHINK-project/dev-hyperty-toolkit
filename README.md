@@ -50,16 +50,18 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 **NOTE for Windows Users:** You should use "Windows PowerShell" and not the standard command line.
 
 1. download [the latest release](https://github.com/reTHINK-project/dev-hyperty-toolkit/releases); **NOTE:** this repository is read only. Your Hyperties Source Code should be hosted somewhere else (see below step 2);
+
 2. run the command `npm install` (this may take some minutes)
+
 3. Create the folder that will contain your Hyperty source code Side by side with toolkit folder. We strongly recommend you to use the "official" Hyperty repository by cloning [dev-hyperty](https://github.com/reTHINK-project/dev-hyperty). IN case you prefer to use something else, you must create a sub-folder "src" where your Hyperty source code will be stored (`<foldername>/src`) and a sub-folder "examples" containing demos/tests for your hyperties.
+
 4. run the local http-server and catalogue with `npm run start:browser` or `npm run start:node` in case you are developing Hyperties for NodeJS. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in previous step  to contain your hyperty source.
    You also have an mode which can start the toolkit without environment restrictions with `npm run start:all`
 
 5. Check the following url's to allow the certificates:
 
-
-* https://localhost
-* https://catalogue.localhost
+  * https://localhost
+  * https://catalogue.localhost
 
 6. Open `https://localhost` with your favorite browser and select your Hyperty to execute.
 
