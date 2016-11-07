@@ -1,6 +1,6 @@
 {
   "name": "dev-hyperty-toolkit",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Hyperty Developer Setup, contains all the initial configuration to develop hyperties",
   "main": "index.js",
   "scripts": {
