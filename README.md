@@ -13,7 +13,7 @@ See the [Wiki](https://github.com/reTHINK-project/dev-hyperty-toolkit/wiki) for 
  - [Slack rethink-project](https://rethink-project.slack.com)
  - [GitHub Issues](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues)
 
-## Run Demo
+## Quick Start
 
 To run the toolkit do the following:
 
@@ -37,6 +37,10 @@ npm install
 npm run start:browser
 
 ```
+Open `https://catalogue.localhost/` and accept certificate
+
+Open `https://localhost/` and select an Hyperty to run.
+
 ### To develop Hyperties for Nodejs
 ```shell
 # or toolkit for nodejs and select where is the dev-hyperty repository
