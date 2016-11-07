@@ -68,15 +68,7 @@ To setup the Hyperty development (starter project), make sure you have nodeJS av
 
 
 
-5. run the local http-server and catalogue with `npm run start:dev`. A list of folders that are side by side with the toolkit folder will be presented. Select the one you have created in step 2 to contain your hyperty source.
-
-6. Check the following url's to allow the certificates:
-
-
- * https://hysmart.rethink.ptinovacao.pt
- * https://catalogue.hysmart.rethink.ptinovacao.pt
-
-7. Open `https://hysmart.rethink.ptinovacao.pt` with your favorite browser and select your Hyperty to execute.
+<a name="docker"/>
 
 ### With docker and docker-compose
 
