@@ -5,6 +5,8 @@ import {RuntimeCatalogue} from 'service-framework/dist/RuntimeCatalogue';
 import PersistenceManager from 'service-framework/dist/PersistenceManager';
 import StorageManager from 'service-framework/dist/StorageManager';
 
+import RuntimeCapabilities from './RuntimeCapabilities';
+
 // import StorageManagerFake from './StorageManagerFake';
 
 import Dexie from 'dexie';
@@ -49,6 +51,10 @@ const runtimeFactory = Object.create({
       this.catalogue = new RuntimeCatalogue(this);
 
     return this.catalogue;
+  },
+
+  runtimeCapabilities() {
+    return new RuntimeCapabilities(this.storageManager());
   }
 
 });
