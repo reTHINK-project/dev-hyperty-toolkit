@@ -53,8 +53,8 @@ const runtimeFactory = Object.create({
     return this.catalogue;
   },
 
-  runtimeCapabilities() {
-    return new RuntimeCapabilities(this.storageManager());
+  runtimeCapabilities(storageManager) {
+    return new RuntimeCapabilities(storageManager);
   }
 
 });

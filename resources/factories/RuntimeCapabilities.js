@@ -67,9 +67,10 @@ class RuntimeCapabilities {
   // TODO: organize the code in separated files
   _getEnvironment() {
 
+    // TODO: this should be more effective and check the environment
     return {
-      browser: !!(navigator),
-      node: !(navigator)
+      browser: !!(window && navigator),
+      node: !!!(window && navigator)
     };
   }
 
