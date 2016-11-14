@@ -1,6 +1,6 @@
 {
   "name": "dev-hyperty-toolkit",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Hyperty Developer Setup, contains all the initial configuration to develop hyperties",
   "main": "index.js",
   "scripts": {
@@ -64,5 +64,5 @@
     "webrtc-adapter": "^2.0.5",
     "webrtc-adapter-test": "^0.2.10",
     "yargs": "^4.4.0"
-}
+  }
 }
