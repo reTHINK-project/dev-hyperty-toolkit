@@ -133,7 +133,7 @@ describe('Install Runtime', function() {
   it('should send multiple read messages', function(done) {
 
     let seq = 0;
-    let time = 500;
+    let time = 1000;
     let limit = 10;
 
     this.timeout(1000 * (limit + 2));
