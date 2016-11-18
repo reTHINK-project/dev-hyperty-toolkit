@@ -19,5 +19,5 @@ before_install:
 
 install:
   - npm install
-  - npm run start:browser &
+  - sudo npm run start:browser &
   - sleep 60
