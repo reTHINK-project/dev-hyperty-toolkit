@@ -68,7 +68,7 @@ module.exports = function(config) {
     }],
 
     client: {
-      captureConsole: false
+      captureConsole: true
     },
 
     // enable / disable colors in the output (reporters and logs)

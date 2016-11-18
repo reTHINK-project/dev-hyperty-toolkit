@@ -133,10 +133,10 @@ describe('Install Runtime', function() {
   it('should send multiple read messages', function(done) {
 
     let seq = 0;
-    let time = 100;
+    let time = 500;
     let limit = 3;
 
-    this.timeout(1000 * (limit + 2));
+    this.timeout(1000 * (limit + 10));
 
     // expect(runtimeHyperty.instance.discovery.discoverHyperty('vitorsilva@boldint.com', ['connection'], ['audio', 'video']))
     // .to.be.fulfilled.and.notify(done);
@@ -162,25 +162,27 @@ describe('Install Runtime', function() {
 
     let b = setInterval(function() {
 
-      if (seq < limit) {
-        msg.id = seq + 1;
-        console.info('[MSG READ] Post Message: ', msg);
-        numOfMsgsSend.push(msg);
-        window.runtime.messageBus.postMessage(msg, function(reply) {
-          numOfMsgsReply.push(reply);
-          setTimeout(function() {
-            console.info('[MSG READ] Reply Message: ', reply);
-            expect(reply.from).to.eq(msgTo);
-            expect(reply.to).to.eq(msgFrom);
-            expect(reply.type).to.eq('response');
-            expect(reply.body.code).to.eq(200);
-          });
-        });
-      } else {
+      if (seq > limit) {
         clearInterval(b);
-        expect(numOfMsgsReply).to.have.lengthOf(numOfMsgsSend.length);
-        done();
       }
+
+      msg.id = seq;
+      console.info('[MSG READ] Post Message: ', msg.id);
+      numOfMsgsSend.push(msg);
+      window.runtime.messageBus.postMessage(msg, function(reply) {
+        numOfMsgsReply.push(reply);
+        setTimeout(function() {
+          console.info('[MSG READ] Reply Message: ', reply.id);
+          expect(reply.from).to.eq(msgTo);
+          expect(reply.to).to.eq(msgFrom);
+          expect(reply.type).to.eq('response');
+          expect(reply.body.code).to.eq(200);
+          expect(numOfMsgsReply).to.have.lengthOf(numOfMsgsSend.length);
+          if (reply.id === limit) {
+            done();
+          }
+        });
+      });
 
       seq++;
     }, time);
