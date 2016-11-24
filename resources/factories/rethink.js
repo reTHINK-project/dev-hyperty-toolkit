@@ -109,6 +109,13 @@ const rethink = {
         window.eval(sourcePackage.sourceCode);
 
         let runtime = new Runtime(runtimeFactory, domain);
+        runtime.init().then((result) => {
+          console.log('Runtime Initialized: ', result);
+          resolve(runtimeProxy);
+        }).catch((error) => {
+          console.error('Error:', error);
+        });
+
         window.runtime = runtime;
 
         minibus.addListener('core:loadHyperty', function(msg) {
@@ -150,8 +157,6 @@ const rethink = {
           });
 
         });
-
-        resolve(runtimeProxy);
 
       })
       .catch(function(reason) {
