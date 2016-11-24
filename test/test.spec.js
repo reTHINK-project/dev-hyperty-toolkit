@@ -130,7 +130,7 @@ describe('Install Runtime', function() {
 
   });
 
-  it('should send multiple read messages', function(done) {
+  it.skip('should send multiple read messages', function(done) {
 
     let seq = 0;
     let time = 500;
