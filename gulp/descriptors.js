@@ -38,6 +38,8 @@ var descriptorBase = function(type) {
     case 'runtime':
       base.type = '';
       base.runtimeType = 'browser';
+      base.p2pHandlerStub = '';
+      base.p2pRequesterStub = '';
       base.hypertyCapabilities = {};
       base.protocolCapabilities = {};
       break;
@@ -46,6 +48,7 @@ var descriptorBase = function(type) {
     case 'idp-proxy':
       base.type = '';
       base.constraints = '';
+      base.interworking = false;
       break;
 
     case 'dataschema':
@@ -161,6 +164,8 @@ var encode = function(opts) {
 
     if (opts.descriptor === 'Runtimes') {
       json[value].runtimeType = 'browser';
+      json[value].p2pHandlerStub = '';
+      json[value].p2pRequesterStub = '';
       json[value].hypertyCapabilities = {
         mic: true,
         camera: true,
@@ -196,6 +201,10 @@ var encode = function(opts) {
       json[value].sourcePackage.sourceCodeClassname = filename;
       json[value].sourcePackage.encoding = 'base64';
       json[value].sourcePackage.signature = '';
+    }
+
+    if (opts.descriptor === 'IDPProxys') {
+      json[value].interworking = checkValues('interworking', opts.interworking, json[value]);
     }
 
     json[value].signature = checkValues('signature', '', json[value]);

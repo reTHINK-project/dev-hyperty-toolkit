@@ -6,7 +6,7 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": "5-4dc70bbf-e162-0803-7ef4-94000c6b65020",
+    "cguid": "5-25056ef0-7059-b2d9-68e7-9fe101a6a3000",
     "type": "IDPProxys",
     "version": "0.1",
     "description": "Description of OrangeProxyStub",
@@ -27,7 +27,7 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": "5-4dc70bbf-e162-0803-7ef4-94000c6b65021",
+    "cguid": "5-25056ef0-7059-b2d9-68e7-9fe101a6a3001",
     "type": "IDPProxys",
     "version": 0.2,
     "description": "Description of MicrosoftProxyStub",
@@ -48,7 +48,7 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": "5-4dc70bbf-e162-0803-7ef4-94000c6b65022",
+    "cguid": "5-25056ef0-7059-b2d9-68e7-9fe101a6a3002",
     "type": "IDPProxys",
     "version": 0.2,
     "description": "Description of IdpProxyStub",
@@ -70,8 +70,8 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "cguid": "5-4dc70bbf-e162-0803-7ef4-94000c6b65023",
-    "version": 0.2,
+    "cguid": "5-25056ef0-7059-b2d9-68e7-9fe101a6a3003",
+    "version": 0.7999999999999999,
     "description": "Description of SlackProxyStub",
     "language": "Javascript",
     "type": "IDPProxys",
@@ -81,6 +81,7 @@
     "signature": "",
     "accessControlPolicy": "somePolicy",
     "constraints": "",
-    "dataObjects": []
+    "dataObjects": [],
+    "interworking": true
   }
 }

@@ -350,6 +350,7 @@ gulp.task('encode', function(done) {
     if (file.indexOf('Hyperty') !== -1 || file.indexOf('ProtoStub') !== -1 ||
     file.indexOf('DataSchema') !== -1 ||
     file.indexOf('ProxyStub') !== -1 ||
+    file.indexOf('Stub') !== -1 ||
     (file.indexOf('runtime') !== -1 || file.indexOf('Runtime') !== -1)) {
       return fs.statSync('resources/' + file).isFile();
     }
@@ -367,6 +368,12 @@ gulp.task('encode', function(done) {
       name: 'esVersion',
       message: 'This file are in ES5 or ES6',
       choices: ['ES5', 'ES6']
+    },
+    {
+      type: 'list',
+      name: 'interworking',
+      message: 'This component is to work with interworking:',
+      choices: ['no', 'yes']
     },
     {
       type: 'input',
@@ -411,6 +418,11 @@ gulp.task('encode', function(done) {
 
       if (res.name) {
         opts.name = res.name;
+      }
+
+      opts.interworking = false;
+      if (res.interworking === 'yes') {
+        opts.interworking = true;
       }
 
       var isES6 = false;
@@ -657,6 +669,8 @@ function resource(opts) {
       descriptorName = 'Runtimes';
     } else if (filename.indexOf('ProxyStub') !== -1) {
       descriptorName = 'IDPProxys';
+    } else if (filename.indexOf('P2P') !== -1) {
+      descriptorName = 'ProtoStubs';
     }
 
     var defaultPath = 'resources/';

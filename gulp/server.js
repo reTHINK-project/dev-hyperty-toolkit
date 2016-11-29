@@ -184,15 +184,22 @@ function devMiddleware(req, res, next) {
     } else {
       var raw = getResources(type);
 
-      res.writeHeader(200, {'Content-Type': 'application/json'});
       if (resource) {
+        let selectedResource = raw[resource];
 
-        if (req.originalUrl.includes('cguid')) {
-          res.end(raw[resource].cguid.toString());
-        } else if (req.originalUrl.includes('version')) {
-          res.end(JSON.stringify(Number(raw[resource].version), '', 2));
+        if (selectedResource) {
+          res.writeHeader(200, {'Content-Type': 'application/json'});
+
+          if (req.originalUrl.includes('cguid')) {
+            res.end(selectedResource.cguid.toString());
+          } else if (req.originalUrl.includes('version')) {
+            res.end(JSON.stringify(Number(selectedResource.version), '', 2));
+          } else {
+            res.end(JSON.stringify(selectedResource, '', 2));
+          }
         } else {
-          res.end(JSON.stringify(raw[resource], '', 2));
+          res.writeHeader(404, {'Content-Type': 'application/json'});
+          res.end('404 - ' + resource + ' not found;');
         }
 
       } else {
@@ -202,6 +209,7 @@ function devMiddleware(req, res, next) {
             listOfResources.push(key);
           }
         }
+        res.writeHeader(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify(listOfResources, '', 2));
       }
     }
