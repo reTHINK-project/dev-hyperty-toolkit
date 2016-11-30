@@ -185,7 +185,7 @@ function devMiddleware(req, res, next) {
       var raw = getResources(type);
 
       if (resource) {
-        let selectedResource = raw[resource];
+        var selectedResource = raw[resource];
 
         if (selectedResource) {
           res.writeHeader(200, {'Content-Type': 'application/json'});
