@@ -94,8 +94,10 @@ const rethink = {
       console.log('Install configuration: ', development, domain, runtimeURL);
 
       let catalogue = runtimeFactory.createRuntimeCatalogue(development);
+      let runtimeDescriptor;
 
       catalogue.getRuntimeDescriptor(runtimeURL).then((descriptor) => {
+        runtimeDescriptor = descriptor;
 
         if (descriptor.sourcePackageURL === '/sourcePackage') {
           return descriptor.sourcePackage;
@@ -108,7 +110,7 @@ const rethink = {
 
         window.eval(sourcePackage.sourceCode);
 
-        let runtime = new Runtime(runtimeFactory, domain);
+        let runtime = new Runtime(runtimeDescriptor, runtimeFactory, domain);
         runtime.init().then((result) => {
           console.log('Runtime Initialized: ', result);
           resolve(runtimeProxy);

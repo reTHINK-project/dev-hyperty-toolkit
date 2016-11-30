@@ -164,8 +164,8 @@ var encode = function(opts) {
 
     if (opts.descriptor === 'Runtimes') {
       json[value].runtimeType = 'browser';
-      json[value].p2pHandlerStub = '';
-      json[value].p2pRequesterStub = '';
+      json[value].p2pHandlerStub = checkValues('p2pHandlerStub', opts.p2pHandlerStub || '', json[value]);
+      json[value].p2pRequesterStub = checkValues('p2pRequesterStub', opts.p2pRequesterStub || '', json[value]);
       json[value].hypertyCapabilities = {
         mic: true,
         camera: true,

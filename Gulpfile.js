@@ -376,6 +376,12 @@ gulp.task('encode', function(done) {
       choices: ['no', 'yes']
     },
     {
+      type: 'list',
+      name: 'interworking',
+      message: 'This component is to work with interworking:',
+      choices: ['no', 'yes']
+    },
+    {
       type: 'input',
       name: 'configuration',
       message: 'Resource configuration, use something like {"url": "wss://msg-node.localhost:9090/ws"}:'
