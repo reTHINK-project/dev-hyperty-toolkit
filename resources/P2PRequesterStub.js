@@ -45,7 +45,7 @@ class P2PRequesterStub {
     if (!runtimeProtoStubURL) throw new Error('The runtimeProtoStubURL is a required parameter');
     if (!miniBus) throw new Error('The bus is a required parameter');
     if (!configuration) throw new Error('The configuration is a required parameter');
-    if (!configuration.p2pHandler) throw new Error('The p2pHandler is a required attribute in the configuration parameter');
+    // if (!configuration.p2pHandler) throw new Error('The p2pHandler is a required attribute in the configuration parameter');
 
     this._runtimeProtoStubURL = runtimeProtoStubURL;
     this._runtimeURL = configuration.runtimeURL;
@@ -56,7 +56,7 @@ class P2PRequesterStub {
     });
 
     this._syncher = new Syncher(runtimeProtoStubURL, miniBus, configuration);
-    this._connectionController = new ConnectionController(this._runtimeProtoStubURL, this._syncher, this._configuration);
+    this._connectionController = new ConnectionController(this._runtimeProtoStubURL, this._syncher, this._configuration, true);
 
     this._syncher.onNotification((event) => {
       console.log('+[P2PRequesterStub] On Syncher Notification: ', event);
@@ -85,7 +85,13 @@ class P2PRequesterStub {
     });
 
     // the target handler stub url must be present in the configuration as "p2pHandler" attribute
-    this._connectionController.report( this._configuration.p2pHandler ).then( () => {
+    if ( this._configuration.p2pHandler )
+      this.connect( this._configuration.p2pHandler );
+  }
+
+  connect(handlerURL) {
+    // the target handler stub url must be present in the configuration as "p2pHandler" attribute
+    this._connectionController.report( handlerURL ).then( () => {
       this._connectionController.onMessage( (m) => {
         this._deliver(m);
       });
@@ -107,7 +113,7 @@ class P2PRequesterStub {
   _sendChannelMsg(msg) {
     if ( this._filter(msg) ) {
       if ( this._connectionController ) {
-        this._connectionController.sendMessage(msg);
+        this._connectionController.sendMessage(JSON.stringify(msg));
       }
     }
   }

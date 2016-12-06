@@ -29,7 +29,7 @@ import 'webrtc-adapter';
   does not have audio/video streams.
 **/
 class ConnectionController {
-  constructor(myUrl, syncher, configuration) {
+  constructor(myUrl, syncher, configuration, caller) {
 
     if (!myUrl) throw new Error('The own url (myUrl) is a needed parameter');
     if (!syncher) throw new Error('The syncher is a needed parameter');
@@ -41,6 +41,7 @@ class ConnectionController {
     this._myUrl = myUrl;
     this._syncher = syncher;
     this._configuration = configuration;
+    this._caller = caller;
     this._dataObjectObserver;
     this._dataObjectReporter;
     this._peerUrl;
@@ -56,20 +57,12 @@ class ConnectionController {
       pc = new RTCPeerConnection(this._configuration.webRTC);
       console.log("[P2P-ConnectionController]: created PeerConnection");
 
-      this._dataChannel = pc.createDataChannel("P2PChannel");
-      this._dataChannel.onopen = () => {
-        this._onDataChannelOpen();
-      };
-      this._dataChannel.onerror = (e) => {
-        this._onDataChannelError(e);
-      };
-      this._dataChannel.onmessage = (m) => {
-        if (this._onDataChannelMessage)
-          this._onDataChannelMessage(m);
-      };
-      this._dataChannel.onclose = () => {
-        this._onDataChannelClose();
-      };
+      // add handler for datachannel creation from peer side
+      pc.ondatachannel = (event) => {
+        console.log("[P2P-ConnectionController]: ondatachannel -> remote side has created a datachannel");
+        this._dataChannel = event.channel;
+        this._addDataChannelListeners();
+      }
 
       // event handler for local ice candidates
       pc.onicecandidate = (e) => {
@@ -116,6 +109,15 @@ class ConnectionController {
     if ( ! this._peerUrl )
       this._peerUrl = peerUrl;
     return new Promise((resolve, reject) => {
+
+      //  if we are the caller (i.e. no reporter object present yet, initalize the creation of the DataChannel)
+      if ( this._caller ) {
+        console.log("[P2P-ConnectionController]: we are in caller role --> createDataChannel ...");
+        this._dataChannel = this._peerConnection.createDataChannel("P2PChannel", {reliable: false});
+        console.log("P2P: datachannel object", this._dataChannel);
+        this._addDataChannelListeners();
+      }
+
         // initial data for reporter sync object
         let dataObject = {
           name: "P2PConnection",
@@ -125,7 +127,7 @@ class ConnectionController {
           iceCandidates: []
         }
         // ensure this the objReporter object is created before we create the offer
-        this._syncher.create(this._objectDescURL, [this._peerUrl], dataObject).then((objReporter) => {
+        this._syncher.create(this._objectDescURL,  [this._peerUrl], dataObject).then((objReporter) => {
             console.info('[P2P-ConnectionController] Created WebRTC Object Reporter', objReporter);
 
             this._dataObjectReporter = objReporter;
@@ -137,15 +139,17 @@ class ConnectionController {
               offerToReceiveAudio: false,
               offerToReceiveVideo: false
             };
-            this._peerConnection.createOffer(constraints).then((offer) => {
-              this._peerConnection.setLocalDescription( new RTCSessionDescription(offer), () => {
-                  this._dataObjectReporter.data.connectionDescription = offer;
-                  console.info('[P2P-ConnectionController] localDescription set successfully');
-                  resolve();
-                }
-              )
+            // either invoke createOffer or createAnswer, depending on the roles
+            let sdpPromise = this._caller ? this._peerConnection.createOffer(constraints) : this._peerConnection.createAnswer();
+            sdpPromise.then((sdp) => {
+              console.log("[P2P-ConnectionController] SDP created", sdp);
+              this._peerConnection.setLocalDescription( new RTCSessionDescription(sdp), () => {
+                console.info('[P2P-ConnectionController] localDescription set successfully');
+                this._dataObjectReporter.data.connectionDescription = sdp;
+                resolve();
+              })
               .catch((e) => {
-                reject("Create Offer failed: ", e);
+                reject("setting of localDescription failed: ", e);
               });
             })
             .catch( (reason) => {
@@ -163,14 +167,33 @@ class ConnectionController {
     }
 
     sendMessage(m) {
-      this._dataChannel.send(m.stringify());
+      this._dataChannel.send(m);
     }
 
     cleanup() {
+      delete this._dataObjectReporter;
+      delete this._dataObjectObserver;
       if ( this._dataChannel ) this._dataChannel.close();
       if ( this._peerConnection ) this._peerConnection.close();
       this._dataChannel = null;
       this._peerConnection = null;
+    }
+
+    _addDataChannelListeners() {
+      this._dataChannel.onopen = () => {
+        this._onDataChannelOpen();
+      };
+      this._dataChannel.onerror = (e) => {
+        this._onDataChannelError(e);
+      };
+      this._dataChannel.onmessage = (m) => {
+        if (this._onDataChannelMessage)
+          this._onDataChannelMessage(m);
+      };
+      this._dataChannel.onclose = () => {
+        this._onDataChannelClose();
+      };
+
     }
 
     _setupObserver(dataObjectObserver) {
@@ -232,15 +255,17 @@ class ConnectionController {
     }
 
     _onDataChannelOpen() {
-      console.info('[P2P-ConnectionController] DataChannel opened');
+      console.log('[P2P-ConnectionController] DataChannel opened');
+      // let msg = this._caller ? "hello from requesterStub" : "hello from handlerStub";
+      // this._dataChannel.send(msg);
     }
 
     _onDataChannelError(e) {
-      console.error('[P2P-ConnectionController] DataChannel error: ', e);
+      console.log('[P2P-ConnectionController] DataChannel error: ', e);
     }
 
     _onDataChannelClose() {
-      console.error('[P2P-ConnectionController] DataChannel closed: ');
+      console.log('[P2P-ConnectionController] DataChannel closed: ');
     }
 
 
@@ -271,5 +296,4 @@ class ConnectionController {
       return result;
     }
   }
-
 export default ConnectionController;

@@ -212,9 +212,7 @@ gulp.task('watch', function() {
     return gulp.src('./server/rethink.js')
     .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
     .resume()
-    .on('end', function() {
-      browserSync.reload();
-    });
+    .on('end', browserSync.reload);
   });
 
   gulp.watch(['./src/**/*.js'], function(event) {

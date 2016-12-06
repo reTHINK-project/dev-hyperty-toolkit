@@ -1,19 +1,47 @@
+import WindowSandbox from '../sandboxes/WindowSandbox';
 import SandboxBrowser from '../sandboxes/SandboxBrowser';
 import AppSandboxBrowser from '../sandboxes/AppSandboxBrowser';
+
 import Request from '../browser/Request';
 import {RuntimeCatalogue} from 'service-framework/dist/RuntimeCatalogue';
 import PersistenceManager from 'service-framework/dist/PersistenceManager';
 import StorageManager from 'service-framework/dist/StorageManager';
 
-import RuntimeCapabilities from './RuntimeCapabilities';
-
-// import StorageManagerFake from './StorageManagerFake';
+import CapabilitiesManager from './CapabilitiesManager';
 
 import Dexie from 'dexie';
 
 const runtimeFactory = Object.create({
-  createSandbox() {
-    return new SandboxBrowser();
+
+  createSandbox(capabilities) {
+
+    return new Promise((resolve) => {
+      let sandbox;
+      let isWindowSandbox = '';
+      if (capabilities.hasOwnProperty('windowSandbox') && capabilities.windowSandbox) isWindowSandbox = 'windowSandbox';
+
+      // TODO this should be corrected.. now is only for testing
+      this.capabilitiesManager.isAvailable(isWindowSandbox).then((result) => {
+        if (result) {
+          console.info('[createSandbox ] - windowSandbox');
+          sandbox = new WindowSandbox();
+        } else {
+          console.info('[createSandbox ] - sandbox');
+          sandbox = new SandboxBrowser();
+        }
+
+        resolve(sandbox);
+
+      }).catch((reason) => {
+        console.log('By default create a normal sandbox: ', reason);
+        console.info('[createSandbox ] - sandbox');
+        sandbox = new SandboxBrowser();
+
+        resolve(sandbox);
+      });
+
+    });
+
   },
 
   createAppSandbox() {
@@ -54,7 +82,8 @@ const runtimeFactory = Object.create({
   },
 
   runtimeCapabilities(storageManager) {
-    return new RuntimeCapabilities(storageManager);
+    this.capabilitiesManager = new CapabilitiesManager(storageManager);
+    return this.capabilitiesManager;
   }
 
 });

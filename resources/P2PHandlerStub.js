@@ -104,10 +104,10 @@ class P2PHandlerStub {
   _createConnectionController(invitationEvent) {
 
     return new Promise((resolve, reject) => {
-      let connectionController = new ConnectionController(this._runtimeProtoStubURL, this._syncher, this._configuration);
+      let connectionController = new ConnectionController(this._runtimeProtoStubURL, this._syncher, this._configuration, false);
       connectionController.observe( invitationEvent ).then( () => {
         // create the reporter automatically
-        connectionController.report(invitationEvent.from).then( () => {
+        connectionController.report(invitationEvent.from, false).then( () => {
           resolve(connectionController);
         })
       })
@@ -120,7 +120,7 @@ class P2PHandlerStub {
       // TODO: verify: is this selection correct?
       let connectionController = this._connectionControllers[msg.to];
       if ( connectionController )
-        connectionController.sendMessage(msg);
+        connectionController.sendMessage(JSON.stringify(msg));
     }
   }
 

@@ -1,7 +1,7 @@
 // TODO: import and extend the class of the service-framework
 // service-framework/dist/RuntimeCapabilities;
 
-class RuntimeCapabilities {
+class CapabilitiesManager {
 
   constructor(storageManager) {
     if (!storageManager) throw new Error('The Runtime Capabilities need the storageManager');
@@ -67,10 +67,17 @@ class RuntimeCapabilities {
   // TODO: organize the code in separated files
   _getEnvironment() {
 
+    let isBrowser = !!(window && navigator);
+    let isNode = !!!(window && navigator);
+    let isWindowSandbox = false;
+
+    if (isBrowser) isWindowSandbox = true;
+
     // TODO: this should be more effective and check the environment
     return {
-      browser: !!(window && navigator),
-      node: !!!(window && navigator)
+      browser: isBrowser,
+      windowSandbox: isWindowSandbox,
+      node: isNode
     };
   }
 
@@ -110,4 +117,4 @@ class RuntimeCapabilities {
 
 }
 
-export default RuntimeCapabilities;
+export default CapabilitiesManager;
