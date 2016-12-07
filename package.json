@@ -64,5 +64,5 @@
     "webrtc-adapter": "^2.0.5",
     "webrtc-adapter-test": "^0.2.10",
     "yargs": "^4.4.0"
-}
+  }
 }

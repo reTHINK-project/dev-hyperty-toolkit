@@ -223,7 +223,7 @@ var encode = function(opts) {
 };
 
 function checkValues(property, value, object) {
-  return _.isEmpty(object[property]) ? value : object[property];
+  return (_.isEmpty(object[property]) || object[property] !== value) && !_.isEmpty(value) ? value : object[property];
 }
 
 module.exports = {
