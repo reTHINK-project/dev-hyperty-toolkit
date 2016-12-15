@@ -111,47 +111,49 @@ const rethink = {
         let runtime = new Runtime(runtimeFactory, domain);
         window.runtime = runtime;
 
-        minibus.addListener('core:loadHyperty', function(msg) {
-          console.log('Load Hyperty: ', msg);
+        runtime.init().then((result) => {
+          minibus.addListener('core:loadHyperty', function(msg) {
+            console.log('Load Hyperty: ', msg);
 
-          let resultMsg = {};
-          resultMsg.from = msg.to;
-          resultMsg.to = msg.from;
-          resultMsg.body = {};
+            let resultMsg = {};
+            resultMsg.from = msg.to;
+            resultMsg.to = msg.from;
+            resultMsg.body = {};
 
-          //TODO: Work the message errors, probably use message factory
-          runtime.loadHyperty(msg.body.value.descriptor).then(function(result) {
-            resultMsg.body.value = result;
-            minibus._onMessage(resultMsg);
-          }).catch(function(reason) {
-            resultMsg.body.value = reason;
-            resultMsg.body.code = 404;
-            minibus._onMessage(resultMsg);
+            //TODO: Work the message errors, probably use message factory
+            runtime.loadHyperty(msg.body.value.descriptor).then(function(result) {
+              resultMsg.body.value = result;
+              minibus._onMessage(resultMsg);
+            }).catch(function(reason) {
+              resultMsg.body.value = reason;
+              resultMsg.body.code = 404;
+              minibus._onMessage(resultMsg);
+            });
+
           });
 
-        });
+          minibus.addListener('core:loadStub', function(msg) {
+            console.log('Load Stub:', msg);
 
-        minibus.addListener('core:loadStub', function(msg) {
-          console.log('Load Stub:', msg);
+            let resultMsg = {};
+            resultMsg.from = msg.to;
+            resultMsg.to = msg.from;
+            resultMsg.body = {};
 
-          let resultMsg = {};
-          resultMsg.from = msg.to;
-          resultMsg.to = msg.from;
-          resultMsg.body = {};
+            //TODO: Work the message errors, probably use message factory
+            runtime.loadStub(msg.body.value.domain).then(function(result) {
+              resultMsg.body.value = result;
+              minibus._onMessage(resultMsg);
+            }).catch(function(reason) {
+              resultMsg.body.value = reason;
+              resultMsg.body.code = 400;
+              minibus._onMessage(resultMsg);
+            });
 
-          //TODO: Work the message errors, probably use message factory
-          runtime.loadStub(msg.body.value.domain).then(function(result) {
-            resultMsg.body.value = result;
-            minibus._onMessage(resultMsg);
-          }).catch(function(reason) {
-            resultMsg.body.value = reason;
-            resultMsg.body.code = 400;
-            minibus._onMessage(resultMsg);
           });
 
+          resolve(runtimeProxy);
         });
-
-        resolve(runtimeProxy);
 
       })
       .catch(function(reason) {

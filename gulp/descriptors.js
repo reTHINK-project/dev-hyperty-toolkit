@@ -4,6 +4,7 @@ var path = require('path');
 
 var generateGUID = require('./guid');
 
+var notifier = require('node-notifier');
 var through = require('through2');
 var gutil = require('gulp-util');
 var _ = require('lodash');
@@ -206,6 +207,12 @@ var encode = function(opts) {
     }
 
     json[value].accessControlPolicy = checkValues('accessControlPolicy', 'somePolicy', json[value]);
+
+    // Object
+    notifier.notify({
+      title: 'Encode Completed',
+      message: 'The file ' + filename + ' was successfully encoded'
+    });
 
     var newDescriptor = new Buffer(JSON.stringify(json, null, 2));
     cb(null, newDescriptor);

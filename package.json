@@ -22,8 +22,8 @@
   },
   "homepage": "https://github.com/reTHINK-project/dev-hyperty-toolkit#readme",
   "dependencies": {
-    "runtime-core": "github:rethink-project/dev-runtime-core#develop",
-    "service-framework": "github:rethink-project/dev-service-framework#develop"
+    "runtime-core": "github:rethink-project/dev-runtime-core#dev-address-reusage",
+    "service-framework": "github:rethink-project/dev-service-framework#dev-address-reusage"
   },
   "devDependencies": {
     "babel-plugin-add-module-exports": "^0.2.1",
@@ -53,6 +53,7 @@
     "karma-mocha-reporter": "^2.2.0",
     "lodash": "^4.6.1",
     "mocha": "^3.0.0",
+    "node-notifier": "^4.6.1",
     "run-sequence": "^1.1.5",
     "sinon": "^1.17.6",
     "through2": "^2.0.1",
