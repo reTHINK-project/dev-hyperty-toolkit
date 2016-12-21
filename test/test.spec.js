@@ -59,7 +59,7 @@ describe('Install Runtime', function() {
     window.runtime.identityModule.getIdentityAssertion.restore();
   });
 
-  it('should load an stub', (done) => {
+  it('should load a protocolstub', (done) => {
 
     let stub = config.domain;
 
@@ -101,7 +101,7 @@ describe('Install Runtime', function() {
 
     this.timeout(100000);
 
-    let hyperty = 'https://catalogue.' + config.domain + '/.well-known/hyperty/Connector';
+    let hyperty = 'https://catalogue.' + config.domain + '/.well-known/hyperty/HelloWorldObserver';
 
     expect(runtimeLoader.requireHyperty(hyperty).then((result) => {
       console.log('HYPERTY: ', result);
@@ -130,7 +130,7 @@ describe('Install Runtime', function() {
 
   });
 
-  it.skip('should send multiple read messages', function(done) {
+  it('should send multiple read messages', function(done) {
 
     let seq = 0;
     let time = 500;
