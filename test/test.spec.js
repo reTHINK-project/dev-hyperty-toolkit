@@ -2,7 +2,13 @@ import chai from 'chai';
 import sinon from 'sinon';
 import chaiAsPromised from 'chai-as-promised';
 
-import configs from '../config.json';
+import browserConfig from '../config.json';
+let domain = browserConfig.DOMAIN;
+let config = {
+  development: browserConfig.DEVELOPMENT,
+  runtimeURL: browserConfig.RUNTIME_URL,
+  domain: browserConfig.DOMAIN
+};
 
 let expect = chai.expect;
 
@@ -12,7 +18,6 @@ import rethink from '../resources/factories/rethink';
 
 describe('Install Runtime', function() {
 
-  let config = configs;
   let runtimeLoader;
   let msgNodeAddress;
   let runtimeHyperty;

@@ -1,4 +1,4 @@
 DEVELOPMENT=true
-RUNTIME_URL=hyperty-catalogue://catalogue.hysmart.rethink.ptinovacao.pt/.well-known/runtime/Runtime
-DOMAIN=hysmart.rethink.ptinovacao.pt
-HYPERTY_REPO=/tmp/dev-hyperty
+RUNTIME_URL=hyperty-catalogue://catalogue.localhost/.well-known/runtime/Runtime
+DOMAIN=localhost
+HYPERTY_REPO=../dev-hyperty

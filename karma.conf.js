@@ -44,7 +44,7 @@ module.exports = function(config) {
 
     browserify: {
       transform: [
-        ['babelify', {presets: ['es2015'], plugins: ['add-module-exports']}]
+        ['babelify']
       ]
     },
 
@@ -68,7 +68,7 @@ module.exports = function(config) {
     }],
 
     client: {
-      captureConsole: false
+      captureConsole: true
     },
 
     // enable / disable colors in the output (reporters and logs)

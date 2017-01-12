@@ -1,21 +1,33 @@
 // jshint browser:true, jquery: true
 // jshint varstmt: true
 
-import rethink from '../resources/factories/rethink';
-import config from '../config.json';
+// All the environments
+import rethinkCore from '../resources/factories/rethink';
+import rethinkBrowser from 'runtime-browser/bin/rethink';
+
+import browserConfig from '../config.json';
 
 import { hypertyDeployed, hypertyFail } from '../app/main';
 
 window.KJUR = {};
 
-let domain = config.domain;
+console.info('environment config:', browserConfig);
+let rethink = browserConfig.ENVIRONMENT === 'core' ? rethinkCore : rethinkBrowser;
+
+let domain = browserConfig.DOMAIN;
+let config = {
+  development: browserConfig.DEVELOPMENT,
+  runtimeURL: browserConfig.RUNTIME_URL,
+  domain: browserConfig.DOMAIN
+};
+
 let runtimeLoader;
 let loading = false;
 
-console.log('Configuration file before:', config);
-
-// To avoid cache
-// window.localStorage.clear();
+if (!rethink) {
+  hypertyFail('This environment is not ready to be used');
+  throw new Error('This environment is not ready to be used');
+}
 
 rethink.install(config).then(function(result) {
 
@@ -28,19 +40,19 @@ rethink.install(config).then(function(result) {
   let $dropDown = $('#hyperties-dropdown');
 
   hyperties.forEach(function(key) {
-      let $item = $(document.createElement('li'));
-      let $link = $(document.createElement('a'));
+    let $item = $(document.createElement('li'));
+    let $link = $(document.createElement('a'));
 
-      // create the link features
-      $link.html(key);
-      $link.css('text-transform', 'none');
-      $link.attr('data-name', key);
-      $link.on('click', loadHyperty);
+    // create the link features
+    $link.html(key);
+    $link.css('text-transform', 'none');
+    $link.attr('data-name', key);
+    $link.on('click', loadHyperty);
 
-      $item.append($link);
+    $item.append($link);
 
-      $dropDown.append($item);
-    });
+    $dropDown.append($item);
+  });
 
   $('.preloader-wrapper').remove();
   $('.card .card-action').removeClass('center');
@@ -55,28 +67,28 @@ function getListOfHyperties(domain) {
   let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty';
 
   return new Promise(function(resolve, reject) {
-        $.ajax({
-            url: hypertiesURL,
-            success: function(result) {
-                let response = [];
-                if (typeof result === 'object') {
-                  result.forEach(function(key) {
-                    response.push(key);
-                  });
-                } else if (typeof result === 'string') {
-                  response = JSON.parse(result);
-                }
-
-                response.sort();
-                resolve(response);
-              },
-            fail: function(reason) {
-                reject(reason);
-                notification(reason, 'warn');
-              }
-
+    $.ajax({
+      url: hypertiesURL,
+      success: function(result) {
+        let response = [];
+        if (typeof result === 'object') {
+          result.forEach(function(key) {
+            response.push(key);
           });
-      });
+        } else if (typeof result === 'string') {
+          response = JSON.parse(result);
+        }
+
+        response.sort();
+        resolve(response);
+      },
+      fail: function(reason) {
+        reject(reason);
+        notification(reason, 'warn');
+      }
+
+    });
+  });
 }
 
 function loadHyperty(event) {

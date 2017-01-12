@@ -38,6 +38,8 @@ var descriptorBase = function(type) {
     case 'runtime':
       base.type = '';
       base.runtimeType = 'browser';
+      base.p2pHandlerStub = '';
+      base.p2pRequesterStub = '';
       base.hypertyCapabilities = {};
       base.protocolCapabilities = {};
       break;
@@ -46,6 +48,7 @@ var descriptorBase = function(type) {
     case 'idp-proxy':
       base.type = '';
       base.constraints = '';
+      base.interworking = false;
       break;
 
     case 'dataschema':
@@ -161,6 +164,8 @@ var encode = function(opts) {
 
     if (opts.descriptor === 'Runtimes') {
       json[value].runtimeType = 'browser';
+      json[value].p2pHandlerStub = checkValues('p2pHandlerStub', opts.p2pHandlerStub || '', json[value]);
+      json[value].p2pRequesterStub = checkValues('p2pRequesterStub', opts.p2pRequesterStub || '', json[value]);
       json[value].hypertyCapabilities = {
         mic: true,
         camera: true,
@@ -198,6 +203,10 @@ var encode = function(opts) {
       json[value].sourcePackage.signature = '';
     }
 
+    if (opts.descriptor === 'IDPProxys') {
+      json[value].interworking = checkValues('interworking', opts.interworking, json[value]);
+    }
+
     json[value].signature = checkValues('signature', '', json[value]);
     json[value].messageSchemas = checkValues('messageSchemas', '', json[value]);
 
@@ -214,7 +223,7 @@ var encode = function(opts) {
 };
 
 function checkValues(property, value, object) {
-  return _.isEmpty(object[property]) ? value : object[property];
+  return (_.isEmpty(object[property]) || object[property] !== value) && !_.isEmpty(value) ? value : object[property];
 }
 
 module.exports = {
