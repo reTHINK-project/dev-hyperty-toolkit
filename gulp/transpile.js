@@ -6,7 +6,7 @@ var path = require('path');
 var babel = require('babelify');
 var gutil = require('gulp-util');
 var through = require('through2');
-var browserify = require('browserify');
+var webpack = require('webpack-stream');
 var source = require('vinyl-source-stream');
 
 var getStage = require('./stage');
@@ -19,8 +19,6 @@ function getHypertyConfiguration(filePath) {
   var fileObject = path.parse(filePath);
 
   try {
-
-    console.log('Get Hyperty Configuration: ', fileObject);
 
     var config = fs.readFileSync(fileObject.dir + '/' + fileObject.name + '.json', 'utf8');
     var parsedConfig = JSON.parse(config);
@@ -67,13 +65,12 @@ module.exports = function transpile(opts) {
 
     if (environment === 'all') {
       var configEnv = getHypertyConfiguration(chunk.path);
-      console.log('configEven: ', configEnv, filename);
 
-      if (configEnv === 'node' && !filename.includes('.hy.js')) {
-        gutil.log('Converting ' + filename + ' to be used on ' + configEnv);
+      if (configEnv === 'node') {
+        gutil.log('Converting ' + filename + ' to be used on node');
         return transpileNode(chunk.path, opts, chunk, cb);
       } else {
-        gutil.log('Converting ' + filename + ' to be used on ' + configEnv);
+        gutil.log('Converting ' + filename + ' to be used on browser');
         return transpileBrowser(args, filename, opts, chunk, cb);
       }
 
@@ -92,38 +89,79 @@ module.exports = function transpile(opts) {
 
 function transpileBrowser(args, filename, opts, chunk, cb) {
   var fileObject = path.parse(chunk.path);
+  var stage = getStage();
 
-  return browserify(args)
-        .transform(babel)
-        .bundle()
-        .on('error', function(err) {
-          gutil.log(gutil.colors.red(err));
-          this.emit('end');
-        })
-        .pipe(source(filename))
-        .pipe(gulp.dest(opts.destination))
-        .on('end', function() {
-          chunk.contents = fs.readFileSync(opts.destination + '/' + fileObject.base);
-          chunk.path = opts.destination + '/' + fileObject.base;
-          cb(null, chunk);
-        });
+  return gulp.src(chunk.path)
+    .pipe(webpack({
+      devtool: stage === 'develop' ? 'inline-source-map' : false,
+      output: {
+        path: path.join(opts.destination),
+        library: opts.standalone,
+        libraryTarget: 'umd',
+        umdNamedDefine: true,
+        filename: fileObject.base
+      },
+      module: {
+        loaders: [
+          { test: /\.json$/, loader: 'json' },
+          { exclude: 'node_modules', test: /\.js$/, loader: "babel-loader" },
+        ]
+      }
+    }))
+    .on('error', function(err) {
+        gutil.log(gutil.colors.red(err));
+      this.emit('end');
+    })
+    .pipe(gulp.dest(opts.destination))
+    .on('end', function() {
+      var resolvedPath = verifyAndCreate(path.resolve(opts.destination + '/' + fileObject.base));
+      chunk.contents = fs.readFileSync(resolvedPath);
+      chunk.path = resolvedPath;
+      cb(null, chunk);
+    });
 }
 
 function transpileNode(filename, opts, chunk, cb) {
+  
   var fileObject = path.parse(chunk.path);
+  var stage = getStage();
 
-  return browserify(chunk.path, {
-    standalone: 'activate'
-  })
-    .transform(babel, {
-      presets: ['es2015']
+  return gulp.src(chunk.path)
+    .pipe(webpack({
+      target: 'node',
+      devtool: stage === 'develop' ? 'inline-source-map' : false,
+      output: {
+        path: path.join(opts.destination),
+        library: opts.standalone,
+        libraryTarget: 'umd',
+        umdNamedDefine: true,
+        filename: fileObject.base
+      },
+      module: {
+        loaders: [
+          { test: /\.json$/, loader: 'json' },
+          { exclude: 'node_modules', test: /\.js$/, loader: "babel-loader" },
+        ]
+      }
+    }))
+    .on('error', function(err) {
+      gutil.log(gutil.colors.red(err));
+      this.emit('end');
     })
-    .bundle()
-    .pipe(source(filename))
     .pipe(gulp.dest(opts.destination))
     .on('end', function() {
-      chunk.contents = fs.readFileSync(opts.destination + '/' + fileObject.base);
-      chunk.path = opts.destination + '/' + fileObject.base;
+      var resolvedPath = verifyAndCreate(path.resolve(opts.destination + '/' + fileObject.base));
+      chunk.contents = fs.readFileSync(resolvedPath);
+      chunk.path = resolvedPath;
       cb(null, chunk);
     });
+}
+
+function verifyAndCreate(path) {
+
+  if (!fs.existsSync(path)) {
+    fs.writeFileSync(path, '', 'utf8');
+  }
+
+  return path;
 }

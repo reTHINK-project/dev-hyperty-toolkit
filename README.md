@@ -34,7 +34,7 @@ cd dev-hyperty-toolkit
 npm install
 ```
 
-### Configuration
+### <a id="env">Configuration</a>
 
 Configure all settings on the `env` file.
 
@@ -83,3 +83,4 @@ You can build hyperties without running the toolkit.
 npm run build:hyperties # build the hyperties to be used on browser
 npm run build:hyperties:node # build the hyperties to be used on nodejs
 ```
+On each initial descriptor of hyperty on dev-hyperty repository, if you want replace the your descriptor static domain for the one which is on [env file](#env) you should replace your domain for `%domain%`.

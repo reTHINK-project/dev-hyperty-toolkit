@@ -11,6 +11,7 @@ var gutil = require('gulp-util');
 var runSequence = require('run-sequence');
 var clean = require('gulp-clean');
 
+var replacePattern = require('./gulp/utils').replacePattern;
 var getEnvironment = require('./gulp/environment');
 var getStage = require('./gulp/stage');
 var server = require('./gulp/server').server;
@@ -185,17 +186,14 @@ function copyFiles(opts) {
     .pipe(gulp.dest(dir))
     .on('end', function() {
       done();
-
-      console.log('AQUI:', path.resolve(dir + '/' + fileObject.base));
-
-      fs.readFile(dir + '/' + fileObject.base, function(err, data) {
+      /*fs.readFile(dir + '/' + fileObject.base, function(err, data) {
         if (err) throw err;
         var a = chunk;
         a.path = dir + '/' + fileObject.base;
         a.contents = data;
         done(null, a);
       });
-
+*/
     });
 
   });
@@ -382,7 +380,8 @@ function createDescriptor() {
 
     var fileObject = path.parse(chunk.path);
     var nameOfHyperty = fileObject.name.replace('.hy', '');
-    var preconfig = JSON.parse(chunk.contents);
+    var preconfig = chunk.contents.toString('utf8');
+    preconfig = JSON.parse(replacePattern(preconfig, process.env.DOMAIN || 'localhost'));
 
     gutil.log('---------------------- ' + nameOfHyperty + ' ------------------------');
 
@@ -396,8 +395,7 @@ function createDescriptor() {
     var newChunk = _.clone(chunk);
     newChunk.path = path.resolve('./descriptors/Hyperties.json');
     newChunk.contents = new Buffer(JSON.stringify(data, null, 2));
-    gutil.log('Initial Configuration');
-    gutil.log(JSON.stringify(preconfig, null, 2));
+    gutil.log(JSON.stringify(preconfig));
 
     done(null, newChunk);
   });

@@ -23,6 +23,7 @@ src
 examples
 app
 
+descriptors/
 resources/tmp
 resources/bundle.js
 resources/*.hy.js

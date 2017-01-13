@@ -12,7 +12,7 @@ import { hypertyDeployed, hypertyFail } from '../app/main';
 window.KJUR = {};
 
 console.info('environment config:', browserConfig);
-let rethink = browserConfig.ENVIRONMENT === 'core' ? rethinkCore : rethinkBrowser;
+let rethink = browserConfig.ENVIRONMENT === 'core' || browserConfig.ENVIRONMENT === 'all' ? rethinkCore : rethinkBrowser;
 
 let domain = browserConfig.DOMAIN;
 let config = {
