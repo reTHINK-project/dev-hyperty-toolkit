@@ -1,8 +1,16 @@
 
-Hyperty Development Toolkit [![Build Status](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit.svg?branch=develop)](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit)
+Hyperty Development Toolkit
 =========================
 
-This repository provides required tools to develop Hyperties and a few demos. Currently the toolkit can be used to develop hyperties to be executed in the Browser or in the NodeJS;;
+
+#### Build status
+
+| Master                                   | Develop                                  | Current                                  |
+| ---------------------------------------- | ---------------------------------------- | ---------------------------------------- |
+| [![Build Status](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit.svg?branch=master)](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit) | [![Build Status](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit.svg?branch=develop)](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit) | [![Build Status](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit.svg?branch=develop-improves)](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit) |
+
+This repository provides required tools to develop Hyperties and a few demos.
+Currently the toolkit can be used to develop hyperties to be executed in the Browser or in the NodeJS;
 
 
 ## Full Documentation
@@ -10,8 +18,8 @@ This repository provides required tools to develop Hyperties and a few demos. Cu
 See the [Wiki](https://github.com/reTHINK-project/dev-hyperty-toolkit/wiki) for full documentation, operational details and other information.
 
 ## Communication
- - [Slack rethink-project](https://rethink-project.slack.com)
- - [GitHub Issues](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues)
+- [Slack rethink-project](https://rethink-project.slack.com)
+- [GitHub Issues](https://github.com/reTHINK-project/dev-hyperty-toolkit/issues)
 
 ## Quick Start
 
@@ -33,13 +41,27 @@ cd dev-hyperty-toolkit
 npm install
 ```
 
+### <a id="env">Configuration</a>
+
+Configure all settings on the `env` file.
+
+```shell
+DEVELOPMENT=true # development mode or not, soon will be depracted
+RUNTIME_URL=hyperty-catalogue://catalogue.localhost/.well-known/runtime/Runtime # place in the catalogue where is your runtimeURL
+DOMAIN=localhost # domain where the toolkit will run and reference to contact msg-node
+HYPERTY_REPO=../dev-hyperty # path to locate your dev-hyperty repository by default, is on the parent directory.. but you can change it
+```
+You are free to change for what you want..
+
 
 ### To develop Hyperties for Browsers
 
 ```shell
-# run the toolkit for browser and select where is the dev-hyperty repository
-npm run start:browser
+# run the toolkit with runtime-core
+npm run start:dev
 
+# run the toolkit with runtime-browser
+npm run start:browser
 ```
 Open `https://catalogue.localhost/` and accept certificate
 
@@ -52,27 +74,20 @@ Open `https://localhost/` and select an Hyperty to run.
 npm run start:node
 ```
 
-## Other developments
+### Production Mode
 
-The toolkit can also be used to test other rethink components.
-
-* To test development branches from Runtime Core or Service Framework, Use Toolkit develop branch:
+This file will not be loaded if you run the toolkit in on production mode:
 
 ```shell
-# clone the toolkit repository with the develop branches
-git clone --branch=develop https://github.com/reTHINK-project/dev-hyperty-toolkit.git
+npm run start
 ```
 
-* To test stable releases (master branch) from Runtime Browser or Runtime Node, Use Toolkit "runtimes" branch:
+## Build hyperties
+
+You can build hyperties without running the toolkit.
 
 ```shell
-# clone the toolkit repository with the stable releases
-git clone --branch=runtimes https://github.com/reTHINK-project/dev-hyperty-toolkit.git
+npm run build:hyperties # build the hyperties to be used on browser
+npm run build:hyperties:node # build the hyperties to be used on nodejs
 ```
-
-* To test "develop" branches from Runtime Browser or Runtime Node, Use Toolkit "runtimes-develop" branch:
-
-```shell
-# clone the toolkit repository with the develop branches
-git clone --branch=runtimes-develop https://github.com/reTHINK-project/dev-hyperty-toolkit.git
-```
+On each initial descriptor of hyperty on dev-hyperty repository, if you want replace the your descriptor static domain for the one which is on [env file](#env) you should replace your domain for `%domain%`.

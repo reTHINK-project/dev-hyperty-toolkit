@@ -30,14 +30,16 @@ const runtimeFactory = Object.create({
   },
 
   storageManager() {
-    // Using the implementation of Service Framework
-    // Dexie is the IndexDB Wrapper
-    const db = new Dexie('cache');
-    const storeName = 'objects';
 
-    return new StorageManager(db, storeName);
+    if (!this.storage) {
+      // Using the implementation of Service Framework
+      // Dexie is the IndexDB Wrapper
+      const db = new Dexie('cache');
+      const storeName = 'objects';
+      this.storage = new StorageManager(db, storeName);
+    }
 
-    // return new StorageManagerFake('a', 'b');
+    return this.storage;
   },
 
   persistenceManager() {
@@ -45,16 +47,17 @@ const runtimeFactory = Object.create({
     return new PersistenceManager(localStorage);
   },
 
-  createRuntimeCatalogue(development) {
+  createRuntimeCatalogue() {
 
-    if (!this.catalogue)
+    if (!this.catalogue) {
       this.catalogue = new RuntimeCatalogue(this);
+    }
 
     return this.catalogue;
   },
 
-  runtimeCapabilities(storageManager) {
-    return new RuntimeCapabilities(storageManager);
+  runtimeCapabilities() {
+    return new RuntimeCapabilities(this.storage);
   }
 
 });

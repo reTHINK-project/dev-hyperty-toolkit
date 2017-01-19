@@ -4,6 +4,7 @@
 
 var fs = require('fs');
 
+// TODO use webpack in tests
 module.exports = function(config) {
 
   config.set({
@@ -44,7 +45,7 @@ module.exports = function(config) {
 
     browserify: {
       transform: [
-        ['babelify', {presets: ['es2015'], plugins: ['add-module-exports']}]
+        ['babelify']
       ]
     },
 
