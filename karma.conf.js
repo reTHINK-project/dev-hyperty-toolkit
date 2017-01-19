@@ -4,6 +4,7 @@
 
 var fs = require('fs');
 
+// TODO use webpack in tests
 module.exports = function(config) {
 
   config.set({
@@ -68,7 +69,7 @@ module.exports = function(config) {
     }],
 
     client: {
-      captureConsole: true
+      captureConsole: false
     },
 
     // enable / disable colors in the output (reporters and logs)
@@ -99,6 +100,6 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: true
   });
 };
