@@ -27,6 +27,7 @@ class AppSandboxBrowser extends Sandbox {
       let component = activate(url, this._bus, config);
 
       //for testing, this make components accessible from browser console
+      if (!window.components) window.components = {};
       window.components[url] = component;
 
       return component;

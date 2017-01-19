@@ -1,6 +1,5 @@
 // jshint
 // Runtime
-
 import runtimeFactory from './runtimeFactory';
 
 import MiniBus from 'runtime-core/dist/minibus';

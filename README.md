@@ -1,6 +1,13 @@
 
-Hyperty Development Toolkit [![Build Status](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit.svg?branch=develop)](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit)
+Hyperty Development Toolkit
 =========================
+
+
+#### Build status
+
+| Master                                   | Develop                                  | Current                                  |
+| ---------------------------------------- | ---------------------------------------- | ---------------------------------------- |
+| [![Build Status](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit.svg?branch=master)](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit) | [![Build Status](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit.svg?branch=develop)](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit) | [![Build Status](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit.svg?branch=develop-improves)](https://travis-ci.org/reTHINK-project/dev-hyperty-toolkit) |
 
 This repository provides required tools to develop Hyperties and a few demos.
 Currently the toolkit can be used to develop hyperties to be executed in the Browser or in the NodeJS;

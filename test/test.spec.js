@@ -87,7 +87,7 @@ describe('Install Runtime', function() {
 
   });
 
-  it('should load diferent protostub', (done) => {
+  it.skip('should load diferent protostub', (done) => {
 
     let stubList = [
       'https://rethink.tlabscloud.com/.well-known/protocolstub/default',
