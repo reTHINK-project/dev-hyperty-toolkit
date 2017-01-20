@@ -61,7 +61,7 @@
     "type": "ProtoStubs",
     "objectName": "VertxProtoStubNode",
     "configuration": {
-      "url": "wss://msg-node.hysmart.rethink.ptinovacao.pt/localhost/ws"
+      "url": "wss://msg-node.localhost:9090/ws"
     },
     "messageSchemas": "",
     "signature": "",

@@ -2,14 +2,13 @@
 var fs = require('fs');
 var gutil = require('gulp-util');
 var getStage = require('./stage');
+var getEnvironment = require('./environment.js');
 var browserSync = require('browser-sync').create('Toolkit');
-
-module.exports = browserSync;
 
 var bsServer;
 var serverStatus;
 
-module.exports = function server(done) {
+function server(done) {
 
   var stage = getStage();
 
@@ -62,7 +61,7 @@ module.exports = function server(done) {
     logLevel: logLevel,
     cors: true,
     logFileChanges: logFileChanges,
-    port: 443,
+    port: process.env.PORT || 443,
     minify: minify,
     notify: notify,
     ui: ui,
@@ -101,7 +100,7 @@ module.exports = function server(done) {
 
   checkStatus();
 
-};
+}
 
 function checkStatus() {
   bsServer.utils.portscanner.checkPortStatus(443, {}, function(err, status) {
@@ -184,15 +183,22 @@ function devMiddleware(req, res, next) {
     } else {
       var raw = getResources(type);
 
-      res.writeHeader(200, {'Content-Type': 'application/json'});
       if (resource) {
+        var selectedResource = raw[resource];
 
-        if (req.originalUrl.includes('cguid')) {
-          res.end(raw[resource].cguid.toString());
-        } else if (req.originalUrl.includes('version')) {
-          res.end(JSON.stringify(Number(raw[resource].version), '', 2));
+        if (selectedResource) {
+          res.writeHeader(200, {'Content-Type': 'application/json'});
+
+          if (req.originalUrl.includes('cguid')) {
+            res.end(selectedResource.cguid.toString());
+          } else if (req.originalUrl.includes('version')) {
+            res.end(JSON.stringify(Number(selectedResource.version), '', 2));
+          } else {
+            res.end(JSON.stringify(selectedResource, '', 2));
+          }
         } else {
-          res.end(JSON.stringify(raw[resource], '', 2));
+          res.writeHeader(404, {'Content-Type': 'application/json'});
+          res.end('404 - ' + resource + ' not found;');
         }
 
       } else {
@@ -202,6 +208,7 @@ function devMiddleware(req, res, next) {
             listOfResources.push(key);
           }
         }
+        res.writeHeader(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify(listOfResources, '', 2));
       }
     }
@@ -239,3 +246,8 @@ function filterResource(resource, key) {
     return resource[a].cguid === key;
   })[0];
 }
+
+module.exports = {
+  browserSync: browserSync,
+  server: server
+};

@@ -13,7 +13,7 @@ class SandboxBrowser extends Sandbox {
     //simulate sandbox frontier
     _this._bus = new MiniBus();
     _this._bus._onPostMessage = function(msg) {
-      console.log('SandboxBrowser._onPostMessage -> external (out)', 'from: ', msg.from, 'to: ', msg.to, 'msg: ', msg);
+      console.log('SandboxBrowser._onPostMessage -> external (out)', 'from: ', msg.from, 'to: ', msg.to);
 
       //redirect messages to the external part of the sandbox
       _this._onMessage(msg);
@@ -27,6 +27,7 @@ class SandboxBrowser extends Sandbox {
       let component = activate(url, this._bus, config);
 
       //for testing, this make components accessible from browser console
+      if (!window.components) window.components = {};
       window.components[url] = component;
 
       return component;
@@ -35,7 +36,7 @@ class SandboxBrowser extends Sandbox {
 
   _onPostMessage(msg) {
     let _this = this;
-    console.log('SandboxBrowser._onPostMessage -> internal (in)', 'from: ', msg.from, 'to: ', msg.to, 'msg: ', msg);
+    console.log('SandboxBrowser._onPostMessage -> internal (in)', 'from: ', msg.from, 'to: ', msg.to);
 
     //redirect messages to the internal part of the sandbox
     _this._bus._onMessage(msg);
