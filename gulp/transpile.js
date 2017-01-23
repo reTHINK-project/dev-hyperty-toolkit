@@ -104,7 +104,7 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
       module: {
         loaders: [
           { test: /\.json$/, loader: 'json' },
-          { exclude: 'node_modules', test: /\.js$/, loader: "babel-loader" },
+          { exclude: /node_modules/, test: /\.js$/, loader: "babel-loader" },
         ]
       }
     }))
@@ -140,7 +140,7 @@ function transpileNode(filename, opts, chunk, cb) {
       module: {
         loaders: [
           { test: /\.json$/, loader: 'json' },
-          { exclude: 'node_modules', test: /\.js$/, loader: "babel-loader" },
+          { exclude: /node_modules/, test: /\.js$/, loader: "babel-loader" },
         ]
       }
     }))

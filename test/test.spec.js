@@ -64,7 +64,7 @@ describe('Install Runtime', function() {
     window.runtime.identityModule.getIdentityAssertion.restore();
   });
 
-  it('should load an stub', (done) => {
+  it('should load a protocolstub', (done) => {
 
     let stub = config.domain;
 
@@ -106,7 +106,7 @@ describe('Install Runtime', function() {
 
     this.timeout(100000);
 
-    let hyperty = 'https://catalogue.' + config.domain + '/.well-known/hyperty/Connector';
+    let hyperty = 'https://catalogue.' + config.domain + '/.well-known/hyperty/HelloWorldObserver';
 
     expect(runtimeLoader.requireHyperty(hyperty).then((result) => {
       console.log('HYPERTY: ', result);
