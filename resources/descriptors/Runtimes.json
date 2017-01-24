@@ -34,7 +34,7 @@
     "messageSchemas": "",
     "dataObjects": [],
     "accessControlPolicy": "somePolicy",
-    "p2pHandlerStub": "https://localhost/.well-known/protocolstub/P2PHandlerStub",
-    "p2pRequesterStub": "https://localhost/.well-known/protocolstub/P2PRequesterStub"
+    "p2pHandlerStub": "https://localhost/.well-known/protocolstub/P2PHandlerProtoStub",
+    "p2pRequesterStub": "https://localhost/.well-known/protocolstub/P2PRequesterProtoStub"
   }
 }
