@@ -22,8 +22,8 @@
   },
   "homepage": "https://github.com/reTHINK-project/dev-hyperty-toolkit#readme",
   "dependencies": {
-    "runtime-core": "github:rethink-project/dev-runtime-core#dev-address-reusage",
-    "service-framework": "github:rethink-project/dev-service-framework#dev-address-reusage"
+    "runtime-core": "github:rethink-project/dev-runtime-core#dev-interworking",
+    "service-framework": "github:rethink-project/dev-service-framework#dev-interworking"
   },
   "devDependencies": {
     "babel-plugin-add-module-exports": "^0.2.1",
