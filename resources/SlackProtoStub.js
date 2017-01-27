@@ -1,4 +1,5 @@
 import slack from 'slack';
+import {Syncher} from 'service-framework/dist/Syncher';
 
 class SlackProtoStub {
 
@@ -7,10 +8,20 @@ class SlackProtoStub {
     if (!bus) throw new Error('The bus is a needed parameter');
     if (!config) throw new Error('The config is a needed parameter');
 
+    console.log('ON PROTOSTUB: Constructor Loaded');
+
     let _this = this;
 
+    this._subscribedList = [];
+    this._usersList = [];
+    this._groupsList = [];
+    this._channelsList = [];
+    this._imsList = [];
+    this._observer;
+    this._channelID = '';
     this._id = 0;
     this._continuousOpen = true;
+    this._token = '';
 
     this._runtimeProtoStubURL = runtimeProtoStubURL;
     this._bus = bus;
@@ -19,28 +30,102 @@ class SlackProtoStub {
     this._runtimeSessionURL = config.runtimeURL;
     this._reOpen = false;
     this._slack = slack;
-
-    this.connect();
-
-    this._slackSession.message(message => {
-      this._deliver(message);
-    });
+    console.log('ON PROTOSTUB -  instatiate syncher with url', runtimeProtoStubURL);
+    this._syncher = new Syncher(runtimeProtoStubURL, bus, config);
 
     bus.addListener('*', (msg) => {
-      console.log('new msg', msg);
-      if (_this._filter(msg)) {
+      console.log('ON PROTOSTUB ->', msg);
+      if (msg.body.identity) {
 
-        let message = {
-          as_user: true,
-          token: token,
-          channel: 'D0BFVEZNU',
-          text: JSON.stringify(msg.body.value)
-        };
+        let token = msg.body.identity;
+        _this._open(msg.body.identity, ()=> {
+          if (_this._filter(msg)) {
+            console.log('ON PROTOSTUB - AFTER FILTER->', msg);
 
-        _this._slack.chat.postMessage(message, function(err, data) {
-          console.log('err', err, ' data ', data);});
-          if (err) throw Error(err);
-        }
+            if (msg.body.value.schema && msg.body.value.name) {
+
+              let schemaSplitted =  msg.body.value.schema.split('/');
+
+              if (schemaSplitted[schemaSplitted.length - 1] === 'Communication') {
+                _this._subscribe(msg.body.value.schema, msg.from).then((result) => {
+                  console.log('ON PROTOSTUB - IS IT subscribed->', result);
+                  if (result) {
+                    _this._token = token;
+
+                    let URLUsersList = 'https://slack.com/api/users.list?token=' + _this._token;
+                    let URLGroupsList = 'https://slack.com/api/groups.list?token=' + _this._token;
+                    let URLChannelsList = 'https://slack.com/api/channels.list?token=' + _this._token;
+                    let URLImsList = 'https://slack.com/api/im.list?token=' + _this._token;
+
+                    let UsersListPromise = _this._sendHTTPRequest('GET', URLUsersList);
+                    let GroupsListPromise = _this._sendHTTPRequest('GET', URLGroupsList);
+                    let ChannelsListPromise = _this._sendHTTPRequest('GET', URLChannelsList);
+                    let ImsListPromise = _this._sendHTTPRequest('GET', URLImsList);
+
+                    Promise.all([UsersListPromise, GroupsListPromise, ChannelsListPromise, ImsListPromise]).then(function(result) {
+                      _this._usersList = result[0].members;
+                      _this._groupsList = result[1].groups;
+                      _this._channelsList = result[2].channels;
+                      _this._imsList = result[3].ims;
+
+                      let channelAlreadyUP = _this._channelsList.filter(function(value, key) { return value.name === msg.body.value.name; })[0];
+
+                      //get userID to invite
+
+                      let toSplitted = msg.to.split('://')[1];
+                      let user = toSplitted.split('@')[0];
+                      let userID = _this._usersList.filter(function(value, key) {
+                        return value.name === user;
+                      })[0].id;
+
+                      // if channel exist, invite user, else channel need to be created and then invite user
+                      if (channelAlreadyUP) {
+                        console.log('ON PROTOSTUB - channel exist', channelAlreadyUP);
+
+                        let toInvite = { token: token, channel: channelAlreadyUP.id, user: userID };
+                        _this._channelID = channelAlreadyUP.id;
+
+                        _this._slack.channels.invite(toInvite, (err, data) => {
+                          if (err) {
+                            console.err('error', err);
+                          } else {
+                            console.log('ON PROTOSTUB - user invited with sucess', data);
+                          }
+                        });
+
+                      } else {
+                        let toCreate = { token: token, name: msg.body.value.name };
+                        _this._slack.channels.create(toCreate, (err, data) => {
+                          if (err) {
+                            console.err('error', err);
+                          } else {
+                            if (data.ok) {
+                              let channelID = data.channel.id;
+                              _this._channelID = channelID;
+                              let toInvite = { token: token, channel: channelID, user: userID };
+
+                              _this._slack.channels.invite(toInvite, (err, data) => {
+                                if (err) {
+                                  console.err('error', err);
+                                } else {
+                                  console.log('ON PROTOSTUB - user invited with sucess', data);
+                                }
+                              });
+                            }
+                          }
+                        });
+                      }
+                    }, function(error) {
+                      console.err(error);
+                    });
+                  }
+                });
+              }
+            }
+          }
+        });
+      }
+
     });
 
   }
@@ -49,78 +134,116 @@ class SlackProtoStub {
 
   get runtimeSession() { return this._runtimeSessionURL; }
 
-  connect() {
-
-    this._slackSession = slack.rtm.client();
-    let token = 'xoxp-11533603872-11537760645-92180697376-2965064fb34f76d8bea678e7710370c5';
-
-    return new Promise((resolve, reject) => {
-
-      this._slack.oauth.access({
-        client_id: '11533603872.72434934356',
-        client_secret: 'd427ef3c957d68a292dc7c4e20b78330',
-        code: '11533603872.72536123910.d0e0667753'
-      }, (err, data) => {
-        console.log('data  ', err, data);
-
-        let myTest = {as_user: true, token: token, channel: 'D0BFVEZNU',text: 'ping'};
-        this._slack.chat.postMessage(myTest, function(err, data) {
-            console.log('err', err, ' data ', data);});
-      });
-
-      this._slackSession.listen(token);
-
-    })
-
-  }
-
-  disconnect() {
-    let _this = this;
-
-    _this._continuousOpen = false;
-    if (_this._sock) {
-      _this._sendClose();
-    }
-  }
-
-  _sendOpen(callback) {
-
-  }
-
-  _sendClose() {
-
-  }
-
-  _sendStatus(value, reason) {
-
-  }
-
-  _waitReady(callback) {
-
-  }
-
   _filter(msg) {
     if (msg.body && msg.body.via === this._runtimeProtoStubURL)
       return false;
     return true;
   }
 
-  _deliver(msg) {
-    if (!msg.body) msg.body = {};
-
-    msg.body.via = this._runtimeProtoStubURL;
-    console.log('msg', msg);
-    // this._bus.postMessage(msg);
-
-  }
-
-  _open(callback) {
+  _open(token, callback) {
     let _this = this;
 
-    if (!this._continuousOpen) {
-      //TODO: send status (sent message error - disconnected)
-      return;
+    if (!_this._session) {
+      console.log('ON PROTOSTUB - new Session for token:', token);
+      _this._session = _this._slack.rtm.client();
+
+      _this._session.listen({token});
+
+      _this._session.message(message=> {
+        console.log(`ON PROTOSTUB - new message on session`, message);
+        if (message.channel) {
+          if (message.channel === _this._channelID) {
+            _this._observer.addChild('chatmessages', { message: message.text});
+          }
+        }
+      });
+    } else {
+      console.log('ON PROTOSTUB - session already exist');
     }
+    callback();
+  }
+
+  _subscribe(schema, urlDataObj) {
+    let _this = this;
+
+    return new Promise(function(resolve) {
+
+      _this._subscribedList.forEach(function(obj) {
+        if (obj.urlDataObj === urlDataObj && obj.subscribed)
+          resolve(true);
+      });
+
+      let subscription = {urlDataObj: urlDataObj, schema: schema, subscribed: true};
+
+      let objectDescURL = schema;
+      let dataObjectUrl = urlDataObj.substring(0, urlDataObj.lastIndexOf('/'));
+
+      console.log('ON PROTOSTUB - new subscription for schema:', objectDescURL, ' and dataObject:', dataObjectUrl);
+
+      return _this._syncher.subscribe(objectDescURL, dataObjectUrl).then((observer) => {
+        _this._observer = observer;
+        _this._subscribedList.push(subscription);
+        console.log('ON PROTOSTUB - subscribed', dataObjectUrl);
+
+        observer.onAddChild((child) => {
+          console.info('ON PROTOSTUB - Observer - Add Child: ', child);
+          if (_this._channelID !== '' && child.value.message) {
+            console.log('token', _this._token, 'channel', _this._channelID, 'text',  child.value.message);
+            let message = { as_user: true, token: _this._token, channel: _this._channelID, text: child.value.message };
+
+            _this._slack.chat.postMessage(message, function(err, data) {
+              console.log('err', err, ' data ', data);
+              if (err) throw Error(err);
+            });
+          }
+
+        });
+
+        observer.onChange('*', (event) => {
+          console.log('ON PROTOSTUB - Observer - onChange: ', event);
+        });
+        resolve(true);
+
+      }).catch((error) => {
+        console.log('ON PROTOSTUB - Observer - ERROR', error);
+        resolve(false);
+      });
+    });
+  }
+
+  _sendHTTPRequest(method, url) {
+
+    return new Promise(function(resolve,reject) {
+      let xhr = new XMLHttpRequest();
+      if ('withCredentials' in xhr) {
+        xhr.open(method, url, true);
+      } else if (typeof XDomainRequest !== 'undefined') {
+        // Otherwise, check if XDomainRequest.
+        // XDomainRequest only exists in IE, and is IE's way of making CORS requests.
+        xhr = new XDomainRequest();
+        xhr.open(method, url);
+      } else {
+        // Otherwise, CORS is not supported by the browser.
+        xhr = null;
+      }
+      if (xhr) {
+        xhr.onreadystatechange = function(e) {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              let info = JSON.parse(xhr.responseText);
+              resolve(info);
+            } else if (xhr.status === 400) {
+              reject('There was an error processing the token');
+            } else {
+              reject('something else other than 200 was returned');
+            }
+          }
+        };
+        xhr.send();
+      } else {
+        reject('CORS not supported');
+      }
+    });
   }
 
 }
