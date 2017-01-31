@@ -53,8 +53,9 @@ HYPERTY_REPO=../dev-hyperty # path to locate your dev-hyperty repository by defa
 ```
 You are free to change for what you want..
 
-
 ### To develop Hyperties for Browsers
+
+When you start the toolkit with develop mode, the runtime-core loadHyperty, will reuse your hyperty address;
 
 ```shell
 # run the toolkit with runtime-core

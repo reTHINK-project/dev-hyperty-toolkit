@@ -32,7 +32,7 @@ function getTypeOfFile(file) {
 
 function encodeRuntime(file) {
 
-  return gulp.src('./', {buffer: false})
+  return gulp.src('./', {buffer:false})
   .pipe(prompt.prompt([
     {
       type: 'input',
@@ -99,10 +99,12 @@ function encodeStub(file) {
       isDefault = true;
     }
 
+    resourceOpts.isDefault = isDefault;
     resourceOpts.configuration = configuration;
 
     if (res.name) {
       transpileOpts.name = res.name;
+      resourceOpts.name = res.name;
     }
 
     resourceOpts.interworking = false;
@@ -110,12 +112,12 @@ function encodeStub(file) {
       resourceOpts.interworking = true;
     }
 
-    transpileOpts = false;
+    transpileOpts.isES6 = false;
     if (res.esVersion === 'ES6') {
       transpileOpts.isES6 = true;
       transpileOpts.standalone = 'activate';
     }
-
+    console.log(resourceOpts, transpileOpts);
     encode(file, resourceOpts, transpileOpts);
 
   }));
@@ -127,7 +129,7 @@ function encode(file, resourceOpts, transpileOpts) {
   var isES6 = transpileOpts.isES6;
   transpileOpts.debug = false;
   transpileOpts.standalone = path.parse(file).basename;
-  transpileOpts.destination = __dirname + '/resources/tmp';
+  transpileOpts.destination = path.join(__dirname, '..', 'resources', 'tmp');
 
   if (file) {
     return gulp.src(file)
