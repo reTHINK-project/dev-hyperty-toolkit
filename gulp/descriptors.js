@@ -203,7 +203,9 @@ var encode = function(opts) {
       json[value].sourcePackage.signature = '';
     }
 
-    if (opts.descriptor === 'IDPProxys') {
+    console.log(opts);
+
+    if (opts.descriptor === 'IDPProxys' || opts.descriptor === 'ProtoStubs') {
       json[value].interworking = checkValues('interworking', opts.interworking, json[value]);
     }
 
@@ -223,7 +225,7 @@ var encode = function(opts) {
 };
 
 function checkValues(property, value, object) {
-  return (_.isEmpty(object[property]) || object[property] !== value) && !_.isEmpty(value) ? value : object[property];
+  return (_.isEmpty(object[property]) || object[property] !== value) ? value : object[property];
 }
 
 module.exports = {
