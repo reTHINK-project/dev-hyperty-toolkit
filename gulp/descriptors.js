@@ -189,7 +189,8 @@ var encode = function(opts) {
     }
 
     if (opts.descriptor === 'ProtoStubs' || opts.descriptor === 'IDPProxys') {
-      json[value].constraints = '';
+      json[value].constraints = checkValues('constraints', '', json[value]);
+      json[value].interworking = checkValues('interworking', opts.interworking, json[value]);
     }
 
     if (!json[value].sourcePackageURL) {
@@ -201,12 +202,6 @@ var encode = function(opts) {
       json[value].sourcePackage.sourceCodeClassname = filename;
       json[value].sourcePackage.encoding = 'base64';
       json[value].sourcePackage.signature = '';
-    }
-
-    console.log(opts);
-
-    if (opts.descriptor === 'IDPProxys' || opts.descriptor === 'ProtoStubs') {
-      json[value].interworking = checkValues('interworking', opts.interworking, json[value]);
     }
 
     json[value].signature = checkValues('signature', '', json[value]);

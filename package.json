@@ -19,7 +19,7 @@
     "url": "git+https://github.com/reTHINK-project/dev-hyperty-toolkit.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "Apache 2.0",
   "bugs": {
     "url": "https://github.com/reTHINK-project/dev-hyperty-toolkit/issues"
   },
