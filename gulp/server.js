@@ -2,14 +2,13 @@
 var fs = require('fs');
 var gutil = require('gulp-util');
 var getStage = require('./stage');
+var getEnvironment = require('./environment.js');
 var browserSync = require('browser-sync').create('Toolkit');
-
-module.exports = browserSync;
 
 var bsServer;
 var serverStatus;
 
-module.exports = function server(done) {
+function server(done) {
 
   var stage = getStage();
 
@@ -62,7 +61,7 @@ module.exports = function server(done) {
     logLevel: logLevel,
     cors: true,
     logFileChanges: logFileChanges,
-    port: 443,
+    port: process.env.PORT || 443,
     minify: minify,
     notify: notify,
     ui: ui,
@@ -101,7 +100,7 @@ module.exports = function server(done) {
 
   checkStatus();
 
-};
+}
 
 function checkStatus() {
   bsServer.utils.portscanner.checkPortStatus(443, {}, function(err, status) {
@@ -247,3 +246,8 @@ function filterResource(resource, key) {
     return resource[a].cguid === key;
   })[0];
 }
+
+module.exports = {
+  browserSync: browserSync,
+  server: server
+};

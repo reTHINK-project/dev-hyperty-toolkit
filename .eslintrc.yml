@@ -1,0 +1,121 @@
+plugins:
+  - import
+
+extends:
+  - eslint:recommended
+  - plugin:import/errors
+  - plugin:import/warnings
+
+env:
+  browser: true
+  commonjs: true
+  es6: true
+  node: true
+  mocha: true
+  jquery: true
+
+parserOptions:
+  ecmaVersion: 6
+  ecmaFeatures: 
+    modules: true
+    classes: true
+  sourceType: module
+
+
+rules:
+  no-const-assign: warn
+  no-this-before-super: warn
+  no-undef: warn
+  no-unreachable: warn
+  no-unused-vars: warn
+  constructor-super: warn
+  valid-typeof: warn
+  quotes:
+    - error
+    - single
+  semi:
+    - warn
+    - always
+  consistent-this:
+    - warn
+    - _this
+  space-before-function-paren:
+    - error
+    - never
+  block-spacing: error
+  brace-style: 
+    - error
+    - 1tbs
+    - allowSingleLine: true
+  no-console: off
+  no-empty:
+    - warn
+    - allowEmptyCatch: true
+  no-spaced-func: 2
+  array-bracket-spacing:
+    - warn
+    - never
+    - {}
+  space-in-parens:
+    - warn
+    - never
+  quote-props:
+    - warn
+    - as-needed
+  key-spacing:
+    - error
+    - beforeColon: false
+      afterColon: true
+  space-unary-ops:
+    - error
+    - words: false
+      nonwords: false
+  no-mixed-spaces-and-tabs: error
+  no-trailing-spaces: error
+  comma-dangle:
+    - warn
+    - never
+  yoda:
+    - warn
+    - never
+  no-with: error
+  no-multiple-empty-lines: error
+  no-multi-str: off
+  one-var:
+    - error
+    - never
+  comma-spacing:
+    - error
+    - before: false
+      after: true
+  semi-spacing:
+    - error
+    - before: false
+      after: true
+  space-before-blocks:
+    - error
+    - always
+  wrap-iife: error
+  comma-style:
+    - error
+    - last
+  space-infix-ops: error
+  camelcase:
+    - error
+    - properties: never
+  eol-last: error
+  dot-notation: error
+  curly:
+    - error
+    - multi-line
+  keyword-spacing:
+    - error
+    - {}
+  lines-around-comment:
+    - error
+    - beforeLineComment: true
+      allowBlockStart: true
+  indent:
+    - error
+    - 2
+    - SwitchCase: 1

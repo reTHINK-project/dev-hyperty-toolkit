@@ -2,7 +2,13 @@ import chai from 'chai';
 import sinon from 'sinon';
 import chaiAsPromised from 'chai-as-promised';
 
-import configs from '../config.json';
+import browserConfig from '../config.json';
+let domain = browserConfig.DOMAIN;
+let config = {
+  development: browserConfig.DEVELOPMENT,
+  runtimeURL: browserConfig.RUNTIME_URL,
+  domain: browserConfig.DOMAIN
+};
 
 let expect = chai.expect;
 
@@ -12,7 +18,6 @@ import rethink from '../resources/factories/rethink';
 
 describe('Install Runtime', function() {
 
-  let config = configs;
   let runtimeLoader;
   let msgNodeAddress;
   let runtimeHyperty;
@@ -59,7 +64,7 @@ describe('Install Runtime', function() {
     window.runtime.identityModule.getIdentityAssertion.restore();
   });
 
-  it('should load an stub', (done) => {
+  it('should load a protocolstub', (done) => {
 
     let stub = config.domain;
 
@@ -82,11 +87,11 @@ describe('Install Runtime', function() {
 
   });
 
-  it('should load diferent protostub', (done) => {
+  it.skip('should load diferent protostub', (done) => {
 
     let stubList = [
-      'https://catalogue.rethink.tlabscloud.com/.well-known/protocolstub/default',
-      'https://catalogue.rethink.quobis.com/.well-known/protocolstub/default'
+      'https://rethink.tlabscloud.com/.well-known/protocolstub/default',
+      'https://rethink.quobis.com/.well-known/protocolstub/default'
     ];
 
     stubList.forEach((stub) => {
@@ -101,7 +106,7 @@ describe('Install Runtime', function() {
 
     this.timeout(100000);
 
-    let hyperty = 'https://catalogue.' + config.domain + '/.well-known/hyperty/Connector';
+    let hyperty = 'https://catalogue.' + config.domain + '/.well-known/hyperty/HelloWorldObserver';
 
     expect(runtimeLoader.requireHyperty(hyperty).then((result) => {
       console.log('HYPERTY: ', result);
@@ -189,7 +194,7 @@ describe('Install Runtime', function() {
 
   });
 
-  it('should send and recive allocate messages', function(done) {
+  it.skip('should send and recive allocate messages', function(done) {
 
     let time = 1000;
     let limit = 2;

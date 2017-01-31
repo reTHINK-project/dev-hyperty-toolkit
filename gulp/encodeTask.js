@@ -32,7 +32,7 @@ function getTypeOfFile(file) {
 
 function encodeRuntime(file) {
 
-  return gulp.src('./', {buffer:false})
+  return gulp.src('./', {buffer: false})
   .pipe(prompt.prompt([
     {
       type: 'input',

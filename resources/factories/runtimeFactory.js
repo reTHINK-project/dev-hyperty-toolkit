@@ -7,7 +7,9 @@ import {RuntimeCatalogue} from 'service-framework/dist/RuntimeCatalogue';
 import PersistenceManager from 'service-framework/dist/PersistenceManager';
 import StorageManager from 'service-framework/dist/StorageManager';
 
-import CapabilitiesManager from './CapabilitiesManager';
+import RuntimeCapabilities from './RuntimeCapabilities';
+
+// import StorageManagerFake from './StorageManagerFake';
 
 import Dexie from 'dexie';
 
@@ -58,14 +60,16 @@ const runtimeFactory = Object.create({
   },
 
   storageManager() {
-    // Using the implementation of Service Framework
-    // Dexie is the IndexDB Wrapper
-    const db = new Dexie('cache');
-    const storeName = 'objects';
 
-    return new StorageManager(db, storeName);
+    if (!this.storage) {
+      // Using the implementation of Service Framework
+      // Dexie is the IndexDB Wrapper
+      const db = new Dexie('cache');
+      const storeName = 'objects';
+      this.storage = new StorageManager(db, storeName);
+    }
 
-    // return new StorageManagerFake('a', 'b');
+    return this.storage;
   },
 
   persistenceManager() {
@@ -73,16 +77,17 @@ const runtimeFactory = Object.create({
     return new PersistenceManager(localStorage);
   },
 
-  createRuntimeCatalogue(development) {
+  createRuntimeCatalogue() {
 
-    if (!this.catalogue)
+    if (!this.catalogue) {
       this.catalogue = new RuntimeCatalogue(this);
+    }
 
     return this.catalogue;
   },
 
-  runtimeCapabilities(storageManager) {
-    this.capabilitiesManager = new CapabilitiesManager(storageManager);
+  runtimeCapabilities() {
+    this.capabilitiesManager = new RuntimeCapabilities(this.storage);
     return this.capabilitiesManager;
   }
 

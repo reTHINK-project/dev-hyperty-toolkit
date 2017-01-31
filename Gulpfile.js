@@ -10,11 +10,12 @@ var prompt = require('gulp-prompt');
 var gutil = require('gulp-util');
 var runSequence = require('run-sequence');
 var clean = require('gulp-clean');
-var browserSync = require('browser-sync');
 
+var replacePattern = require('./gulp/utils').replacePattern;
 var getEnvironment = require('./gulp/environment');
 var getStage = require('./gulp/stage');
-var server = require('./gulp/server');
+var server = require('./gulp/server').server;
+var browserSync = require('./gulp/server').browserSync;
 var descriptorBase = require('./gulp/descriptors').descriptorBase;
 var encodeTask = require('./gulp/encodeTask').encodeTask;
 var getTypeOfFile = require('./gulp/encodeTask').getTypeOfFile;
@@ -24,20 +25,42 @@ var transpile = require('./gulp/transpile');
 var resource = require('./gulp/resources');
 var walk = require('./gulp/walk');
 
-var systemConfig = require('./system.config.json');
 var dirname = __dirname;
+
+var env = require('node-env-file');
 
 gulp.task('serve', function(done) {
 
   var stage = getStage();
+
   var sequence = ['stage', 'clean', 'checkHyperties', 'checkDataSchemas', 'src-hyperties', 'descriptor', 'schemas', 'js', 'hyperties', 'server'];
   if (stage !== 'production') {
+
+    env(path.join(process.cwd(), '.env.server'));
+    env(path.join(process.cwd(), 'env'));
+
     sequence.push('watch');
   }
 
   runSequence.apply(runSequence, sequence, done);
 
 });
+
+gulp.task('build:hyperties', function(done) {
+
+  env(path.join(process.cwd(), '.env.server'));
+  env(path.join(process.cwd(), 'env'));
+  
+  var sequence = ['stage', 'clean', 'checkHyperties', 'src-hyperties', 'descriptor', 'hyperties'];
+  runSequence.apply(runSequence, sequence, function() {
+
+    return gulp.src('./src/**/*.js')
+    .pipe(watchHyperties('./src/**/*.js'))
+    .on('end', done);
+
+  });
+
+})
 
 gulp.task('checkHyperties', function() {
 
@@ -70,9 +93,12 @@ gulp.task('checkDataSchemas', function() {
 gulp.task('src-hyperties', function(done) {
 
   var srcPath;
+
   if (process.env.HYPERTY_REPO) {
 
-    srcPath = path.resolve(path.join('../', process.env.HYPERTY_REPO));
+    srcPath = path.resolve(process.env.HYPERTY_REPO);
+
+    console.log('Hyperty:', srcPath)
 
     fs.stat(srcPath, function(error) {
       if (error) {
@@ -85,17 +111,17 @@ gulp.task('src-hyperties', function(done) {
 
   } else {
     var parentDirs = fs.readdirSync(path.resolve('../'));
-    gulp.src('./', {buffer:false})
+    gulp.src('./', {buffer: false})
       .pipe(prompt.prompt([{
         type: 'list',
         name: 'folders',
         message: 'Where is dev-hyperty?',
         choices: parentDirs
       }
-    ], function(res) {
-      srcPath = path.join('../', res.folders);
-      copyHyperties(srcPath, done);
-    }));
+      ], function(res) {
+        srcPath = path.join('../', res.folders);
+        copyHyperties(srcPath, done);
+      }));
 
   }
 
@@ -119,34 +145,14 @@ gulp.task('server', server);
 gulp.task('stage', function() {
 
   var stage = getStage();
-  var configuration = systemConfig[stage];
 
-  // console.log(configuration, stage);
-
-  if (process.env.DEVELOPMENT && process.env.DOMAIN) {
-    // console.log(process.env.DEVELOPMENT, process.env.DOMAIN);
-
-    if (process.env.DEVELOPMENT) {
-      configuration.development = process.env.DEVELOPMENT;
-    }
-
-    if (process.env.RUNTIME_URL) {
-      configuration.runtimeURL = process.env.RUNTIME_URL;
-    } else {
-      delete configuration.runtimeURL;
-    }
-
-    if (process.env.DOMAIN) {
-      configuration.domain = process.env.DOMAIN;
-    }
-
-  } else {
-    gutil.log(gutil.colors.yellow('To use the environment variables you need use'));
-    console.log('export DEVELOPMENT=true|false\nexport DOMAIN=<your domain>\nexport RUNTIME_URL=<runtime location> (optional)');
-    gutil.log(gutil.colors.yellow('For default the settings applied are in the system.config.json file'));
-
-    configuration = systemConfig[stage];
-  }
+  var configuration = {
+    DEVELOPMENT: process.env.DEVELOPMENT || true,
+    RUNTIME_URL: process.env.RUNTIME_URL,
+    DOMAIN: process.env.DOMAIN || 'localhost',
+    HYPERTY_REPO: process.env.HYPERTY_REPO || '../dev-hyperty',
+    ENVIRONMENT: process.env.ENVIRONMENT || 'core'
+  };
 
   return gulp.src('./')
   .pipe(createFile('config.json', new Buffer(JSON.stringify(configuration, null, 2))))
@@ -168,37 +174,40 @@ function copyFiles(opts) {
       dest = opts.dest;
     }
 
-    var indexOfDest = fileObject.dir.indexOf(dest);
-    var dirPath = fileObject.dir.substring();
-    if (indexOfDest !== -1) {
-      dirPath = fileObject.dir.substring(indexOfDest);
-    } else {
-      dirPath = dest + fileObject.dir.substring(fileObject.dir.lastIndexOf('/'));
-    }
+    let pathStructure = fileObject.dir.replace(path.resolve(dirname) + '/', '');
+    let pathDirs = pathStructure.split('/');
+    let validPaths = pathDirs.slice(1);
 
-    var dir = __dirname + '/' + dirPath;
-
-    if (dirPath.indexOf(dirname) !== -1) {
-      dir = dirPath;
-    }
+    let dir = path.resolve(__dirname + '/' + dest + '/' + validPaths.join('/') + '/');
 
     gutil.log('Copy changes from ' + fileObject.base + ' to ' + dir);
+
     return gulp.src(chunk.path)
     .pipe(gulp.dest(dir))
     .on('end', function() {
-
-      fs.readFile(dir + '/' + fileObject.base, function(err, data) {
+      done();
+      /*fs.readFile(dir + '/' + fileObject.base, function(err, data) {
         if (err) throw err;
         var a = chunk;
         a.path = dir + '/' + fileObject.base;
         a.contents = data;
         done(null, a);
       });
-
+*/
     });
 
   });
 
+}
+
+function watchHyperties(filePath) {
+  console.log('Watch:', filePath);
+  return gulp.src(filePath)
+    .pipe(convertHyperty())
+    .resume()
+    .on('end', function() {
+      browserSync.reload();
+    });
 }
 
 gulp.task('watch', function() {
@@ -217,12 +226,8 @@ gulp.task('watch', function() {
 
   gulp.watch(['./src/**/*.js'], function(event) {
     var fileObject = path.parse(event.path);
-    return gulp.src([fileObject.dir + '/*.hy.js'])
-    .pipe(convertHyperty())
-    .resume()
-    .on('end', function() {
-      browserSync.reload();
-    });
+    var filePath = fileObject.dir + '/*.hy.js';
+    watchHyperties(filePath);
   });
 
   gulp.watch(['./resources/*.js'], function(event) {
@@ -259,6 +264,10 @@ gulp.task('watch', function() {
     });
 
   });
+
+  gulp.watch(['/app/*.html', '/app/*.js'], function(event) {
+    console.log('AQUI:', event);
+  }, browserSync.reload);
 
   // Watch
   gulp.watch([dirname + '/src/**/*.js'], function(event) {
@@ -314,17 +323,17 @@ gulp.task('hyperties-watch', ['hyperties'], browserSync.reload);
 gulp.task('js', function() {
 
   return gulp.src(['./app/main.js', './server/rethink.js'])
-  .on('end', function() {
-    var fileObject = path.parse('./app/main.js');
-    gutil.log('-----------------------------------------------------------');
-    gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
-  })
-  .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
-  .on('end', function() {
-    gutil.log('The main file was created like a distribution file on /dist');
-    gutil.log('-----------------------------------------------------------');
-    browserSync.reload();
-  });
+    .on('end', function() {
+      var fileObject = path.parse('./app/main.js');
+      gutil.log('-----------------------------------------------------------');
+      gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
+    })
+    .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
+    .on('end', function() {
+      gutil.log('The main file was created like a distribution file on /dist');
+      gutil.log('-----------------------------------------------------------');
+      browserSync.reload();
+    });
 
 });
 
@@ -371,7 +380,8 @@ function createDescriptor() {
 
     var fileObject = path.parse(chunk.path);
     var nameOfHyperty = fileObject.name.replace('.hy', '');
-    var preconfig = JSON.parse(chunk.contents);
+    var preconfig = chunk.contents.toString('utf8');
+    preconfig = JSON.parse(replacePattern(preconfig, process.env.DOMAIN || 'localhost'));
 
     gutil.log('---------------------- ' + nameOfHyperty + ' ------------------------');
 
@@ -385,8 +395,7 @@ function createDescriptor() {
     var newChunk = _.clone(chunk);
     newChunk.path = path.resolve('./descriptors/Hyperties.json');
     newChunk.contents = new Buffer(JSON.stringify(data, null, 2));
-    gutil.log('Initial Configuration');
-    gutil.log(JSON.stringify(preconfig, null, 2));
+    gutil.log(JSON.stringify(preconfig));
 
     done(null, newChunk);
   });
@@ -444,23 +453,25 @@ function filterHyperties(environment) {
   });
 
   return hyperties.filter(function(file) {
-      var temp;
-      try {
-        temp = JSON.parse(file.content);
-      } catch (e) {
-        temp = file.content;
-      }
+    var temp;
+    try {
+      temp = JSON.parse(file.content);
+    } catch (e) {
+      temp = file.content;
+    }
 
-      if (environment !== 'all') {
-        return temp.hasOwnProperty('constraints') && temp.constraints.hasOwnProperty(environment) && temp.constraints[environment];
-      } else {
-        return true;
-      }
-    }).map(function(file) {
-      var dir = path.parse(file.folder + file.filename).dir;
-      var folder = dir.replace(filePath, '');
-      return {dir: folder, filename: file.filename};
-    });
+    if (environment !== 'all') {
+      let typeOfEnvironment = environment === 'core' ? 'browser' : environment;
+      return temp.hasOwnProperty('constraints') && temp.constraints.hasOwnProperty(typeOfEnvironment) && temp.constraints[typeOfEnvironment];
+    } else {
+      return true;
+    }
+
+  }).map(function(file) {
+    var dir = path.parse(file.folder + file.filename).dir;
+    var folder = dir.replace(filePath, '');
+    return {dir: folder, filename: file.filename};
+  });
 }
 
 function convertSchema() {
@@ -543,6 +554,7 @@ function copyExamples() {
 }
 
 function copyHyperties(from, done) {
+
   if (from) {
     dirname = from;
     var stage = getStage();
