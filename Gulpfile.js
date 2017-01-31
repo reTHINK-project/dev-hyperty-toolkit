@@ -50,7 +50,7 @@ gulp.task('build:hyperties', function(done) {
 
   env(path.join(process.cwd(), '.env.server'));
   env(path.join(process.cwd(), 'env'));
-  
+
   var sequence = ['stage', 'clean', 'checkHyperties', 'src-hyperties', 'descriptor', 'hyperties'];
   runSequence.apply(runSequence, sequence, function() {
 
@@ -174,11 +174,11 @@ function copyFiles(opts) {
       dest = opts.dest;
     }
 
-    let pathStructure = fileObject.dir.replace(path.resolve(dirname) + '/', '');
-    let pathDirs = pathStructure.split('/');
-    let validPaths = pathDirs.slice(1);
+    var pathStructure = fileObject.dir.replace(path.resolve(dirname) + '/', '');
+    var pathDirs = pathStructure.split('/');
+    var validPaths = pathDirs.slice(1);
 
-    let dir = path.resolve(__dirname + '/' + dest + '/' + validPaths.join('/') + '/');
+    var dir = path.resolve(__dirname + '/' + dest + '/' + validPaths.join('/') + '/');
 
     gutil.log('Copy changes from ' + fileObject.base + ' to ' + dir);
 
@@ -461,7 +461,7 @@ function filterHyperties(environment) {
     }
 
     if (environment !== 'all') {
-      let typeOfEnvironment = environment === 'core' ? 'browser' : environment;
+      var typeOfEnvironment = environment === 'core' ? 'browser' : environment;
       return temp.hasOwnProperty('constraints') && temp.constraints.hasOwnProperty(typeOfEnvironment) && temp.constraints[typeOfEnvironment];
     } else {
       return true;
