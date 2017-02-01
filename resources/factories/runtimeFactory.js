@@ -18,7 +18,12 @@ const runtimeFactory = Object.create({
   createSandbox(capabilities) {
 
     return new Promise((resolve) => {
-      let sandbox;
+
+      let sandbox = new SandboxBrowser();
+      resolve(sandbox);
+
+
+      /*let sandbox;
       let isWindowSandbox = '';
       if (capabilities.hasOwnProperty('windowSandbox') && capabilities.windowSandbox) isWindowSandbox = 'windowSandbox';
 
@@ -41,7 +46,7 @@ const runtimeFactory = Object.create({
 
         resolve(sandbox);
       });
-
+*/
     });
 
   },
@@ -73,8 +78,12 @@ const runtimeFactory = Object.create({
   },
 
   persistenceManager() {
-    let localStorage = window.localStorage;
-    return new PersistenceManager(localStorage);
+    if (!this.localStorage) {
+      window.localStorage;
+      this.localStorage = new PersistenceManager(localStorage);
+    }
+
+    return this.localStorage;
   },
 
   createRuntimeCatalogue() {
