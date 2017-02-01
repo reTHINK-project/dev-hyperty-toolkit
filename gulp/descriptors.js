@@ -220,10 +220,13 @@ var encode = function(opts) {
 };
 
 function checkValues(property, value, object) {
-  if (_.isEmpty(object[property])) {
-    return value;
-  } else if (!_.isEqual(object[property], value)) {
+
+  if (_.isEmpty(value)) {
     return object[property];
+  } else if (_.isEqual(object[property], value)) {
+    return value;
+  } else {
+    return value;
   }
 
 }
