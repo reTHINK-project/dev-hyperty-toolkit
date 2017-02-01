@@ -128,7 +128,7 @@ function encode(file, resourceOpts, transpileOpts) {
 
   var isES6 = transpileOpts.isES6;
   transpileOpts.debug = false;
-  transpileOpts.standalone = path.parse(file).basename;
+  transpileOpts.standalone = transpileOpts.standalone || path.parse(file).basename;
   transpileOpts.destination = path.join(__dirname, '..', 'resources', 'tmp');
 
   if (file) {
