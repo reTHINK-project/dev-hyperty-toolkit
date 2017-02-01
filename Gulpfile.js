@@ -33,7 +33,7 @@ gulp.task('serve', function(done) {
 
   var stage = getStage();
 
-  var sequence = ['stage', 'clean', 'checkHyperties', 'checkDataSchemas', 'src-hyperties', 'descriptor', 'schemas', 'js', 'hyperties', 'server'];
+  var sequence = ['stage', 'clean', 'src-hyperties', 'checkHyperties', 'descriptor', 'checkDataSchemas', 'schemas', 'js', 'hyperties', 'server'];
   if (stage !== 'production') {
 
     env(path.join(process.cwd(), '.env.server'));
@@ -257,7 +257,7 @@ gulp.task('watch', function() {
 
     return gulp.src(event.path)
     .pipe(createDescriptor())
-    .pipe(gulp.dest('resources/descriptors/'))
+    .pipe(gulp.dest('./resources/descriptors/'))
     .on('end', function() {
       gutil.log('the preconfiguration hyperty was changed, and the Hyperties.json was updated');
       browserSync.reload();
@@ -364,7 +364,7 @@ gulp.task('descriptor', function() {
 
   return gulp.src('./src/**/*.hy.json')
   .pipe(createDescriptor())
-  .pipe(gulp.dest('./resources/descriptors/'))
+  .pipe(gulp.dest('./resources/'))
   .on('end', function() {
     browserSync.reload();
   });
@@ -374,7 +374,12 @@ gulp.task('descriptor', function() {
 function createDescriptor() {
 
   var descriptor = fs.readFileSync('./resources/descriptors/Hyperties.json', 'utf8');
-  var data = JSON.parse(descriptor);
+  var data;
+  try {
+    data = JSON.parse(descriptor);
+  } catch (error) {
+    data = {}; 
+  }
 
   return through.obj(function(chunk, enc, done) {
 
@@ -383,17 +388,20 @@ function createDescriptor() {
     var preconfig = chunk.contents.toString('utf8');
     preconfig = JSON.parse(replacePattern(preconfig, process.env.DOMAIN || 'localhost'));
 
+    console.log('PRE:', preconfig);
+
     gutil.log('---------------------- ' + nameOfHyperty + ' ------------------------');
 
     if (!data.hasOwnProperty(nameOfHyperty)) {
       data[nameOfHyperty] = descriptorBase('hyperty');
     }
 
+    console.log('Before:', data[nameOfHyperty])
     var updated = _.extend(data[nameOfHyperty], preconfig);
     data[nameOfHyperty] = updated;
 
     var newChunk = _.clone(chunk);
-    newChunk.path = path.resolve('./descriptors/Hyperties.json');
+    newChunk.path = './resources/descriptors/Hyperties.json';
     newChunk.contents = new Buffer(JSON.stringify(data, null, 2));
     gutil.log(JSON.stringify(preconfig));
 
