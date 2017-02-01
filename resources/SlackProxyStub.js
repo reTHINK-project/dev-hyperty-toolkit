@@ -6,7 +6,7 @@ let slackInfo = {
   codeEndpoint: 'https://slack.com/oauth/authorize?',
   tokenEndpoint: 'https://slack.com/api/oauth.access?',
   infoEndpoint: 'https://slack.com/api/users.info?',
-  scope: 'users:read chat:write:user'
+  scope: 'client'
 };
 
 //function to parse the query string in the given URL to obatin certain values
@@ -92,6 +92,8 @@ let idp = {
   validateAssertion: (assertion, origin) => {
     return new Promise(function(resolve,reject) {
 
+      console.log('assertion - >', assertion);
+      console.log('origin - >', origin);
       console.log('MYPROXY - VALIDATING');
       resolve({identity: 'identity@idp.com', contents: 'content'});
 
@@ -121,7 +123,7 @@ let idp = {
       if (!hint) {
         //let requestUrl = https://slack.com/oauth/authorize?client_id=11533603872.72434934356&scope=chat:write:user&redirect_uri=https://www.getpostman.com/oauth2/callback;
 
-        let requestUrl = s.codeEndpoint + 'client_id=' + s.clientID + '&team=T0BFPHRRN' + '&scope=' + s.scope + '&redirect_uri=' +  s.redirectURI;
+        let requestUrl = s.codeEndpoint + 'client_id=' + s.clientID + '&scope=' + s.scope + '&redirect_uri=' +  s.redirectURI;
 
         console.log('first url ', requestUrl, 'done');
         reject({name: 'IdPLoginError', loginUrl: requestUrl});
@@ -142,7 +144,10 @@ let idp = {
             let infoToken = {picture: profile.image_original, email: profile.email, family_name: profile.last_name, given_name: profile.first_name};
 
             let assertion = btoa(JSON.stringify({tokenID: value.access_token, email: profile.email, id: info.user.id}));
-            resolve({assertion: assertion, idp: {domain: 'slack.com', protocol: 'OAuth 2.0'}, infoToken: infoToken});
+
+            let toResolve = {assertion: assertion, idp: {domain: 'slack.com', protocol: 'OAuth 2.0'}, infoToken: infoToken, interworking: {access_token: value.access_token, domain: 'slack.com' }};
+            console.log('RESOLVING THIS OBJECT', toResolve);
+            resolve(toResolve);
           }, function(error) {
             console.log('error->', error);
           });

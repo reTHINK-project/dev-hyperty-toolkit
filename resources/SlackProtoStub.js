@@ -33,6 +33,10 @@ class SlackProtoStub {
     console.log('ON PROTOSTUB -  instatiate syncher with url', runtimeProtoStubURL);
     this._syncher = new Syncher(runtimeProtoStubURL, bus, config);
 
+    this._syncher.onNotification((event) => {
+      console.log('ON PROTOSTUB - On Syncher Notification: ', event);
+    });
+
     bus.addListener('*', (msg) => {
       console.log('ON PROTOSTUB ->', msg);
       if (msg.body.identity) {
@@ -82,16 +86,28 @@ class SlackProtoStub {
                       if (channelAlreadyUP) {
                         console.log('ON PROTOSTUB - channel exist', channelAlreadyUP);
 
-                        let toInvite = { token: token, channel: channelAlreadyUP.id, user: userID };
-                        _this._channelID = channelAlreadyUP.id;
+                        let channelMembers = _this._channelsList.filter(function(value, key) { return value.name === msg.body.value.name; })[0].members;
+                        let alreadyOnChannel = false;
 
-                        _this._slack.channels.invite(toInvite, (err, data) => {
-                          if (err) {
-                            console.err('error', err);
-                          } else {
-                            console.log('ON PROTOSTUB - user invited with sucess', data);
-                          }
+                        channelMembers.forEach(function(s) {
+                          if (s === userID)
+                            alreadyOnChannel = true;
                         });
+                        console.log('ON PROTOSTUB - channel members', channelMembers, '   ->', alreadyOnChannel);
+                        if (!alreadyOnChannel) {
+                          let toInvite = { token: token, channel: channelAlreadyUP.id, user: userID };
+
+                          _this._slack.channels.invite(toInvite, (err, data) => {
+                            if (err) {
+                              console.err('error', err);
+                            } else {
+                              _this._channelID = channelAlreadyUP.id;
+                              console.log('ON PROTOSTUB - user invited with sucess', data);
+                            }
+                          });
+                        } else {
+                          _this._channelID = channelAlreadyUP.id;
+                        }
 
                       } else {
                         let toCreate = { token: token, name: msg.body.value.name };
