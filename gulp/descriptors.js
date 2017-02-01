@@ -12,6 +12,8 @@ var descriptorBase = function(type) {
 
   var base = {};
 
+  console.log('AQUI:', type);
+
   base.sourcePackage = {};
   base.sourcePackage.sourceCode = '';
   base.sourcePackage.sourceCodeClassname = '';
@@ -72,7 +74,10 @@ var descriptorBase = function(type) {
 
 var encode = function(opts) {
 
-  opts = _.extend({}, opts || {});
+  opts = _.extend({}, opts);
+
+  var descriptor = fs.readFileSync(path.resolve('./resources/descriptors/' + opts.descriptor + '.json'), 'utf8');
+  var json = JSON.parse(descriptor);
 
   return through.obj(function(file, enc, cb) {
 
@@ -87,13 +92,10 @@ var encode = function(opts) {
     gutil.log('Encode: ', file.path);
 
     var fileObject = path.parse(file.path);
-    var descriptor = fs.readFileSync(path.resolve('./resources/descriptors/' + opts.descriptor + '.json'), 'utf8');
-    var json = JSON.parse(descriptor);
     var contents = fs.readFileSync(file.path, 'utf8');
     var type = '';
 
     var encoded = new Buffer(contents).toString('base64');
-    var value = 'default';
     var filename = fileObject.name;
 
     if (fileObject.name.indexOf('.hy') !== -1) {
@@ -102,6 +104,7 @@ var encode = function(opts) {
       filename = fileObject.name.replace('.ds', '');
     }
 
+    var value = 'default';
     if (opts.isDefault) {
       value = 'default';
     } else {
@@ -133,7 +136,7 @@ var encode = function(opts) {
     }
 
     if (!json.hasOwnProperty(value)) {
-      json[value] = descriptorBase();
+      json[value] = descriptorBase(type);
     }
 
     Object.keys(json).map(function(key, index) {
@@ -221,10 +224,12 @@ var encode = function(opts) {
 
 function checkValues(property, value, object) {
 
-  if (_.isEmpty(object[property])) {
-    return value;
-  } else if (!_.isEqual(object[property], value)) {
+  if (_.isEmpty(value)) {
     return object[property];
+  } else if (_.isEqual(object[property], value)) {
+    return value;
+  } else {
+    return value;
   }
 
 }
