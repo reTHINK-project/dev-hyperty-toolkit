@@ -87,7 +87,7 @@ var encode = function(opts) {
     gutil.log('Encode: ', file.path);
 
     var fileObject = path.parse(file.path);
-    var descriptor = fs.readFileSync(path.resolve('resources/descriptors/' + opts.descriptor + '.json'), 'utf8');
+    var descriptor = fs.readFileSync(path.resolve('./resources/descriptors/' + opts.descriptor + '.json'), 'utf8');
     var json = JSON.parse(descriptor);
     var contents = fs.readFileSync(file.path, 'utf8');
     var type = '';
@@ -133,7 +133,7 @@ var encode = function(opts) {
     }
 
     if (!json.hasOwnProperty(value)) {
-      json[value] = descriptorBase();
+      json[value] = descriptorBase(type);
     }
 
     Object.keys(json).map(function(key, index) {
@@ -189,7 +189,8 @@ var encode = function(opts) {
     }
 
     if (opts.descriptor === 'ProtoStubs' || opts.descriptor === 'IDPProxys') {
-      json[value].constraints = '';
+      json[value].constraints = checkValues('constraints', '', json[value]);
+      json[value].interworking = checkValues('interworking', opts.interworking, json[value]);
     }
 
     if (!json[value].sourcePackageURL) {
@@ -201,12 +202,6 @@ var encode = function(opts) {
       json[value].sourcePackage.sourceCodeClassname = filename;
       json[value].sourcePackage.encoding = 'base64';
       json[value].sourcePackage.signature = '';
-    }
-
-    console.log(opts);
-
-    if (opts.descriptor === 'IDPProxys' || opts.descriptor === 'ProtoStubs') {
-      json[value].interworking = checkValues('interworking', opts.interworking, json[value]);
     }
 
     json[value].signature = checkValues('signature', '', json[value]);
@@ -225,7 +220,13 @@ var encode = function(opts) {
 };
 
 function checkValues(property, value, object) {
-  return (_.isEmpty(object[property]) || object[property] !== value) ? value : object[property];
+
+  if (_.isEmpty(object[property])) {
+    return value;
+  } else if (!_.isEqual(object[property], value)) {
+    return object[property];
+  }
+
 }
 
 module.exports = {

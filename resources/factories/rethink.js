@@ -129,7 +129,7 @@ const rethink = {
             resultMsg.body = {};
 
             //TODO: Work the message errors, probably use message factory
-            runtime.loadHyperty(msg.body.value.descriptor).then(function(result) {
+            runtime.loadHyperty(msg.body.value.descriptor, true).then(function(result) {
               resultMsg.body.value = result;
               minibus._onMessage(resultMsg);
             }).catch(function(reason) {
