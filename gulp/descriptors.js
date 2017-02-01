@@ -133,7 +133,7 @@ var encode = function(opts) {
     }
 
     if (!json.hasOwnProperty(value)) {
-      json[value] = descriptorBase(type);
+      json[value] = descriptorBase();
     }
 
     Object.keys(json).map(function(key, index) {
