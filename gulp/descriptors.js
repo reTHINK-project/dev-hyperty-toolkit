@@ -12,8 +12,6 @@ var descriptorBase = function(type) {
 
   var base = {};
 
-  console.log('AQUI:', type);
-
   base.sourcePackage = {};
   base.sourcePackage.sourceCode = '';
   base.sourcePackage.sourceCodeClassname = '';
