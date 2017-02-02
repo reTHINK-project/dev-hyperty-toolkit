@@ -19,11 +19,7 @@ const runtimeFactory = Object.create({
 
     return new Promise((resolve) => {
 
-      let sandbox = new SandboxBrowser();
-      resolve(sandbox);
-
-
-      /*let sandbox;
+      let sandbox;
       let isWindowSandbox = '';
       if (capabilities.hasOwnProperty('windowSandbox') && capabilities.windowSandbox) isWindowSandbox = 'windowSandbox';
 
@@ -46,7 +42,7 @@ const runtimeFactory = Object.create({
 
         resolve(sandbox);
       });
-*/
+
     });
 
   },
