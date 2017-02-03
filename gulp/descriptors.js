@@ -222,7 +222,7 @@ var encode = function(opts) {
 
 function checkValues(property, value, object) {
 
-  if (_.isEmpty(value)) {
+  if (_.isEmpty(value) && typeof(value) !== 'boolean') {
     return object[property];
   } else if (_.isEqual(object[property], value)) {
     return value;
