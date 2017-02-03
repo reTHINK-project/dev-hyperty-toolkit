@@ -16,7 +16,7 @@ import Dexie from 'dexie';
 const runtimeFactory = Object.create({
 
   createSandbox(capabilities) {
-
+    
     return new Promise((resolve) => {
 
       let sandbox;
