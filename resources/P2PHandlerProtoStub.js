@@ -8272,6 +8272,9 @@ var P2PHandlerStub = function () {
       _this._sendChannelMsg(msg);
     });
 
+    console.log('+[P2PHandlerStub] deployed ', runtimeProtoStubURL);
+    this._sendStatus("deployed");
+
     this._connectionControllers = {};
 
     this._syncher = new _Syncher.Syncher(runtimeProtoStubURL, miniBus, configuration);
