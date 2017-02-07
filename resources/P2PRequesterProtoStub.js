@@ -497,7 +497,7 @@ module.exports = SDPUtils;
 
 },{}],2:[function(require,module,exports){
 // version: 0.5.1
-// date: Wed Feb 01 2017 10:11:49 GMT+0000 (WET)
+// date: Mon Feb 06 2017 16:00:21 GMT+0000 (WET)
 // licence: 
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
@@ -4303,11 +4303,14 @@ __webpack_require__(153);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var objectType = { ARRAY: '[object Array]', OBJECT: '[object Object]' };
+
 /**
  * @access private
  * Main class that maintains a JSON object, and observes changes in this object, recursively.
  * Internal objects and arrays are also observed.
  */
+
 var SyncObject = function () {
   function SyncObject(initialData) {
     (0, _classCallCheck3.default)(this, SyncObject);
@@ -4369,20 +4372,6 @@ var SyncObject = function () {
       var _this2 = this;
 
       var handler = function handler(changeset) {
-
-        changeset.forEach(function (change) {
-          if (change.newValue && change.newValue instanceof Object) {
-            if (change.newValue instanceof Object) {
-              var o = Object.deepObserve(change.newValue, handler);
-              object[change.keypath] = o;
-            }
-
-            if (change.newValue instanceof Array) {
-              var _o = Array.observe(change.newValue, handler);
-              object[change.keypath] = _o;
-            }
-          }
-        });
 
         changeset.every(function (change) {
           _this2._onChanges(change);
@@ -5419,6 +5408,7 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
 	    	if(!(object instanceof Array) && !Array.isArray(object)) {
 	    		throw new TypeError("First argument to Array.observer is not an Array");
 	    	}
+            	acceptlist = acceptlist || ["add", "update", "delete", "splice"];
 	    	var arrayproxy = new Proxy(object,{get: function(target,property) {
 	    		if(property==="unobserve") {
 		    		return function(callback) {
@@ -5482,15 +5472,26 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
 	    }
 	}
 	Object.deepObserve = function(object,callback,parts) {
+
 		parts = (parts ? parts : []);
-		var keys = Object.keys(object);
-		keys.forEach(function(key) {
-			if(object[key] instanceof Object) {
-				var newparts = parts.slice(0);
-				newparts.push(key);
-				object[key] = Object.deepObserve(object[key],callback,newparts);
-			}
-		});
+
+		var toTypeName = function(obj) {
+			return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+		}
+
+		function reobserve(value, parts) {
+			var keys = Object.keys(value);
+			keys.forEach(function(key) {
+				if((toTypeName(value[key]) === 'object' || toTypeName(value[key]) === 'array') && !value[key].hasOwnProperty('__observers__')) {
+					var newparts = parts.slice(0);
+					newparts.push(key);
+					value[key] = Object.deepObserve(value[key],callback,newparts);
+				}
+			});
+		}
+
+		reobserve(object, parts);
+
 		var observed = Object.observe(object,function(changeset) {
 			var changes = [];
 			function recurse(name,rootObject,oldObject,newObject,path) {
@@ -5501,6 +5502,7 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
 							var oldvalue = (oldObject && oldObject[key]!==undefined ? oldObject[key] : undefined),
 								change = (oldvalue===undefined ? "add" : "update"),
 								keypath = path + "." + key;
+
 							changes.push({name:name,object:rootObject,type:change,oldValue:oldvalue,newValue:newObject[key],keypath:keypath});
 							recurse(name,rootObject,oldvalue,newObject[key],keypath);
 						}
@@ -5510,6 +5512,7 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
 					oldkeys.forEach(function(key) {
 						var change = (newObject===null ? "update" : "delete"),
 							keypath = path + "." + key;
+							
 						changes.push({name:name,object:rootObject,type:change,oldValue:oldObject[key],newValue:newObject,keypath:keypath});
 						recurse(name,rootObject,oldObject[key],undefined,keypath);
 					});
@@ -5517,6 +5520,11 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
 			}
 			changeset.forEach(function(change) {
 				var keypath = (parts.length>0 ? parts.join(".") + "." : "") + change.name;
+
+				if (change.type === "update" || change.type === "add") { 
+					reobserve(change.object, parts);
+				}
+
 				changes.push({name:change.name,object:change.object,type:change.type,oldValue:change.oldValue,newValue:change.object[change.name],keypath:keypath});
 				recurse(change.name,change.object,change.oldValue,change.object[change.name],keypath);
 			});
@@ -5525,6 +5533,7 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
 		return observed;
 	};
 })();
+
 
 /***/ }),
 /* 154 */,
@@ -8227,8 +8236,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 * limitations under the License.
 **/
 
-// TODO: integrate the status eventing
-
 exports.default = activate;
 
 var _Syncher = require('service-framework/dist/Syncher');
@@ -8241,10 +8248,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+// TODO: integrate the status eventing
+
 /**
  * ProtoStub Interface
  */
-var P2PHandlerStub = function () {
+var P2PRequesterStub = function () {
 
   /**
    * Initialise the protocol stub including as input parameters its allocated
@@ -8254,109 +8263,99 @@ var P2PHandlerStub = function () {
    * @param  {Message.Message}                           busPostMessage     configuration
    * @param  {ProtoStubDescriptor.ConfigurationDataList} configuration      configuration
    */
-  function P2PHandlerStub(runtimeProtoStubURL, miniBus, configuration) {
+  function P2PRequesterStub(runtimeProtoStubURL, miniBus, configuration) {
     var _this = this;
 
-    _classCallCheck(this, P2PHandlerStub);
+    _classCallCheck(this, P2PRequesterStub);
 
     if (!runtimeProtoStubURL) throw new Error('The runtimeProtoStubURL is a required parameter');
     if (!miniBus) throw new Error('The bus is a required parameter');
     if (!configuration) throw new Error('The configuration is a required parameter');
+    // if (!configuration.p2pHandler) throw new Error('The p2pHandler is a required attribute in the configuration parameter');
+
+    console.log('+[P2PRequesterStub] deployed ', runtimeProtoStubURL);
 
     this._runtimeProtoStubURL = runtimeProtoStubURL;
     this._runtimeURL = configuration.runtimeURL;
     this._configuration = configuration;
     this._bus = miniBus;
     this._bus.addListener('*', function (msg) {
-
       _this._sendChannelMsg(msg);
     });
 
-    this._connectionControllers = {};
-
     this._syncher = new _Syncher.Syncher(runtimeProtoStubURL, miniBus, configuration);
-    this._syncher.onNotification(function (event) {
+    this._connectionController = new _ConnectionController2.default(this._runtimeProtoStubURL, this._syncher, this._configuration, true);
+    this._connectionController.onStatusUpdate(function (status, reason) {
+      _this._sendStatus(status, reason);
+    });
 
-      console.log('+[P2PHandlerStub] On Syncher Notification: ', event);
+    this._syncher.onNotification(function (event) {
+      console.log('+[P2PRequesterStub] On Syncher Notification: ', event);
       event.ack(200);
 
       switch (event.type) {
 
         case 'create':
-          // as discussed with Paulo, we expect the "remoteRuntimeURL" as field "runtimeURL" in the initial dataObject
-          // emit the "create" event as requested in issue: https://github.com/reTHINK-project/dev-protostubs/issues/5
-          _this._sendStatus("create", undefined, event.runtimeURL);
-
-          _this._createConnectionController(event).then(function (connectionController) {
-            _this._connectionControllers[event.from] = connectionController;
-            connectionController.onStatusUpdate(function (status, reason) {
-              _this._sendStatus(status, reason);
+          // incoming observe invitation from peer
+          if (_this._connectionController) {
+            _this._connectionController.observe(event).then(function () {
+              console.log("+[P2PRequesterStub] observer created ");
             });
-            connectionController.onMessage(function (m) {
-              _this._deliver(m);
-            });
-          });
+          }
           break;
 
         case 'delete':
-          // TODO: question code in Connector --> there it deletes all controllers --> why?
-          console.log("+[P2PHandlerStub] deleting connection handler for " + event.from);
-          var connectionController = _this._connectionControllers[event.from];
+          // TODO: question regarding code in Connector: --> there it deletes all controllers --> why?
+          console.log("+[P2PRequesterStub] deleting connection handler for " + event.from);
 
-          if (connectionController) {
-            connectionController.cleanup();
-            delete _this._connectionControllers[event.from];
-          }
+          disconnect();
           break;
 
         default:
       }
     });
+
+    // the target handler stub url must be present in the configuration as "p2pHandler" attribute
+    if (this._configuration.p2pHandler) this.connect(this._configuration.p2pHandler);
   }
 
-  /**
-   * To disconnect the protocol stub.
-   */
-
-
-  _createClass(P2PHandlerStub, [{
-    key: 'disconnect',
-    value: function disconnect() {
+  _createClass(P2PRequesterStub, [{
+    key: 'connect',
+    value: function connect(handlerURL) {
       var _this2 = this;
 
-      // cleanup ALL connectionControllers
-      Object.keys(this._connectionControllers).forEach(function (key) {
-        _this2._controllers[key].cleanup();;
-        delete _this2._controllers[key];
+      this._connectionController.report(handlerURL, this._runtimeURL).then(function () {
+        _this2._connectionController.onMessage(function (m) {
+          _this2._deliver(m);
+        });
+        console.log("+[P2PRequesterStub] setup reporter object successfully");
       });
     }
-  }, {
-    key: '_createConnectionController',
-    value: function _createConnectionController(invitationEvent) {
-      var _this3 = this;
 
-      return new Promise(function (resolve, reject) {
-        var connectionController = new _ConnectionController2.default(_this3._runtimeProtoStubURL, _this3._syncher, _this3._configuration, false);
-        connectionController.observe(invitationEvent).then(function () {
-          // create the reporter automatically
-          connectionController.report(invitationEvent.from, _this3._runtimeURL).then(function () {
-            resolve(connectionController);
-          });
-        });
-      });
+    /**
+     * To disconnect the protocol stub.
+     */
+
+  }, {
+    key: 'disconnect',
+    value: function disconnect() {
+      if (this._connectionController) {
+        this._connectionController.cleanup();
+        this._connectionController = null;
+      }
     }
   }, {
     key: '_sendChannelMsg',
     value: function _sendChannelMsg(msg) {
       if (this._filter(msg)) {
-        // TODO: verify: is this selection correct?
-        var connectionController = this._connectionControllers[msg.to];
-        if (connectionController) connectionController.sendMessage(JSON.stringify(msg));
+        if (this._connectionController) {
+          this._connectionController.sendMessage(JSON.stringify(msg));
+        }
       }
     }
   }, {
     key: '_sendStatus',
-    value: function _sendStatus(value, reason, remoteRuntimeURL) {
+    value: function _sendStatus(value, reason) {
       var msg = {
         type: 'update',
         from: this._runtimeProtoStubURL,
@@ -8365,8 +8364,6 @@ var P2PHandlerStub = function () {
           value: value
         }
       };
-      if (remoteRuntimeURL) msg.body.resource = remoteRuntimeURL;
-
       if (reason) {
         msg.body.desc = reason;
       }
@@ -8382,8 +8379,6 @@ var P2PHandlerStub = function () {
   }, {
     key: '_filter',
     value: function _filter(msg) {
-      // todo: only try to send when connected (live status)
-
       if (msg.body && msg.body.via === this._runtimeProtoStubURL) return false;
       return true;
     }
@@ -8403,13 +8398,13 @@ var P2PHandlerStub = function () {
     }
   }]);
 
-  return P2PHandlerStub;
+  return P2PRequesterStub;
 }();
 
 function activate(url, bus, config) {
   return {
-    name: 'P2PHandlerStub',
-    instance: new P2PHandlerStub(url, bus, config)
+    name: 'P2PRequesterStub',
+    instance: new P2PRequesterStub(url, bus, config)
   };
 }
 module.exports = exports['default'];

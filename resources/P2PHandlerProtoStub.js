@@ -497,7 +497,7 @@ module.exports = SDPUtils;
 
 },{}],2:[function(require,module,exports){
 // version: 0.5.1
-// date: Wed Feb 01 2017 10:11:49 GMT+0000 (WET)
+// date: Mon Feb 06 2017 16:00:21 GMT+0000 (WET)
 // licence: 
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
@@ -4303,11 +4303,14 @@ __webpack_require__(153);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var objectType = { ARRAY: '[object Array]', OBJECT: '[object Object]' };
+
 /**
  * @access private
  * Main class that maintains a JSON object, and observes changes in this object, recursively.
  * Internal objects and arrays are also observed.
  */
+
 var SyncObject = function () {
   function SyncObject(initialData) {
     (0, _classCallCheck3.default)(this, SyncObject);
@@ -4369,20 +4372,6 @@ var SyncObject = function () {
       var _this2 = this;
 
       var handler = function handler(changeset) {
-
-        changeset.forEach(function (change) {
-          if (change.newValue && change.newValue instanceof Object) {
-            if (change.newValue instanceof Object) {
-              var o = Object.deepObserve(change.newValue, handler);
-              object[change.keypath] = o;
-            }
-
-            if (change.newValue instanceof Array) {
-              var _o = Array.observe(change.newValue, handler);
-              object[change.keypath] = _o;
-            }
-          }
-        });
 
         changeset.every(function (change) {
           _this2._onChanges(change);
@@ -5419,6 +5408,7 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
 	    	if(!(object instanceof Array) && !Array.isArray(object)) {
 	    		throw new TypeError("First argument to Array.observer is not an Array");
 	    	}
+            	acceptlist = acceptlist || ["add", "update", "delete", "splice"];
 	    	var arrayproxy = new Proxy(object,{get: function(target,property) {
 	    		if(property==="unobserve") {
 		    		return function(callback) {
@@ -5482,15 +5472,26 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
 	    }
 	}
 	Object.deepObserve = function(object,callback,parts) {
+
 		parts = (parts ? parts : []);
-		var keys = Object.keys(object);
-		keys.forEach(function(key) {
-			if(object[key] instanceof Object) {
-				var newparts = parts.slice(0);
-				newparts.push(key);
-				object[key] = Object.deepObserve(object[key],callback,newparts);
-			}
-		});
+
+		var toTypeName = function(obj) {
+			return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+		}
+
+		function reobserve(value, parts) {
+			var keys = Object.keys(value);
+			keys.forEach(function(key) {
+				if((toTypeName(value[key]) === 'object' || toTypeName(value[key]) === 'array') && !value[key].hasOwnProperty('__observers__')) {
+					var newparts = parts.slice(0);
+					newparts.push(key);
+					value[key] = Object.deepObserve(value[key],callback,newparts);
+				}
+			});
+		}
+
+		reobserve(object, parts);
+
 		var observed = Object.observe(object,function(changeset) {
 			var changes = [];
 			function recurse(name,rootObject,oldObject,newObject,path) {
@@ -5501,6 +5502,7 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
 							var oldvalue = (oldObject && oldObject[key]!==undefined ? oldObject[key] : undefined),
 								change = (oldvalue===undefined ? "add" : "update"),
 								keypath = path + "." + key;
+
 							changes.push({name:name,object:rootObject,type:change,oldValue:oldvalue,newValue:newObject[key],keypath:keypath});
 							recurse(name,rootObject,oldvalue,newObject[key],keypath);
 						}
@@ -5510,6 +5512,7 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
 					oldkeys.forEach(function(key) {
 						var change = (newObject===null ? "update" : "delete"),
 							keypath = path + "." + key;
+							
 						changes.push({name:name,object:rootObject,type:change,oldValue:oldObject[key],newValue:newObject,keypath:keypath});
 						recurse(name,rootObject,oldObject[key],undefined,keypath);
 					});
@@ -5517,6 +5520,11 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
 			}
 			changeset.forEach(function(change) {
 				var keypath = (parts.length>0 ? parts.join(".") + "." : "") + change.name;
+
+				if (change.type === "update" || change.type === "add") { 
+					reobserve(change.object, parts);
+				}
+
 				changes.push({name:change.name,object:change.object,type:change.type,oldValue:change.oldValue,newValue:change.object[change.name],keypath:keypath});
 				recurse(change.name,change.object,change.oldValue,change.object[change.name],keypath);
 			});
@@ -5525,6 +5533,7 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
 		return observed;
 	};
 })();
+
 
 /***/ }),
 /* 154 */,
@@ -8271,6 +8280,9 @@ var P2PHandlerStub = function () {
 
       _this._sendChannelMsg(msg);
     });
+
+    console.log('+[P2PHandlerStub] deployed ', runtimeProtoStubURL);
+    this._sendStatus("deployed");
 
     this._connectionControllers = {};
 
