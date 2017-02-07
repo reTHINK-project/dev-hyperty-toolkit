@@ -196,7 +196,7 @@ class SlackProtoStub {
 
       console.log('ON PROTOSTUB - new subscription for schema:', objectDescURL, ' and dataObject:', dataObjectUrl);
 
-      return _this._syncher.subscribe(objectDescURL, dataObjectUrl).then((observer) => {
+      return _this._syncher.subscribe(objectDescURL, dataObjectUrl, false, false, false).then((observer) => {
         _this._observer = observer;
         _this._subscribedList.push(subscription);
         console.log('ON PROTOSTUB - subscribed', dataObjectUrl);
