@@ -226,7 +226,7 @@
     "signature": "",
     "interworking": true,
     "accessControlPolicy": "somePolicy",
-    "constraints": "",
+    "constraints": {},
     "dataObjects": []
   },
   "sip.rethink-project.eu": {
