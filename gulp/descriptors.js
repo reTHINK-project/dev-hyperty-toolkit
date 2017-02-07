@@ -47,7 +47,7 @@ var descriptorBase = function(type) {
     case 'protocolstub':
     case 'idp-proxy':
       base.type = '';
-      base.constraints = '';
+      base.constraints = {};
       base.interworking = false;
       break;
 
@@ -63,6 +63,7 @@ var descriptorBase = function(type) {
   base.objectName = '';
   base.configuration = {};
   base.messageSchemas = '';
+  base.dataObjects = [];
 
   base.signature = '';
   base.accessControlPolicy = 'somePolicy';
@@ -190,7 +191,7 @@ var encode = function(opts) {
     }
 
     if (opts.descriptor === 'ProtoStubs' || opts.descriptor === 'IDPProxys') {
-      json[value].constraints = checkValues('constraints', '', json[value]);
+      json[value].constraints = checkValues('constraints', {}, json[value]);
       json[value].interworking = checkValues('interworking', opts.interworking, json[value]);
     }
 
@@ -222,12 +223,17 @@ var encode = function(opts) {
 
 function checkValues(property, value, object) {
 
+  console.log(property, object[property], value);
+
   if (_.isEmpty(value) && typeof(value) !== 'boolean') {
-    return object[property];
+    console.log('1');
+    return object[property] || value;
   } else if (_.isEqual(object[property], value)) {
+    console.log('2');
     return value;
   } else {
-    return value;
+    console.log('3');
+    return value
   }
 
 }
