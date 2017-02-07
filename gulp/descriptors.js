@@ -223,16 +223,12 @@ var encode = function(opts) {
 
 function checkValues(property, value, object) {
 
-  console.log(property, object[property], value);
 
   if (_.isEmpty(value) && typeof(value) !== 'boolean') {
-    console.log('1');
     return object[property] || value;
   } else if (_.isEqual(object[property], value)) {
-    console.log('2');
     return value;
   } else {
-    console.log('3');
     return value
   }
 
