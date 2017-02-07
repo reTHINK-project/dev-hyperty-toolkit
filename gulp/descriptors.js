@@ -47,7 +47,7 @@ var descriptorBase = function(type) {
     case 'protocolstub':
     case 'idp-proxy':
       base.type = '';
-      base.constraints = '';
+      base.constraints = {};
       base.interworking = false;
       break;
 
@@ -63,6 +63,7 @@ var descriptorBase = function(type) {
   base.objectName = '';
   base.configuration = {};
   base.messageSchemas = '';
+  base.dataObjects = [];
 
   base.signature = '';
   base.accessControlPolicy = 'somePolicy';
@@ -72,7 +73,10 @@ var descriptorBase = function(type) {
 
 var encode = function(opts) {
 
-  opts = _.extend({}, opts || {});
+  opts = _.extend({}, opts);
+
+  var descriptor = fs.readFileSync(path.resolve('./resources/descriptors/' + opts.descriptor + '.json'), 'utf8');
+  var json = JSON.parse(descriptor);
 
   return through.obj(function(file, enc, cb) {
 
@@ -87,13 +91,10 @@ var encode = function(opts) {
     gutil.log('Encode: ', file.path);
 
     var fileObject = path.parse(file.path);
-    var descriptor = fs.readFileSync(path.resolve('./resources/descriptors/' + opts.descriptor + '.json'), 'utf8');
-    var json = JSON.parse(descriptor);
     var contents = fs.readFileSync(file.path, 'utf8');
     var type = '';
 
     var encoded = new Buffer(contents).toString('base64');
-    var value = 'default';
     var filename = fileObject.name;
 
     if (fileObject.name.indexOf('.hy') !== -1) {
@@ -102,6 +103,7 @@ var encode = function(opts) {
       filename = fileObject.name.replace('.ds', '');
     }
 
+    var value = 'default';
     if (opts.isDefault) {
       value = 'default';
     } else {
@@ -189,7 +191,7 @@ var encode = function(opts) {
     }
 
     if (opts.descriptor === 'ProtoStubs' || opts.descriptor === 'IDPProxys') {
-      json[value].constraints = checkValues('constraints', '', json[value]);
+      json[value].constraints = checkValues('constraints', {}, json[value]);
       json[value].interworking = checkValues('interworking', opts.interworking, json[value]);
     }
 
@@ -221,12 +223,12 @@ var encode = function(opts) {
 
 function checkValues(property, value, object) {
 
-  if (_.isEmpty(value)) {
-    return object[property];
+  if (_.isEmpty(value) && typeof(value) !== 'boolean') {
+    return object[property] || value;
   } else if (_.isEqual(object[property], value)) {
     return value;
   } else {
-    return value;
+    return value
   }
 
 }
