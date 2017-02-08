@@ -39,10 +39,10 @@ class SlackProtoStub {
 
     bus.addListener('*', (msg) => {
       console.log('ON PROTOSTUB ->', msg);
-      if (msg.body.identity) {
+      if (msg.body.hasOwnProperty('identity') && msg.body.identity.hasOwnProperty('access_token') && msg.body.identity.access_token) {
 
-        let token = msg.body.identity;
-        _this._open(msg.body.identity, ()=> {
+        let token = msg.body.identity.access_token;
+        _this._open(token, ()=> {
           if (_this._filter(msg)) {
             console.log('ON PROTOSTUB - AFTER FILTER->', msg);
             let schemaUrl = msg.body.schema;
@@ -55,6 +55,9 @@ class SlackProtoStub {
                   console.log('ON PROTOSTUB - IS IT subscribed->', result);
                   if (result) {
                     _this._token = token;
+                    if (msg.body.identity.userProfile.id) {
+                      _this._id = msg.body.identity.userProfile.id;
+                    }
 
                     let URLUsersList = 'https://slack.com/api/users.list?token=' + _this._token;
                     let URLGroupsList = 'https://slack.com/api/groups.list?token=' + _this._token;
@@ -65,6 +68,7 @@ class SlackProtoStub {
                     let GroupsListPromise = _this._sendHTTPRequest('GET', URLGroupsList);
                     let ChannelsListPromise = _this._sendHTTPRequest('GET', URLChannelsList);
                     let ImsListPromise = _this._sendHTTPRequest('GET', URLImsList);
+
 
                     Promise.all([UsersListPromise, GroupsListPromise, ChannelsListPromise, ImsListPromise]).then(function(result) {
                       _this._usersList = result[0].members;
@@ -168,7 +172,8 @@ class SlackProtoStub {
       _this._session.message(message=> {
         console.log(`ON PROTOSTUB - new message on session`, message);
         if (message.channel) {
-          if (message.channel === _this._channelID) {
+          if (message.channel === _this._channelID && message.user != _this._id) {
+
             _this._observer.addChild('chatmessages', { message: message.text});
           }
         }
@@ -204,15 +209,17 @@ class SlackProtoStub {
         observer.onAddChild((child) => {
           console.info('ON PROTOSTUB - Observer - Add Child: ', child);
           if (_this._channelID !== '' && child.value.message) {
-            console.log('token', _this._token, 'channel', _this._channelID, 'text',  child.value.message);
-            let message = { as_user: true, token: _this._token, channel: _this._channelID, text: child.value.message };
+            if (child.hasOwnProperty('identity') && child.identity.hasOwnProperty('userProfile') && child.identity.userProfile.hasOwnProperty('username') && child.identity.userProfile.username) {
+              let text = '' + child.identity.userProfile.username + ': ' + child.value.message;
+              let message = { as_user: true, token: _this._token, channel: _this._channelID, text: text};
+              console.log('token', _this._token, 'channel', _this._channelID, 'text',  child.value.message);
 
-            _this._slack.chat.postMessage(message, function(err, data) {
-              console.log('err', err, ' data ', data);
-              if (err) throw Error(err);
-            });
+              _this._slack.chat.postMessage(message, function(err, data) {
+                console.log('err', err, ' data ', data);
+                if (err) throw Error(err);
+              });
+            }
           }
-
         });
 
         observer.onChange('*', (event) => {

@@ -141,7 +141,7 @@ let idp = {
             console.log('info->', info);
 
             let profile = info.user.profile;
-            let infoToken = {picture: profile.image_original, email: profile.email, family_name: profile.last_name, given_name: profile.first_name};
+            let infoToken = {picture: profile.image_original, email: profile.email, family_name: profile.last_name, given_name: profile.first_name, id: info.user.id };
 
             let assertion = btoa(JSON.stringify({tokenID: value.access_token, email: profile.email, id: info.user.id}));
 
