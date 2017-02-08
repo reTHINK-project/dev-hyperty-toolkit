@@ -16,29 +16,33 @@ import Dexie from 'dexie';
 const runtimeFactory = Object.create({
 
   createSandbox(capabilities) {
-    
+
     return new Promise((resolve) => {
 
       let sandbox;
       let isWindowSandbox = '';
+      let SandboxCapabilities = {};
       if (capabilities.hasOwnProperty('windowSandbox') && capabilities.windowSandbox) isWindowSandbox = 'windowSandbox';
 
       // TODO this should be corrected.. now is only for testing
       this.capabilitiesManager.isAvailable(isWindowSandbox).then((result) => {
         if (result) {
+          // TODO: to be retrieved from capabilitiesManager
+          SandboxCapabilities = { "windowSandbox": true };
+
           console.info('[createSandbox ] - windowSandbox');
-          sandbox = new WindowSandbox();
+          sandbox = new WindowSandbox(SandboxCapabilities);
         } else {
           console.info('[createSandbox ] - sandbox');
-          sandbox = new SandboxBrowser();
+          sandbox = new SandboxBrowser(SandboxCapabilities);
         }
 
         resolve(sandbox);
 
       }).catch((reason) => {
-        console.log('By default create a normal sandbox: ', reason);
+        console.log('[createSandbox ] By default create a normal sandbox: ', reason);
         console.info('[createSandbox ] - sandbox');
-        sandbox = new SandboxBrowser();
+        sandbox = new SandboxBrowser(capabilities);
 
         resolve(sandbox);
       });

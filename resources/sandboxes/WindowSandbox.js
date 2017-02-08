@@ -4,17 +4,18 @@ import {Sandbox, SandboxType, SandboxRegistry} from 'runtime-core/dist/sandbox';
 // Mockup code for testing
 class WindowSandbox extends Sandbox {
 
-  constructor() {
+  constructor(capabilities) {
     super();
     let _this = this;
     _this.type = SandboxType.WINDOW;
+    _this.capabilities = capabilities;
 
-    console.log('AppSandboxBrowser');
+    console.log('[WindowSandbox] New with capabilities: ',capabilities);
 
     //simulate sandbox frontier
     _this._bus = new MiniBus();
     _this._bus._onPostMessage = function(msg) {
-      console.log('SandboxBrowser._onPostMessage -> external (out)', 'from: ', msg.from, 'to: ', msg.to, 'msg: ', msg);
+      console.log('[WindowSandbox]._onPostMessage -> external (out)', 'from: ', msg.from, 'to: ', msg.to, 'msg: ', msg);
 
       //redirect messages to the external part of the sandbox
       _this._onMessage(msg);
