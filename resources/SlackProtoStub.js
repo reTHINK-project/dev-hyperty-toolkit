@@ -39,7 +39,6 @@ class SlackProtoStub {
 
     bus.addListener('*', (msg) => {
       console.log('[SlackProtostub] new msg', msg);
-
       if (msg.body.hasOwnProperty('identity') && msg.body.identity.hasOwnProperty('access_token') && msg.body.identity.access_token) {
 
         let token = msg.body.identity.access_token;
@@ -54,7 +53,6 @@ class SlackProtoStub {
 
               if (schemaSplitted[schemaSplitted.length - 1] === 'Communication') {
                 _this._subscribe(schemaUrl, msg.from).then((result) => {
-
                   console.log('[SlackProtostub] subscribe result', result);
                   if (result) {
                     _this._token = token;
@@ -63,21 +61,21 @@ class SlackProtoStub {
                     }
 
                     let URLUsersList = 'https://slack.com/api/users.list?token=' + _this._token;
-                    let URLGroupsList = 'https://slack.com/api/groups.list?token=' + _this._token;
+                    //let URLGroupsList = 'https://slack.com/api/groups.list?token=' + _this._token;
                     let URLChannelsList = 'https://slack.com/api/channels.list?token=' + _this._token;
-                    let URLImsList = 'https://slack.com/api/im.list?token=' + _this._token;
+                    //let URLImsList = 'https://slack.com/api/im.list?token=' + _this._token;
 
                     let UsersListPromise = _this._sendHTTPRequest('GET', URLUsersList);
-                    let GroupsListPromise = _this._sendHTTPRequest('GET', URLGroupsList);
+                    //let GroupsListPromise = _this._sendHTTPRequest('GET', URLGroupsList);
                     let ChannelsListPromise = _this._sendHTTPRequest('GET', URLChannelsList);
-                    let ImsListPromise = _this._sendHTTPRequest('GET', URLImsList);
+                    //let ImsListPromise = _this._sendHTTPRequest('GET', URLImsList);
 
 
-                    Promise.all([UsersListPromise, GroupsListPromise, ChannelsListPromise, ImsListPromise]).then(function(result) {
+                    Promise.all([UsersListPromise, ChannelsListPromise]).then(function(result) {
                       _this._usersList = result[0].members;
-                      _this._groupsList = result[1].groups;
-                      _this._channelsList = result[2].channels;
-                      _this._imsList = result[3].ims;
+                      //_this._groupsList = result[1].groups;
+                      _this._channelsList = result[1].channels;
+                      //_this._imsList = result[3].ims;
 
                       let channelExists = _this._channelsList.filter(function(value, key) { return value.name === msg.body.value.name; })[0];
 
@@ -109,7 +107,7 @@ class SlackProtoStub {
 
                       } else {
                         _this._create(msg.body.value.name, userID).then(function(result){
-                          if (result) {
+                          if (result)   {
                             _this._invite(userID);
                           }
                         });
@@ -124,7 +122,6 @@ class SlackProtoStub {
           }
         });
       }
-
     });
   }
 
@@ -148,7 +145,7 @@ class SlackProtoStub {
       _this._session.listen({token});
 
       _this._session.message(message=> {
-        console.log('[SlackProtostub] new message on  session', message);
+        console.log('[SlackProtostub] new message on session', message);
         if (message.channel) {
           if (message.channel === _this._channelID && message.user !== _this._id || (!message.hasOwnProperty('bot_id') && message.user === _this._id && message.channel === _this._channelID)) {
 
