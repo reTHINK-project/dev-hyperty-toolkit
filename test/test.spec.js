@@ -87,7 +87,7 @@ describe('Install Runtime', function() {
 
   });
 
-  it.skip('should load diferent protostub', (done) => {
+  it('should load diferent protostub', (done) => {
 
     let stubList = [
       'https://rethink.tlabscloud.com/.well-known/protocolstub/default',
@@ -119,7 +119,7 @@ describe('Install Runtime', function() {
 
   });
 
-  it.skip('should load multiple hyperties', function(done) {
+  it('should load multiple hyperties', function(done) {
     this.timeout(100000);
 
     let hyperties = [

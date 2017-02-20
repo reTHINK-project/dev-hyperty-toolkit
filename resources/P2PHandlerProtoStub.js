@@ -343,6 +343,15 @@ SDPUtils.writeRtpDescription = function(kind, caps) {
     sdp += SDPUtils.writeFmtp(codec);
     sdp += SDPUtils.writeRtcpFb(codec);
   });
+  var maxptime = 0;
+  caps.codecs.forEach(function(codec) {
+    if (codec.maxptime > maxptime) {
+      maxptime = codec.maxptime;
+    }
+  });
+  if (maxptime > 0) {
+    sdp += 'a=maxptime:' + maxptime + '\r\n';
+  }
   sdp += 'a=rtcp-mux\r\n';
 
   caps.headerExtensions.forEach(function(extension) {
@@ -389,7 +398,6 @@ SDPUtils.parseRtpEncodingParameters = function(mediaSection) {
         ssrc: primarySsrc,
         codecPayloadType: parseInt(codec.parameters.apt, 10),
         rtx: {
-          payloadType: codec.payloadType,
           ssrc: secondarySsrc
         }
       };
@@ -464,10 +472,22 @@ SDPUtils.writeMediaSection = function(transceiver, caps, type, stream) {
     sdp += 'a=' + msid;
     sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
         ' ' + msid;
+    if (transceiver.sendEncodingParameters[0].rtx) {
+      sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].rtx.ssrc +
+          ' ' + msid;
+      sdp += 'a=ssrc-group:FID ' +
+          transceiver.sendEncodingParameters[0].ssrc + ' ' +
+          transceiver.sendEncodingParameters[0].rtx.ssrc +
+          '\r\n';
+    }
   }
   // FIXME: this should be written by writeRtpDescription.
   sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
       ' cname:' + SDPUtils.localCName + '\r\n';
+  if (transceiver.rtpSender && transceiver.sendEncodingParameters[0].rtx) {
+    sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].rtx.ssrc +
+        ' cname:' + SDPUtils.localCName + '\r\n';
+  }
   return sdp;
 };
 
@@ -497,7 +517,7 @@ module.exports = SDPUtils;
 
 },{}],2:[function(require,module,exports){
 // version: 0.5.1
-// date: Mon Feb 06 2017 16:00:21 GMT+0000 (WET)
+// date: Tue Feb 07 2017 16:00:39 GMT+0000 (WET)
 // licence: 
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
@@ -3156,10 +3176,12 @@ var DataObjectObserver = function (_DataObject) {
    * @ignore
    * Should not be used directly by Hyperties. It's called by the Syncher.subscribe method
    */
-  function DataObjectObserver(syncher, url, schema, initialStatus, initialData, childrens, initialVersion) {
+
+  //TODO: For Further Study
+  function DataObjectObserver(syncher, url, schema, initialStatus, initialData, childrens, initialVersion, mutual) {
     (0, _classCallCheck3.default)(this, DataObjectObserver);
 
-    var _this2 = (0, _possibleConstructorReturn3.default)(this, (DataObjectObserver.__proto__ || (0, _getPrototypeOf2.default)(DataObjectObserver)).call(this, syncher, url, schema, initialStatus, initialData.data, childrens));
+    var _this2 = (0, _possibleConstructorReturn3.default)(this, (DataObjectObserver.__proto__ || (0, _getPrototypeOf2.default)(DataObjectObserver)).call(this, syncher, url, schema, initialStatus, initialData.data, childrens, mutual));
 
     var _this = _this2;
 
@@ -3531,8 +3553,11 @@ var DataObjectReporter = function (_DataObject) {
   }, {
     key: '_onSubscribe',
     value: function _onSubscribe(msg) {
+      var _this3 = this;
+
       var _this = this;
       var hypertyUrl = msg.body.from;
+      console.log('[DataObjectReporter._onSubscribe]', msg);
 
       var event = {
         type: msg.body.type,
@@ -3552,11 +3577,19 @@ var DataObjectReporter = function (_DataObject) {
             childrenValues[childId] = (0, _utils.deepClone)(childData);
           });
 
-          //send ok response message
-          _this._bus.postMessage({
+          var sendMsg = {
             id: msg.id, type: 'response', from: msg.to, to: msg.from,
             body: { code: 200, schema: _this._schema, version: _this._version, value: { data: (0, _utils.deepClone)(_this.data), childrens: childrenValues } }
-          });
+          };
+
+          //TODO: For Further Study
+          if (msg.body.hasOwnProperty('mutualAuthentication') && !msg.body.mutualAuthentication) {
+            sendMsg.body.mutualAuthentication = _this3._mutualAuthentication;
+            _this3._mutualAuthentication = msg.body.mutualAuthentication;
+          }
+
+          //send ok response message
+          _this._bus.postMessage(sendMsg);
 
           return sub;
         },
@@ -3724,6 +3757,7 @@ var DataObject = function () {
    * Should not be used directly by Hyperties. It's called by the Syncher create or subscribe method's
    */
   function DataObject(syncher, url, schema, initialStatus, initialData, childrens) {
+    var mutual = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : true;
     (0, _classCallCheck3.default)(this, DataObject);
 
     var _this = this;
@@ -3734,6 +3768,9 @@ var DataObject = function () {
     _this._status = initialStatus;
     _this._syncObj = new _ProxyObject2.default(initialData);
     _this._childrens = childrens;
+
+    //TODO: For Further Study
+    _this._mutualAuthentication = mutual;
 
     _this._version = 0;
     _this._childId = 0;
@@ -3851,6 +3888,9 @@ var DataObject = function () {
         body: { resource: msgChildId, value: initialData }
       };
 
+      //TODO: For Further Study
+      if (!_this._mutualAuthentication) requestMsg.body.mutualAuthentication = _this._mutualAuthentication;
+
       //returns promise, in the future, the API may change to asynchronous call
       return new _promise2.default(function (resolve) {
         var msgId = _this._bus.postMessage(requestMsg);
@@ -3948,6 +3988,9 @@ var DataObject = function () {
           changeMsg.to = childInfo.path;
           changeMsg.body.resource = childInfo.childId;
         }
+
+        //TODO: For Further Study
+        if (!_this._mutualAuthentication) changeMsg.body.mutualAuthentication = _this._mutualAuthentication;
 
         _this._bus.postMessage(changeMsg);
       }
@@ -4648,6 +4691,9 @@ var Syncher = function () {
     * Request a subscription to an existent reporter object.
     * @param {SchemaURL} schema - Hyperty Catalogue URL address that can be used to retrieve the JSON-Schema describing the Data Object schema
     * @param {ObjectURL} objURL - Address of the existent reporter object to be observed
+    * @param {Boolean} [store=false] - Save the subscription on the Syncher Manager for further resume (Default is false)
+    * @param {Boolean} [p2p=false] - Info about if should use p2p connection (Default is false)
+    * @param {Boolean} [mutual=true] - Info about if messages of this object should be encrypted (Default is true)
     * @return {Promise<DataObjectObserver>} Return Promise to a new observer. It's associated with the reporter.
     */
 
@@ -4656,6 +4702,7 @@ var Syncher = function () {
     value: function subscribe(schema, objURL) {
       var store = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       var p2p = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      var mutual = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
 
       var _this = this;
       var criteria = {};
@@ -4664,6 +4711,9 @@ var Syncher = function () {
       criteria.store = store;
       criteria.schema = schema;
       criteria.resource = objURL;
+
+      //TODO: For Further Study
+      criteria.mutual = mutual;
 
       console.log('[syncher - subscribe] - subscribe criteria: ', criteria);
 
@@ -4810,14 +4860,18 @@ var Syncher = function () {
         // Resume Subscriptions for a certain user and data schema independently of the Hyperty URL.
         // https://github.com/reTHINK-project/specs/blob/master/messages/data-sync-messages.md#resume-subscriptions-for-a-certain-user-and-data-schema-independently-of-the-hyperty-url
         if (criteria) {
-          if (criteria.p2p) subscribeMsg.body.p2p = criteria.p2p;
-          if (criteria.store) subscribeMsg.body.store = criteria.store;
-          if (criteria.schema) subscribeMsg.body.schema = criteria.schema;
-          if (criteria.identity) subscribeMsg.body.identity = criteria.identity;
-          if (criteria.resource) subscribeMsg.body.resource = criteria.resource;
+          if (criteria.hasOwnProperty('p2p')) subscribeMsg.body.p2p = criteria.p2p;
+          if (criteria.hasOwnProperty('store')) subscribeMsg.body.store = criteria.store;
+          if (criteria.hasOwnProperty('schema')) subscribeMsg.body.schema = criteria.schema;
+          if (criteria.hasOwnProperty('identity')) subscribeMsg.body.identity = criteria.identity;
+          if (criteria.hasOwnProperty('resource')) subscribeMsg.body.resource = criteria.resource;
         }
 
         subscribeMsg.body.resume = criteria.resume;
+
+        //TODO: For Further Study
+        var mutualAuthentication = criteria.mutual;
+        if (!mutualAuthentication) subscribeMsg.body.mutualAuthentication = mutualAuthentication;
 
         console.log('[syncher] - subscribe message: ', criteria, subscribeMsg);
 
@@ -4841,7 +4895,8 @@ var Syncher = function () {
           } else if (reply.body.code === 200) {
             console.log('[syncher] - new Data Object Observer: ', reply, _this._provisionals);
 
-            var newObj = new _DataObjectObserver2.default(_this, objURL, schema, 'on', reply.body.value, newProvisional.children, reply.body.version);
+            //TODO: For Further Study
+            var newObj = new _DataObjectObserver2.default(_this, objURL, schema, 'on', reply.body.value, newProvisional.children, reply.body.version, mutualAuthentication);
             _this._observers[objURL] = newObj;
 
             resolve(newObj);
@@ -5576,6 +5631,7 @@ exports.DataObjectObserver = _DataObjectObserver2.default;
 /***/ })
 /******/ ]);
 });
+
 },{}],3:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
@@ -6175,17 +6231,20 @@ var edgeShim = {
         };
       }
       // this adds an additional event listener to MediaStrackTrack that signals
-      // when a tracks enabled property was changed.
-      var origMSTEnabled = Object.getOwnPropertyDescriptor(
-          MediaStreamTrack.prototype, 'enabled');
-      Object.defineProperty(MediaStreamTrack.prototype, 'enabled', {
-        set: function(value) {
-          origMSTEnabled.set.call(this, value);
-          var ev = new Event('enabled');
-          ev.enabled = value;
-          this.dispatchEvent(ev);
-        }
-      });
+      // when a tracks enabled property was changed. Workaround for a bug in
+      // addStream, see below. No longer required in 15025+
+      if (browserDetails.version < 15025) {
+        var origMSTEnabled = Object.getOwnPropertyDescriptor(
+            MediaStreamTrack.prototype, 'enabled');
+        Object.defineProperty(MediaStreamTrack.prototype, 'enabled', {
+          set: function(value) {
+            origMSTEnabled.set.call(this, value);
+            var ev = new Event('enabled');
+            ev.enabled = value;
+            this.dispatchEvent(ev);
+          }
+        });
+      }
     }
 
     window.RTCPeerConnection = function(config) {
@@ -6203,6 +6262,7 @@ var edgeShim = {
       this.onremovestream = null;
       this.onsignalingstatechange = null;
       this.oniceconnectionstatechange = null;
+      this.onicegatheringstatechange = null;
       this.onnegotiationneeded = null;
       this.ondatachannel = null;
 
@@ -6283,6 +6343,14 @@ var edgeShim = {
       this._localIceCandidatesBuffer = [];
     };
 
+    window.RTCPeerConnection.prototype._emitGatheringStateChange = function() {
+      var event = new Event('icegatheringstatechange');
+      this.dispatchEvent(event);
+      if (this.onicegatheringstatechange !== null) {
+        this.onicegatheringstatechange(event);
+      }
+    };
+
     window.RTCPeerConnection.prototype._emitBufferedCandidates = function() {
       var self = this;
       var sections = SDPUtils.splitSections(self.localDescription.sdp);
@@ -6310,8 +6378,9 @@ var edgeShim = {
             return transceiver.iceGatherer &&
                 transceiver.iceGatherer.state === 'completed';
           });
-          if (complete) {
+          if (complete && self.iceGatheringStateChange !== 'complete') {
             self.iceGatheringState = 'complete';
+            self._emitGatheringStateChange();
           }
         }
       });
@@ -6323,16 +6392,21 @@ var edgeShim = {
     };
 
     window.RTCPeerConnection.prototype.addStream = function(stream) {
-      // Clone is necessary for local demos mostly, attaching directly
-      // to two different senders does not work (build 10547).
-      var clonedStream = stream.clone();
-      stream.getTracks().forEach(function(track, idx) {
-        var clonedTrack = clonedStream.getTracks()[idx];
-        track.addEventListener('enabled', function(event) {
-          clonedTrack.enabled = event.enabled;
+      if (browserDetails.version >= 15025) {
+        this.localStreams.push(stream);
+      } else {
+        // Clone is necessary for local demos mostly, attaching directly
+        // to two different senders does not work (build 10547).
+        // Fixed in 15025 (or earlier)
+        var clonedStream = stream.clone();
+        stream.getTracks().forEach(function(track, idx) {
+          var clonedTrack = clonedStream.getTracks()[idx];
+          track.addEventListener('enabled', function(event) {
+            clonedTrack.enabled = event.enabled;
+          });
         });
-      });
-      this.localStreams.push(clonedStream);
+        this.localStreams.push(clonedStream);
+      }
       this._maybeFireNegotiationNeeded();
     };
 
@@ -6482,6 +6556,7 @@ var edgeShim = {
                     self.onicecandidate(new Event('icecandidate'));
                   }
                   self.iceGatheringState = 'complete';
+                  self._emitGatheringStateChange();
                 }
                 break;
               case 'complete':
@@ -6530,8 +6605,7 @@ var edgeShim = {
       if (recv && transceiver.rtpReceiver) {
         // remove RTX field in Edge 14942
         if (transceiver.kind === 'video'
-            && transceiver.recvEncodingParameters
-            && browserDetails.version < 15019) {
+            && transceiver.recvEncodingParameters) {
           transceiver.recvEncodingParameters.forEach(function(p) {
             delete p.rtx;
           });
@@ -6738,26 +6812,6 @@ var edgeShim = {
                 .filter(function(cand) {
                   return cand.component === '1';
                 });
-            localCapabilities = RTCRtpReceiver.getCapabilities(kind);
-
-            // filter RTX until additional stuff needed for RTX is implemented
-            // in adapter.js
-            localCapabilities.codecs = localCapabilities.codecs.filter(
-                function(codec) {
-                  return codec.name !== 'rtx';
-                });
-            var commonCodecs = self._getCommonCapabilities(
-                localCapabilities,
-                remoteCapabilities).codecs;
-            commonCodecs = commonCodecs.map(function(codec) {
-              return codec.name;
-            });
-            if (commonCodecs.length === 0 ||
-                (commonCodecs.indexOf('H264') === -1 &&
-                commonCodecs.indexOf('VP8') === -1)) {
-              rejected = true;
-            }
-
             if (description.type === 'offer' && !rejected) {
               var transports = self.usingBundle && sdpMLineIndex > 0 ? {
                 iceGatherer: self.transceivers[0].iceGatherer,
@@ -6769,6 +6823,14 @@ var edgeShim = {
                 transports.iceTransport.setRemoteCandidates(cands);
               }
 
+              localCapabilities = RTCRtpReceiver.getCapabilities(kind);
+
+              // filter RTX until additional stuff needed for RTX is implemented
+              // in adapter.js
+              localCapabilities.codecs = localCapabilities.codecs.filter(
+                  function(codec) {
+                    return codec.name !== 'rtx';
+                  });
 
               sendEncodingParameters = [{
                 ssrc: (2 * sdpMLineIndex + 2) * 1001
@@ -7468,9 +7530,21 @@ var firefoxShim = {
           if (browserDetails.version < 53 && !onSucc) {
             // Shim only promise getStats with spec-hyphens in type names
             // Leave callback version alone; misc old uses of forEach before Map
-            stats.forEach(function(stat) {
-              stat.type = modernStatsTypes[stat.type] || stat.type;
-            });
+            try {
+              stats.forEach(function(stat) {
+                stat.type = modernStatsTypes[stat.type] || stat.type;
+              });
+            } catch (e) {
+              if (e.name !== 'TypeError') {
+                throw e;
+              }
+              // Avoid TypeError: "type" is read-only, in old versions. 34-43ish
+              stats.forEach(function(stat, i) {
+                stats.set(i, Object.assign({}, stat, {
+                  type: modernStatsTypes[stat.type] || stat.type
+                }));
+              });
+            }
           }
           return stats;
         })
@@ -7914,6 +7988,7 @@ var ConnectionController = function () {
     this._peerUrl;
     this._dataChannel;
     this._onStatusUpdate;
+    this._remoteRuntimeURL;
 
     this._peerConnection = this._createPeerConnection();
   }
@@ -7965,6 +8040,7 @@ var ConnectionController = function () {
       var _this2 = this;
 
       this._peerUrl = invitationEvent.from;
+      this._remoteRuntimeURL = invitationEvent.value.runtimeURL;
 
       return new Promise(function (resolve, reject) {
 
@@ -8055,7 +8131,7 @@ var ConnectionController = function () {
   }, {
     key: 'sendMessage',
     value: function sendMessage(m) {
-      // todo: only send if data channeld is connected
+      // todo: only send if data channel is connected
       console.log("[P2P-ConnectionController] --> outgoing msg: ", m);
       this._dataChannel.send(m);
     }
@@ -8153,7 +8229,7 @@ var ConnectionController = function () {
     key: '_onDataChannelOpen',
     value: function _onDataChannelOpen() {
       console.log('[P2P-ConnectionController] DataChannel opened');
-      if (this._onStatusUpdate) this._onStatusUpdate("live");
+      if (this._onStatusUpdate) this._onStatusUpdate("live", undefined, this._remoteRuntimeURL);
     }
   }, {
     key: '_onDataChannelError',
@@ -8272,17 +8348,15 @@ var P2PHandlerStub = function () {
     if (!miniBus) throw new Error('The bus is a required parameter');
     if (!configuration) throw new Error('The configuration is a required parameter');
 
+    console.log('+[P2PHandlerStub.constructor] config is: ', configuration);
+
     this._runtimeProtoStubURL = runtimeProtoStubURL;
     this._runtimeURL = configuration.runtimeURL;
     this._configuration = configuration;
     this._bus = miniBus;
     this._bus.addListener('*', function (msg) {
-
       _this._sendChannelMsg(msg);
     });
-
-    console.log('+[P2PHandlerStub] deployed ', runtimeProtoStubURL);
-    this._sendStatus("deployed");
 
     this._connectionControllers = {};
 
@@ -8295,14 +8369,15 @@ var P2PHandlerStub = function () {
       switch (event.type) {
 
         case 'create':
+
           // as discussed with Paulo, we expect the "remoteRuntimeURL" as field "runtimeURL" in the initial dataObject
           // emit the "create" event as requested in issue: https://github.com/reTHINK-project/dev-protostubs/issues/5
-          _this._sendStatus("create", undefined, event.runtimeURL);
+          _this._sendStatus("create", undefined, event.value.runtimeURL);
 
           _this._createConnectionController(event).then(function (connectionController) {
             _this._connectionControllers[event.from] = connectionController;
-            connectionController.onStatusUpdate(function (status, reason) {
-              _this._sendStatus(status, reason);
+            connectionController.onStatusUpdate(function (status, reason, remoteRuntimeURL) {
+              _this._sendStatus(status, reason, remoteRuntimeURL);
             });
             connectionController.onMessage(function (m) {
               _this._deliver(m);
@@ -8350,8 +8425,11 @@ var P2PHandlerStub = function () {
       return new Promise(function (resolve, reject) {
         var connectionController = new _ConnectionController2.default(_this3._runtimeProtoStubURL, _this3._syncher, _this3._configuration, false);
         connectionController.observe(invitationEvent).then(function () {
+          console.log("+[P2PHandlerStub] observer setup successful");
           // create the reporter automatically
           connectionController.report(invitationEvent.from, _this3._runtimeURL).then(function () {
+            console.log("+[P2PHandlerStub] reporter setup successful");
+            _this3._sendStatus("in-progress", undefined, invitationEvent.value.runtimeURL);
             resolve(connectionController);
           });
         });
@@ -8382,6 +8460,7 @@ var P2PHandlerStub = function () {
       if (reason) {
         msg.body.desc = reason;
       }
+      console.log("+[P2PHandlerStub] sending status update: ", msg);
       this._bus.postMessage(msg);
     }
 
@@ -8395,7 +8474,6 @@ var P2PHandlerStub = function () {
     key: '_filter',
     value: function _filter(msg) {
       // todo: only try to send when connected (live status)
-
       if (msg.body && msg.body.via === this._runtimeProtoStubURL) return false;
       return true;
     }
@@ -8408,10 +8486,14 @@ var P2PHandlerStub = function () {
   }, {
     key: '_deliver',
     value: function _deliver(msg) {
-      if (!msg.body) msg.body = {};
 
-      msg.body.via = this._runtimeProtoStubURL;
-      this._bus.postMessage(msg);
+      console.log("+[P2PHandlerStub] posting message to msg bus: ", msg);
+      var message = JSON.parse(msg.data);
+
+      if (!message.body) msg.body = {};
+
+      message.body.via = this._runtimeProtoStubURL;
+      this._bus.postMessage(message);
     }
   }]);
 
