@@ -217,7 +217,7 @@ gulp.task('watch', function() {
   gulp.watch(['system.config.json'], ['main-watch']);
   gulp.watch(['./resources/schemas/**/*.ds.json'], ['schemas'], browserSync.reload);
 
-  gulp.watch(['./server/rethink.js', './resources/factories/*.js', './app/main.js'], function() {
+  gulp.watch(['./server/rethink.js', './resources/factories/*.js', './resources/browser/*.js', './resources/sandboxes/*.js', './app/main.js'], function() {
     return gulp.src('./server/rethink.js')
     .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
     .resume()

@@ -44,7 +44,7 @@ class RuntimeCapabilities {
 
       this.storageManager.get('capabilities').then((capabilities) => {
 
-        console.log('Capability ' + capability + ' is available? ', capabilities.hasOwnProperty(capability) && capabilities[capability]);
+        console.log('[RuntimeCapabilities isAvailable?] ' + capability + ' is ', capabilities.hasOwnProperty(capability) && capabilities[capability]);
         if (capabilities.hasOwnProperty(capability) && capabilities[capability]) {
           resolve(true);
         } else {
@@ -70,6 +70,7 @@ class RuntimeCapabilities {
     // TODO: this should be more effective and check the environment
     return {
       browser: !!(window && navigator),
+      windowSandbox: !!(window && navigator),
       node: !!!(window && navigator)
     };
   }

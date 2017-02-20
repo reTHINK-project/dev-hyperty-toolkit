@@ -48,6 +48,7 @@ var VertxProtoStub = (function () {
     bus.addListener('*', function (msg) {
       _this._open(function () {
         if (_this._filter(msg)) {
+          console.log('[VertxProtoStub: ProtoStub -> MN]', msg);
           _this._sock.send(JSON.stringify(msg));
         }
       });
@@ -191,6 +192,7 @@ var VertxProtoStub = (function () {
       if (!msg.body) msg.body = {};
 
       msg.body.via = this._runtimeProtoStubURL;
+      console.log('[VertxProtoStub: MN -> ProtoStub]', msg);
       this._bus.postMessage(msg);
     }
   }, {
@@ -218,6 +220,9 @@ var VertxProtoStub = (function () {
 
         _this._sock.onmessage = function (e) {
           var msg = JSON.parse(e.data);
+
+          console.log('[VertxProtoStub: MN -> SOCKET ON MESSAGE]', msg);
+
           if (msg.from === 'mn:/session') {
             if (_this._sessionCallback) {
               _this._sessionCallback(msg);

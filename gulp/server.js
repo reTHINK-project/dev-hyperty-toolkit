@@ -183,34 +183,45 @@ function devMiddleware(req, res, next) {
     } else {
       var raw = getResources(type);
 
-      if (resource) {
-        var selectedResource = raw[resource];
+      if (raw) {
 
-        if (selectedResource) {
-          res.writeHeader(200, {'Content-Type': 'application/json'});
+        if (resource) {
+          var selectedResource = raw[resource];
 
-          if (req.originalUrl.includes('cguid')) {
-            res.end(selectedResource.cguid.toString());
-          } else if (req.originalUrl.includes('version')) {
-            res.end(JSON.stringify(Number(selectedResource.version), '', 2));
+          if (selectedResource) {
+            res.writeHeader(200, {'Content-Type': 'application/json'});
+
+            if (req.originalUrl.includes('cguid')) {
+              res.end(selectedResource.cguid.toString());
+            } else if (req.originalUrl.includes('version')) {
+              res.end(JSON.stringify(Number(selectedResource.version), '', 2));
+            } else {
+              res.end(JSON.stringify(selectedResource, '', 2));
+            }
           } else {
-            res.end(JSON.stringify(selectedResource, '', 2));
+            res.writeHeader(404, {'Content-Type': 'application/json'});
+            res.end('404 - ' + resource + ' not found;');
           }
-        } else {
-          res.writeHeader(404, {'Content-Type': 'application/json'});
-          res.end('404 - ' + resource + ' not found;');
-        }
 
-      } else {
-        var listOfResources = [];
-        for (var key in raw) {
-          if (raw.hasOwnProperty(key)) {
-            listOfResources.push(key);
+        } else {
+          var listOfResources = [];
+          for (var key in raw) {
+            if (raw.hasOwnProperty(key)) {
+              listOfResources.push(key);
+            }
           }
+          res.writeHeader(200, {'Content-Type': 'application/json'});
+          res.end(JSON.stringify(listOfResources, '', 2));
         }
-        res.writeHeader(200, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify(listOfResources, '', 2));
+      } else {
+        console.log('this ' + req.originalUrl + ' does not exist, please verify the url');
+        var msg = '<h1>404 - ' + type + ' not found</h1>' +
+                  'Please use one of this:' + 
+                  '<ul><li>hyperty</li><li>protocolstub</li><li>idp-proxy</li><li>dataschema</li><li>runtime</li></ul>';
+        res.writeHeader(404, {'Content-Type': 'text/html'});
+        res.end(msg);
       }
+
     }
   }
 

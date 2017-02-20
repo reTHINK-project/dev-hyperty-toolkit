@@ -93,8 +93,10 @@ const rethink = {
       console.log('Install configuration: ', development, domain, runtimeURL);
 
       let catalogue = runtimeFactory.createRuntimeCatalogue(development);
+      let runtimeDescriptor;
 
       catalogue.getRuntimeDescriptor(runtimeURL).then((descriptor) => {
+        runtimeDescriptor = descriptor;
 
         if (descriptor.sourcePackageURL === '/sourcePackage') {
           return descriptor.sourcePackage;
@@ -107,9 +109,10 @@ const rethink = {
 
         window.eval(sourcePackage.sourceCode);
 
-        let runtime = new Runtime(runtimeFactory, domain);
-        window.runtime = runtime;
+        let runtime = new Runtime(runtimeDescriptor, runtimeFactory, domain);
 
+        window.runtime = runtime;
+        
         runtime.init().then((result) => {
           minibus.addListener('core:loadHyperty', function(msg) {
             console.log('Load Hyperty: ', msg);

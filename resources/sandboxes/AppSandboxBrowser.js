@@ -4,11 +4,11 @@ import {Sandbox, SandboxType, SandboxRegistry} from 'runtime-core/dist/sandbox';
 // Mockup code for testing
 class AppSandboxBrowser extends Sandbox {
 
-  constructor() {
+  constructor(capabilities) {
     super();
     let _this = this;
     _this.type = SandboxType.APP;
-    console.log('AppSandboxBrowser');
+    console.log('[AppSandboxBrowser] new with capabilities: ', capabilities);
 
     //simulate sandbox frontier
     _this._bus = new MiniBus();
