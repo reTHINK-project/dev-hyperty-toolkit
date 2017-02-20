@@ -119,7 +119,7 @@ describe('Install Runtime', function() {
 
   });
 
-  it('should load multiple hyperties', function(done) {
+  it.skip('should load multiple hyperties', function(done) {
     this.timeout(100000);
 
     let hyperties = [
