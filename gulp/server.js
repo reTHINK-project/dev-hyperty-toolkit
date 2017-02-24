@@ -129,8 +129,11 @@ function devMiddleware(req, res, next) {
     var type = paths[2];
     var resource = paths[3];
 
-    if (req.originalUrl.includes('index.html') || req.originalUrl.includes('.js')) {
-      if (req.originalUrl.includes('index.html')) {
+    if (req.originalUrl.includes('.html') || req.originalUrl.includes('.js')) {
+      if (req.originalUrl.includes('sandbox.html')) {
+        res.writeHeader(200, {'Content-Type': 'text/html'});
+        res.end(fs.readFileSync('node_modules/runtime-browser/bin/sandbox.html', 'utf8'));
+      } else if (req.originalUrl.includes('index.html')) {
         res.writeHeader(200, {'Content-Type': 'text/html'});
         res.end(fs.readFileSync('node_modules/runtime-browser/bin/index.html', 'utf8'));
       } else {
