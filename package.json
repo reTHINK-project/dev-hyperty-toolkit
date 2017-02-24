@@ -26,7 +26,7 @@
   "homepage": "https://github.com/reTHINK-project/dev-hyperty-toolkit#readme",
   "dependencies": {
     "runtime-core": "github:rethink-project/dev-runtime-core#develop",
-    "runtime-browser": "github:rethink-project/dev-runtime-browser#dev-interworking",
+    "runtime-browser": "github:rethink-project/dev-runtime-browser#develop",
     "service-framework": "github:rethink-project/dev-service-framework#develop"
   },
   "devDependencies": {
