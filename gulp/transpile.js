@@ -61,7 +61,7 @@ module.exports = function transpile(opts) {
 
     var filename = opts.filename || fileObject.base;
 
-    var environment = getEnvironment();
+    var environment = opts.environment || getEnvironment();
 
     if (environment === 'all') {
       var configEnv = getHypertyConfiguration(chunk.path);
@@ -124,7 +124,7 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
 }
 
 function transpileNode(filename, opts, chunk, cb) {
-  
+
   var fileObject = path.parse(chunk.path);
   var stage = getStage();
 

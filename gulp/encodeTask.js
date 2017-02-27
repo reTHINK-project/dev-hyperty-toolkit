@@ -74,6 +74,12 @@ function encodeStub(file) {
       choices: ['no', 'yes']
     },
     {
+      type: 'list',
+      name: 'environment',
+      message: 'This component is to working with:',
+      choices: ['browser', 'node']
+    },
+    {
       type: 'input',
       name: 'configuration',
       message: 'Resource configuration, use something like {"url": "wss://msg-node.localhost:9090/ws"}:'
@@ -112,11 +118,14 @@ function encodeStub(file) {
       resourceOpts.interworking = true;
     }
 
+    transpileOpts.environment = res.environment;
+
     transpileOpts.isES6 = false;
     if (res.esVersion === 'ES6') {
       transpileOpts.isES6 = true;
       transpileOpts.standalone = 'activate';
     }
+
     console.log(resourceOpts, transpileOpts);
     encode(file, resourceOpts, transpileOpts);
 
