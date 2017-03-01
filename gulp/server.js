@@ -297,10 +297,6 @@ function processPost(req, res) {
         } else if (req.originalUrl.includes('version')) {
           res.writeHeader(200, {'Content-Type': 'application/json'});
           res.end(JSON.stringify(Number(raw[info.resource].version), '', 2));
-        } else if (filtered.length === 1 && info.resource === 'default') {
-          console.log('A', raw[filtered[0]].cguid);
-          res.writeHeader(200, {'Content-Type': 'application/json'});
-          res.end(JSON.stringify(raw[filtered[0]], '', 2));
         } else {
           console.log('B', raw[info.resource].cguid);
           res.writeHeader(200, {'Content-Type': 'application/json'});

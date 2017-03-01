@@ -123,7 +123,7 @@ function transpileNode(filename, opts, chunk, cb) {
   return gulp.src(chunk.path)
     .pipe(webpack({
       target: 'node',
-      devtool: stage === 'develop' ? 'inline-eval-cheap-source-map' : false,
+      devtool: stage === 'develop' ? 'inline-source-map' : false,
       output: {
         path: path.join(opts.destination),
         library: opts.standalone,
