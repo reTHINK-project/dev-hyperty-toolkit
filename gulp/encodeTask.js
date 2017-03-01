@@ -32,7 +32,7 @@ function getTypeOfFile(file) {
 
 function encodeRuntime(file) {
 
-  return gulp.src('./', {buffer:false})
+  return gulp.src('./', {buffer: false})
   .pipe(prompt.prompt([
     {
       type: 'input',
@@ -59,7 +59,7 @@ function encodeRuntime(file) {
 
 function encodeStub(file) {
 
-  return gulp.src('./', {buffer:false})
+  return gulp.src('./', {buffer: false})
   .pipe(prompt.prompt([
     {
       type: 'list',
@@ -169,7 +169,7 @@ var encodeTask = function(done) {
     }
   }
 
-  gulp.src('./', {buffer:false})
+  gulp.src('./', {buffer: false})
     .pipe(prompt.prompt([{
       type: 'list',
       name: 'file',

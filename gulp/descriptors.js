@@ -40,8 +40,7 @@ var descriptorBase = function(type) {
       base.runtimeType = 'browser';
       base.p2pHandlerStub = '';
       base.p2pRequesterStub = '';
-      base.hypertyCapabilities = {};
-      base.protocolCapabilities = {};
+      base.constraints = {};
       break;
 
     case 'protocolstub':
@@ -168,14 +167,13 @@ var encode = function(opts) {
       json[value].runtimeType = 'browser';
       json[value].p2pHandlerStub = checkValues('p2pHandlerStub', opts.p2pHandlerStub || '', json[value]);
       json[value].p2pRequesterStub = checkValues('p2pRequesterStub', opts.p2pRequesterStub || '', json[value]);
-      json[value].hypertyCapabilities = {
+      json[value].constraints = {
+        browser: true,
         mic: true,
         camera: true,
         sensor: false,
         webrtc: true,
-        ortc: true
-      };
-      json[value].protocolCapabilities = {
+        ortc: true,
         http: true,
         https: true,
         ws: true,

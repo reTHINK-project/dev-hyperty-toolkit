@@ -16,7 +16,7 @@ class Request {
           };
 
           break;
-      
+
         case 'POST':
         case 'DELETE':
         case 'UPDATE':
@@ -31,7 +31,7 @@ class Request {
   }
 
   set withCredentials(value = false) {
-    this._withCredentials = value
+    this._withCredentials = value;
   }
 
   get withCredentials() {
@@ -40,7 +40,7 @@ class Request {
 
   _makeLocalRequest(method, url, options) {
 
-    if (!options) { options = null }
+    if (!options) { options = null; }
 
     console.log('method:', method, '| url: ', url, options ? ' | payload:' + options : '');
 
@@ -51,14 +51,11 @@ class Request {
         'http://': 'https://'
       };
 
-      let usedProtocol;
-
       let foundProtocol = false;
       for (let protocol in protocolmap) {
         if (url.slice(0, protocol.length) === protocol) {
           // console.log("exchanging " + protocol + " with " + protocolmap[protocol]);
           url = protocolmap[protocol] + url.slice(protocol.length, url.length);
-          usedProtocol = protocolmap[protocol];
           foundProtocol = true;
           break;
         }
@@ -78,7 +75,7 @@ class Request {
         xhr = this.xhr;
       }
 
-      xhr.addEventListener("readystatechange", function (event) {
+      xhr.addEventListener('readystatechange', function(event) {
         let xhr = event.currentTarget;
         if (xhr.readyState === 4) {
           // console.log("got response:", xhr);
@@ -91,14 +88,15 @@ class Request {
         }
       });
 
-      xhr.open(method, url, true);
+      xhr.open(method, url);
 
       if (method === 'POST') {
-        xhr.setRequestHeader("content-type", "application/x-www-form-urlencoded");
-        xhr.setRequestHeader("cache-control", "no-cache");
+        xhr.setRequestHeader('content-type', 'application/json');
+        xhr.setRequestHeader('cache-control', 'no-cache');
+        xhr.send(JSON.stringify(options));
+      } else {
+        xhr.send();
       }
-
-      xhr.send(options);
 
     });
 

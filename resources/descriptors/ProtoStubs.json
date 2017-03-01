@@ -16,9 +16,9 @@
     "configuration": {
       "url": "wss://msg-node.localhost:9090/ws"
     },
-    "constraints": "",
-    "hypertyCapabilities": "",
-    "protocolCapabilities": "",
+    "constraints": {
+      "browser": true
+    },
     "policies": "",
     "dataObjects": [],
     "interworking": false,
@@ -46,7 +46,9 @@
     "messageSchemas": "",
     "signature": "",
     "accessControlPolicy": "somePolicy",
-    "constraints": {},
+    "constraints": {
+      "node": true
+    },
     "dataObjects": [],
     "interworking": false
   },

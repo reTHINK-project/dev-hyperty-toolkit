@@ -3,11 +3,9 @@ var gulp = require('gulp');
 var fs = require('fs');
 var path = require('path');
 
-var babel = require('babelify');
 var gutil = require('gulp-util');
 var through = require('through2');
 var webpack = require('webpack-stream');
-var source = require('vinyl-source-stream');
 
 var getStage = require('./stage');
 var getEnvironment = require('./environment');
@@ -46,13 +44,7 @@ module.exports = function transpile(opts) {
   return through.obj(function(chunk, enc, cb) {
 
     var fileObject = path.parse(chunk.path);
-    var stage = getStage();
     var args = {};
-
-    var compact = false;
-    if (stage === 'production') {
-      compact = true;
-    }
 
     args.entries = [chunk.path];
     args.extensions = extensions;
@@ -106,12 +98,12 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
       module: {
         loaders: [
           { test: /\.json$/, loader: 'json' },
-          { exclude: /node_modules/, test: /\.js$/, loader: "babel-loader" },
+          { exclude: /node_modules/, test: /\.js$/, loader: 'babel-loader' }
         ]
       }
     }))
     .on('error', function(err) {
-        gutil.log(gutil.colors.red(err));
+      gutil.log(gutil.colors.red(err));
       this.emit('end');
     })
     .pipe(gulp.dest(opts.destination))
@@ -142,7 +134,7 @@ function transpileNode(filename, opts, chunk, cb) {
       module: {
         loaders: [
           { test: /\.json$/, loader: 'json' },
-          { exclude: /node_modules/, test: /\.js$/, loader: "babel-loader" },
+          { exclude: /node_modules/, test: /\.js$/, loader: 'babel-loader' }
         ]
       }
     }))
