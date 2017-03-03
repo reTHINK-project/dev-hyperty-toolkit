@@ -270,7 +270,12 @@ function processPost(req, res) {
 
   req.on('end', function() {
     var body = Buffer.concat(chunks).toString();
-    var data = JSON.parse(body);
+    var data;
+    try {
+      data = JSON.parse(body);
+    } catch (error) {
+      data = {};
+    }
 
     if (data.hasOwnProperty('constraints')) {
       var constraints = data.constraints;
