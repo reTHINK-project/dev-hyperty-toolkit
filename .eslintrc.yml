@@ -16,7 +16,7 @@ env:
 
 parserOptions:
   ecmaVersion: 6
-  ecmaFeatures: 
+  ecmaFeatures:
     modules: true
     classes: true
   sourceType: module
@@ -43,7 +43,7 @@ rules:
     - error
     - never
   block-spacing: error
-  brace-style: 
+  brace-style:
     - error
     - 1tbs
     - allowSingleLine: true
