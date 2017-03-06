@@ -5,7 +5,7 @@ var path = require('path');
 
 var gulpif = require('gulp-if');
 var gutil = require('gulp-util');
-var prompt = require('gulp-prompt');
+var inquirer = require('inquirer');
 
 var resource = require('./resources');
 var transpile = require('./transpile');
@@ -32,8 +32,7 @@ function getTypeOfFile(file) {
 
 function encodeRuntime(file) {
 
-  return gulp.src('./', {buffer: false})
-  .pipe(prompt.prompt([
+  inquirer.prompt([
     {
       type: 'input',
       name: 'p2pHandlerStub',
@@ -44,7 +43,7 @@ function encodeRuntime(file) {
       name: 'p2pRequesterStub',
       message: 'P2PRequesterStub url:'
     }
-  ], function(res) {
+  ]).then(function(res) {
 
     var resourceOpts = {};
     if (res.p2pHandlerStub) resourceOpts.p2pHandlerStub = res.p2pHandlerStub;
@@ -54,13 +53,12 @@ function encodeRuntime(file) {
     transpileOpts.isES6 = false;
 
     encode(file, resourceOpts, transpileOpts);
-  }));
+  });
 }
 
 function encodeStub(file) {
 
-  return gulp.src('./', {buffer: false})
-  .pipe(prompt.prompt([
+  inquirer.prompt([
     {
       type: 'list',
       name: 'esVersion',
@@ -74,10 +72,24 @@ function encodeStub(file) {
       choices: ['no', 'yes']
     },
     {
-      type: 'list',
+      type: 'checkbox',
       name: 'environment',
       message: 'This component is to working with:',
-      choices: ['browser', 'node']
+      choices: [
+        {
+          name: 'browser',
+          checked: true
+        },
+        {
+          name: 'node'
+        }
+      ],
+      validate: function(answer) {
+        if (answer.length < 1) {
+          return 'You must choose at least one environment.';
+        }
+        return true;
+      }
     },
     {
       type: 'input',
@@ -95,7 +107,7 @@ function encodeStub(file) {
       message: 'This will be a default file to be loaded?',
       choices: ['no', 'yes']
     }
-  ], function(res) {
+  ]).then(function(res) {
     var resourceOpts = {};
     var transpileOpts = {};
     var configuration = JSON.parse(res.configuration || '{}');
@@ -118,7 +130,7 @@ function encodeStub(file) {
       resourceOpts.interworking = true;
     }
 
-    transpileOpts.environment = res.environment;
+    transpileOpts.environment = res.environment[0];
 
     transpileOpts.isES6 = false;
     if (res.esVersion === 'ES6') {
@@ -129,7 +141,7 @@ function encodeStub(file) {
     console.log(resourceOpts, transpileOpts);
     encode(file, resourceOpts, transpileOpts);
 
-  }));
+  });
 
 }
 
@@ -169,13 +181,13 @@ var encodeTask = function(done) {
     }
   }
 
-  gulp.src('./', {buffer: false})
-    .pipe(prompt.prompt([{
+  inquirer.prompt([
+    {
       type: 'list',
       name: 'file',
       message: 'File to be converted:',
       choices: files
-    }], function(res) {
+    }]).then(function(res) {
 
       fs.access(res.file, fs.R_OK | fs.W_OK, function(err) {
         if (err) done(new Error('No such file or directory'));
@@ -202,8 +214,9 @@ var encodeTask = function(done) {
           break;
 
       }
-    })
+    }
   );
+
 };
 
 module.exports = {

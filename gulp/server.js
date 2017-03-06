@@ -286,33 +286,36 @@ function processPost(req, res) {
             found++;
           }
         });
-        console.log('Found ' + found + ' keys');
+
+        // console.log('Found ' + found + ' keys');
         return found > 0 ? true : false;
       });
     }
 
     if (info.resource) {
-      var indexOf = filtered.indexOf(info.resource);
-      if (indexOf !== -1 || info.resource === 'default') {
+      var result = getDescriptorByObjectName(raw, filtered, info.resource);
 
-        console.log(filtered.length);
+      if (result.length > 0) {
+        result = result[0];
+
+        console.log('Response: ', result.objectName.toString() + ' - ' + info.resource + ' - ' + result.sourcePackage.sourceCodeClassname);
         if (req.originalUrl.includes('cguid')) {
           res.writeHeader(200, {'Content-Type': 'text/plain'});
-          res.end(raw[info.resource].cguid.toString());
+          res.end(result.cguid.toString());
         } else if (req.originalUrl.includes('version')) {
           res.writeHeader(200, {'Content-Type': 'application/json'});
-          res.end(JSON.stringify(Number(raw[info.resource].version), '', 2));
+          res.end(JSON.stringify(Number(result.version), '', 2));
         } else {
-          console.log('B', raw[info.resource].cguid);
           res.writeHeader(200, {'Content-Type': 'application/json'});
-          res.end(JSON.stringify(raw[info.resource], '', 2));
+          res.end(JSON.stringify(result, '', 2));
         }
 
       } else {
         res.writeHeader(404, {'Content-Type': 'application/json'});
         res.end(JSON.stringify({
           code: 404,
-          description: 'Please review your constraints'
+          description: 'Please review your constraints',
+          url: req.originalUrl.toString()
         }, '', 2));
       }
 
@@ -320,7 +323,15 @@ function processPost(req, res) {
       res.writeHeader(200, {'Content-Type': 'application/json'});
       res.end(JSON.stringify(filtered), '', 2);
     }
+  });
+}
 
+function getDescriptorByObjectName(raw, filtered, name) {
+
+  return filtered.map((resource) => {
+    return raw[resource];
+  }).filter((resource) => {
+    return resource.objectName === name;
   });
 
 }

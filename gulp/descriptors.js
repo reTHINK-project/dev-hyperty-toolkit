@@ -29,10 +29,6 @@ var descriptorBase = function(type) {
   switch (type) {
     case 'hyperty':
       base.hypertyType = [];
-      base.constraints = {
-        node: false,
-        browser: true
-      };
       break;
 
     case 'runtime':
@@ -66,6 +62,7 @@ var descriptorBase = function(type) {
 
   base.signature = '';
   base.accessControlPolicy = 'somePolicy';
+  base.constraints = {};
 
   return base;
 };
@@ -102,13 +99,7 @@ var encode = function(opts) {
       filename = fileObject.name.replace('.ds', '');
     }
 
-    var value = 'default';
-    if (opts.isDefault) {
-      value = 'default';
-    } else {
-      value = opts.name || filename;
-    }
-
+    var value = filename;
     var cguid = 0;
     switch (opts.descriptor) {
       case 'Hyperties':
@@ -149,7 +140,15 @@ var encode = function(opts) {
     }
 
     json[value].description = checkValues('description', 'Description of ' + filename, json[value]);
-    json[value].objectName = checkValues('objectName', filename, json[value]);
+
+    var name = 'default';
+    if (opts.isDefault) {
+      name = 'default';
+    } else {
+      name = opts.name || filename;
+    }
+
+    json[value].objectName = checkValues('objectName', name, json[value]);
 
     if (opts.descriptor !== 'Hyperties') {
       if (opts.configuration) {
@@ -226,7 +225,7 @@ function checkValues(property, value, object) {
   } else if (_.isEqual(object[property], value)) {
     return value;
   } else {
-    return value
+    return value;
   }
 
 }

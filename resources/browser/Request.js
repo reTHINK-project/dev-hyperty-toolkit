@@ -91,9 +91,11 @@ class Request {
       xhr.open(method, url);
 
       if (method === 'POST') {
+        /*
         xhr.setRequestHeader('content-type', 'application/json');
         xhr.setRequestHeader('cache-control', 'no-cache');
-        xhr.send(JSON.stringify(options));
+        */
+        xhr.send(options);
       } else {
         xhr.send();
       }
