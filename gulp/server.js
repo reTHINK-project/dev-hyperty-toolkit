@@ -2,7 +2,6 @@
 var fs = require('fs');
 var gutil = require('gulp-util');
 var getStage = require('./stage');
-var getEnvironment = require('./environment.js');
 var browserSync = require('browser-sync').create('Toolkit');
 
 var bsServer;
@@ -117,119 +116,244 @@ function middleware(req, res, next) {
 }
 
 function devMiddleware(req, res, next) {
-  var paths;
-  gutil.log(req.originalUrl);
+  gutil.log(req.method + ' | ' + req.originalUrl);
+
   res.setHeader('Access-Control-Allow-Origin', '*');
 
-  if (req.originalUrl.includes('.well-known')) {
-    var path = req.originalUrl;
-    var pathIndex = path.indexOf('.well-known');
-    if (pathIndex !== -1) { path = path.substr(pathIndex - 1); }
-    paths = path.split('/');
-    var type = paths[2];
-    var resource = paths[3];
+  if (req.method === 'GET') {
 
-    if (req.originalUrl.includes('.html') || req.originalUrl.includes('.js')) {
-      if (req.originalUrl.includes('sandbox.html')) {
-        res.writeHeader(200, {'Content-Type': 'text/html'});
-        res.end(fs.readFileSync('node_modules/runtime-browser/bin/sandbox.html', 'utf8'));
-      } else if (req.originalUrl.includes('index.html')) {
-        res.writeHeader(200, {'Content-Type': 'text/html'});
-        res.end(fs.readFileSync('node_modules/runtime-browser/bin/index.html', 'utf8'));
-      } else {
-        res.writeHeader(200, {'Content-Type': 'application/javascript'});
-        res.end(fs.readFileSync('node_modules/runtime-browser/bin/' + resource, 'utf8'));
-      }
+    if (req.originalUrl.includes('.well-known')) {
+      var info = getResourceInfo(req.originalUrl);
 
-    } else if (req.originalUrl.includes('sourcepackage')) {
-      // paths = req.originalUrl.split('/');
-      var cguid = Number(paths[3]);
-      var idType = cguid.toString().substring(0, 1);
-      var sourcePackage;
-      var selectedObject;
-      var resourceObject;
+      if (req.originalUrl.includes('.html') || req.originalUrl.includes('.js')) {
 
-      switch (idType) {
-        case '1':
-          resourceObject = getResources('hyperty');
-          selectedObject = filterResource(resourceObject, cguid);
-          sourcePackage = resourceObject[selectedObject].sourcePackage;
-          break;
-
-        case '2':
-          resourceObject = getResources('dataschema');
-          selectedObject = filterResource(resourceObject, cguid);
-          sourcePackage = resourceObject[selectedObject].sourcePackage;
-          break;
-
-        case '3':
-          sourcePackage = getResources('runtime');
-          selectedObject = filterResource(resourceObject, cguid);
-          sourcePackage = resourceObject[selectedObject].sourcePackage;
-          break;
-
-        case '4':
-          resourceObject = getResources('protocolstub');
-          selectedObject = filterResource(resourceObject, cguid);
-          sourcePackage = resourceObject[selectedObject].sourcePackage;
-          break;
-        case '5':
-          sourcePackage = getResources('idp-proxy');
-          selectedObject = filterResource(resourceObject, cguid);
-          sourcePackage = resourceObject[selectedObject].sourcePackage;
-          break;
-      }
-
-      res.writeHeader(200, {'Content-Type': 'application/json'});
-      res.end(JSON.stringify(sourcePackage));
-
-    } else {
-      var raw = getResources(type);
-
-      if (raw) {
-
-        if (resource) {
-          var selectedResource = raw[resource];
-
-          if (selectedResource) {
-            res.writeHeader(200, {'Content-Type': 'application/json'});
-
-            if (req.originalUrl.includes('cguid')) {
-              res.end(selectedResource.cguid.toString());
-            } else if (req.originalUrl.includes('version')) {
-              res.end(JSON.stringify(Number(selectedResource.version), '', 2));
-            } else {
-              res.end(JSON.stringify(selectedResource, '', 2));
-            }
-          } else {
-            res.writeHeader(404, {'Content-Type': 'application/json'});
-            res.end('404 - ' + resource + ' not found;');
-          }
-
+        if (req.originalUrl.includes('sandbox.html')) {
+          res.writeHeader(200, {'Content-Type': 'text/html'});
+          res.end(fs.readFileSync('node_modules/runtime-browser/bin/sandbox.html', 'utf8'));
+        } else if (req.originalUrl.includes('index.html')) {
+          res.writeHeader(200, {'Content-Type': 'text/html'});
+          res.end(fs.readFileSync('node_modules/runtime-browser/bin/index.html', 'utf8'));
         } else {
-          var listOfResources = [];
-          for (var key in raw) {
-            if (raw.hasOwnProperty(key)) {
-              listOfResources.push(key);
-            }
-          }
-          res.writeHeader(200, {'Content-Type': 'application/json'});
-          res.end(JSON.stringify(listOfResources, '', 2));
+          res.writeHeader(200, {'Content-Type': 'application/javascript'});
+          res.end(fs.readFileSync('node_modules/runtime-browser/bin/' + info.resource, 'utf8'));
         }
-      } else {
-        console.log('this ' + req.originalUrl + ' does not exist, please verify the url');
-        var msg = '<h1>404 - ' + type + ' not found</h1>' +
-                  'Please use one of this:' + 
-                  '<ul><li>hyperty</li><li>protocolstub</li><li>idp-proxy</li><li>dataschema</li><li>runtime</li></ul>';
-        res.writeHeader(404, {'Content-Type': 'text/html'});
-        res.end(msg);
-      }
 
+      } else if (req.originalUrl.includes('sourcepackage')) {
+        // paths = req.originalUrl.split('/');
+        var cguid = Number(info.paths[3]);
+        var idType = cguid.toString().substring(0, 1);
+        var sourcePackage;
+        var selectedObject;
+        var resourceObject;
+
+        switch (idType) {
+          case '1':
+            resourceObject = getResources('hyperty');
+            selectedObject = filterResource(resourceObject, cguid);
+            sourcePackage = resourceObject[selectedObject].sourcePackage;
+            break;
+
+          case '2':
+            resourceObject = getResources('dataschema');
+            selectedObject = filterResource(resourceObject, cguid);
+            sourcePackage = resourceObject[selectedObject].sourcePackage;
+            break;
+
+          case '3':
+            sourcePackage = getResources('runtime');
+            selectedObject = filterResource(resourceObject, cguid);
+            sourcePackage = resourceObject[selectedObject].sourcePackage;
+            break;
+
+          case '4':
+            resourceObject = getResources('protocolstub');
+            selectedObject = filterResource(resourceObject, cguid);
+            sourcePackage = resourceObject[selectedObject].sourcePackage;
+            break;
+          case '5':
+            sourcePackage = getResources('idp-proxy');
+            selectedObject = filterResource(resourceObject, cguid);
+            sourcePackage = resourceObject[selectedObject].sourcePackage;
+            break;
+        }
+
+        res.writeHeader(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify(sourcePackage));
+
+      } else {
+        var raw = getResources(info.type);
+
+        if (raw) {
+
+          if (info.resource) {
+            var selectedResource = raw[info.resource];
+
+            if (selectedResource) {
+              res.writeHeader(200, {'Content-Type': 'application/json'});
+
+              if (req.originalUrl.includes('cguid')) {
+                res.end(selectedResource.cguid.toString());
+              } else if (req.originalUrl.includes('version')) {
+                res.end(JSON.stringify(Number(selectedResource.version), '', 2));
+              } else {
+                res.end(JSON.stringify(selectedResource, '', 2));
+              }
+            } else {
+              res.writeHeader(404, {'Content-Type': 'application/json'});
+              res.end(JSON.stringify({
+                code: 404,
+                description: info.resource + ' not found;'
+              }, '', 2));
+            }
+
+          } else {
+            var listOfResources = [];
+            for (var key in raw) {
+              if (raw.hasOwnProperty(key)) {
+                listOfResources.push(key);
+              }
+            }
+            res.writeHeader(200, {'Content-Type': 'application/json'});
+            res.end(JSON.stringify(listOfResources, '', 2));
+          }
+        } else {
+          console.log('this ' + req.originalUrl + ' does not exist, please verify the url');
+          var msg = '<h1>404 - ' + info.type + ' not found</h1>' +
+                    'Please use one of this:' +
+                    '<ul><li>hyperty</li><li>protocolstub</li><li>idp-proxy</li><li>dataschema</li><li>runtime</li></ul>';
+          res.writeHeader(404, {'Content-Type': 'text/html'});
+          res.end(msg);
+        }
+
+      }
     }
+
+    next();
+
+  } else if (req.method === 'POST') {
+    processPost(req, res);
+  } else if (req.method === 'OPTIONS') {
+    var headers = {};
+
+    // IE8 does not allow domains to be specified, just the *
+    // headers["Access-Control-Allow-Origin"] = req.headers.origin;
+    headers['Access-Control-Allow-Origin'] = '*';
+    headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE, OPTIONS';
+    headers['Access-Control-Allow-Credentials'] = false;
+    headers['Access-Control-Max-Age'] = '86400'; // 24 hours
+    headers['Access-Control-Allow-Headers'] = 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Cache-Control';
+    res.writeHead(200, headers);
+    res.end();
   }
 
-  next();
+}
 
+function processPost(req, res) {
+
+  if (req.originalUrl.includes('.well-known')) {
+
+    var info = getResourceInfo(req.originalUrl);
+    var raw = getResources(info.type);
+    if (!raw)  {
+      res.writeHeader(404, {'Content-Type': 'application/json'});
+      res.end(JSON.stringify({
+        code: 404,
+        description: 'Something went wrong'
+      }, '', 2));
+
+      return false;
+    }
+
+    var filtered = Object.keys(raw);
+    var chunks = [];
+    req.on('data', function(chunk) {
+      chunks.push(chunk);
+    });
+
+  }
+
+  req.on('end', function() {
+    var body = Buffer.concat(chunks).toString();
+    var data;
+    try {
+      data = JSON.parse(body);
+    } catch (error) {
+      data = {};
+    }
+
+    if (data.hasOwnProperty('constraints')) {
+      var constraints = data.constraints;
+      filtered = Object.keys(raw).filter((resource) => {
+        let found = 0;
+        Object.keys(raw[resource].constraints).forEach((constraint) => {
+          if (constraints.hasOwnProperty(constraint) && constraints[constraint] === raw[resource].constraints[constraint]) {
+            found++;
+          }
+        });
+
+        // console.log('Found ' + found + ' keys');
+        return found > 0 ? true : false;
+      });
+    }
+
+    if (info.resource) {
+      var result = getDescriptorByObjectName(raw, filtered, info.resource);
+
+      if (result.length > 0) {
+        result = result[0];
+
+        console.log('Response: ', result.objectName.toString() + ' - ' + info.resource + ' - ' + result.sourcePackage.sourceCodeClassname);
+        if (req.originalUrl.includes('cguid')) {
+          res.writeHeader(200, {'Content-Type': 'text/plain'});
+          res.end(result.cguid.toString());
+        } else if (req.originalUrl.includes('version')) {
+          res.writeHeader(200, {'Content-Type': 'application/json'});
+          res.end(JSON.stringify(Number(result.version), '', 2));
+        } else {
+          res.writeHeader(200, {'Content-Type': 'application/json'});
+          res.end(JSON.stringify(result, '', 2));
+        }
+
+      } else {
+        res.writeHeader(404, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({
+          code: 404,
+          description: 'Please review your constraints',
+          url: req.originalUrl.toString()
+        }, '', 2));
+      }
+
+    } else {
+      res.writeHeader(200, {'Content-Type': 'application/json'});
+      res.end(JSON.stringify(filtered), '', 2);
+    }
+  });
+}
+
+function getDescriptorByObjectName(raw, filtered, name) {
+
+  return filtered.map((resource) => {
+    return raw[resource];
+  }).filter((resource) => {
+    return resource.objectName === name;
+  });
+
+}
+
+function getResourceInfo(url) {
+
+  var path = url;
+  var pathIndex = path.indexOf('.well-known');
+  if (pathIndex !== -1) { path = path.substr(pathIndex - 1); }
+  var paths = path.split('/');
+  var type = paths[2];
+  var resource = paths[3];
+
+  return {
+    type: type,
+    resource: resource,
+    paths: paths
+  };
 }
 
 function getResources(type) {

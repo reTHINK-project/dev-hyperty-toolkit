@@ -3,11 +3,9 @@ var gulp = require('gulp');
 var fs = require('fs');
 var path = require('path');
 
-var babel = require('babelify');
 var gutil = require('gulp-util');
 var through = require('through2');
 var webpack = require('webpack-stream');
-var source = require('vinyl-source-stream');
 
 var getStage = require('./stage');
 var getEnvironment = require('./environment');
@@ -46,13 +44,7 @@ module.exports = function transpile(opts) {
   return through.obj(function(chunk, enc, cb) {
 
     var fileObject = path.parse(chunk.path);
-    var stage = getStage();
     var args = {};
-
-    var compact = false;
-    if (stage === 'production') {
-      compact = true;
-    }
 
     args.entries = [chunk.path];
     args.extensions = extensions;
@@ -61,7 +53,7 @@ module.exports = function transpile(opts) {
 
     var filename = opts.filename || fileObject.base;
 
-    var environment = getEnvironment();
+    var environment = opts.environment || getEnvironment();
 
     if (environment === 'all') {
       var configEnv = getHypertyConfiguration(chunk.path);
@@ -106,12 +98,12 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
       module: {
         loaders: [
           { test: /\.json$/, loader: 'json' },
-          { exclude: /node_modules/, test: /\.js$/, loader: "babel-loader" },
+          { exclude: /node_modules/, test: /\.js$/, loader: 'babel-loader' }
         ]
       }
     }))
     .on('error', function(err) {
-        gutil.log(gutil.colors.red(err));
+      gutil.log(gutil.colors.red(err));
       this.emit('end');
     })
     .pipe(gulp.dest(opts.destination))
@@ -124,14 +116,14 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
 }
 
 function transpileNode(filename, opts, chunk, cb) {
-  
+
   var fileObject = path.parse(chunk.path);
   var stage = getStage();
 
   return gulp.src(chunk.path)
     .pipe(webpack({
       target: 'node',
-      devtool: stage === 'develop' ? 'inline-eval-cheap-source-map' : false,
+      devtool: stage === 'develop' ? 'inline-source-map' : false,
       output: {
         path: path.join(opts.destination),
         library: opts.standalone,
@@ -142,7 +134,7 @@ function transpileNode(filename, opts, chunk, cb) {
       module: {
         loaders: [
           { test: /\.json$/, loader: 'json' },
-          { exclude: /node_modules/, test: /\.js$/, loader: "babel-loader" },
+          { exclude: /node_modules/, test: /\.js$/, loader: 'babel-loader' }
         ]
       }
     }))

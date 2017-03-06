@@ -1,4 +1,4 @@
-FROM node
+FROM node:boron
 MAINTAINER vitor-t-silva@telecom.pt
 
 RUN mkdir -p /toolkit

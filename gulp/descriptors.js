@@ -29,10 +29,6 @@ var descriptorBase = function(type) {
   switch (type) {
     case 'hyperty':
       base.hypertyType = [];
-      base.constraints = {
-        node: false,
-        browser: true
-      };
       break;
 
     case 'runtime':
@@ -40,8 +36,7 @@ var descriptorBase = function(type) {
       base.runtimeType = 'browser';
       base.p2pHandlerStub = '';
       base.p2pRequesterStub = '';
-      base.hypertyCapabilities = {};
-      base.protocolCapabilities = {};
+      base.constraints = {};
       break;
 
     case 'protocolstub':
@@ -67,6 +62,7 @@ var descriptorBase = function(type) {
 
   base.signature = '';
   base.accessControlPolicy = 'somePolicy';
+  base.constraints = {};
 
   return base;
 };
@@ -103,13 +99,7 @@ var encode = function(opts) {
       filename = fileObject.name.replace('.ds', '');
     }
 
-    var value = 'default';
-    if (opts.isDefault) {
-      value = 'default';
-    } else {
-      value = opts.name || filename;
-    }
-
+    var value = filename;
     var cguid = 0;
     switch (opts.descriptor) {
       case 'Hyperties':
@@ -150,7 +140,15 @@ var encode = function(opts) {
     }
 
     json[value].description = checkValues('description', 'Description of ' + filename, json[value]);
-    json[value].objectName = checkValues('objectName', filename, json[value]);
+
+    var name = 'default';
+    if (opts.isDefault) {
+      name = 'default';
+    } else {
+      name = opts.name || filename;
+    }
+
+    json[value].objectName = checkValues('objectName', name, json[value]);
 
     if (opts.descriptor !== 'Hyperties') {
       if (opts.configuration) {
@@ -168,14 +166,13 @@ var encode = function(opts) {
       json[value].runtimeType = 'browser';
       json[value].p2pHandlerStub = checkValues('p2pHandlerStub', opts.p2pHandlerStub || '', json[value]);
       json[value].p2pRequesterStub = checkValues('p2pRequesterStub', opts.p2pRequesterStub || '', json[value]);
-      json[value].hypertyCapabilities = {
+      json[value].constraints = {
+        browser: true,
         mic: true,
         camera: true,
         sensor: false,
         webrtc: true,
-        ortc: true
-      };
-      json[value].protocolCapabilities = {
+        ortc: true,
         http: true,
         https: true,
         ws: true,
@@ -228,7 +225,7 @@ function checkValues(property, value, object) {
   } else if (_.isEqual(object[property], value)) {
     return value;
   } else {
-    return value
+    return value;
   }
 
 }
