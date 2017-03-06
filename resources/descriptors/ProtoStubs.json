@@ -223,13 +223,15 @@
     "description": "Description of SlackProtoStub",
     "language": "Javascript",
     "type": "ProtoStubs",
-    "objectName": "SlackProtoStub",
+    "objectName": "slack.slack.com",
     "configuration": {},
     "messageSchemas": "",
     "signature": "",
     "interworking": true,
     "accessControlPolicy": "somePolicy",
-    "constraints": {},
+    "constraints": {
+      "browser": true
+    },
     "dataObjects": []
   },
   "sip.rethink-project.eu": {
@@ -245,14 +247,16 @@
     "description": "Description of IMSIWProtoStub",
     "language": "Javascript",
     "type": "ProtoStubs",
-    "objectName": "IMSIWProtoStub",
+    "objectName": "sip.rethink-project.eu",
     "configuration": {
       "credential_server": "https://ims.rethink-project.eu/credential"
     },
     "messageSchemas": "",
     "signature": "",
     "accessControlPolicy": "somePolicy",
-    "constraints": {},
+    "constraints": {
+      "browser": true
+    },
     "dataObjects": [],
     "interworking": true
   }
