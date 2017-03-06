@@ -6,7 +6,7 @@ var path = require('path');
 
 var _ = require('lodash');
 var through = require('through2');
-var prompt = require('gulp-prompt');
+var inquirer = require('inquirer');
 var gutil = require('gulp-util');
 var runSequence = require('run-sequence');
 var clean = require('gulp-clean');
@@ -111,17 +111,16 @@ gulp.task('src-hyperties', function(done) {
 
   } else {
     var parentDirs = fs.readdirSync(path.resolve('../'));
-    gulp.src('./', {buffer: false})
-      .pipe(prompt.prompt([{
-        type: 'list',
-        name: 'folders',
-        message: 'Where is dev-hyperty?',
-        choices: parentDirs
-      }
-      ], function(res) {
-        srcPath = path.join('../', res.folders);
-        copyHyperties(srcPath, done);
-      }));
+
+    inquirer.prompt([{
+      type: 'list',
+      name: 'folders',
+      message: 'Where is dev-hyperty?',
+      choices: parentDirs
+    }]).then(function(res) {
+      srcPath = path.join('../', res.folders);
+      copyHyperties(srcPath, done);
+    });
 
   }
 
