@@ -1,0 +1,1 @@
+/Users/dvilchez/workspace/rethink/dev-protostubs/src/protostub/ims_iw/dist/IMSIWProtoStub.js
