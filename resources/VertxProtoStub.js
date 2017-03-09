@@ -64,6 +64,8 @@ class VertxProtoStub {
     bus.addListener('*', (msg) => {
       _this._open(() => {
         if (_this._filter(msg)) {
+          msg.body.via = this._runtimeProtoStubURL;
+          console.log('[VertxProtoStub: ProtoStub -> MN]', msg);
           _this._sock.send(JSON.stringify(msg));
         }
       });
@@ -212,6 +214,7 @@ class VertxProtoStub {
     if (!msg.body) msg.body = {};
 
     msg.body.via = this._runtimeProtoStubURL;
+    console.log('[VertxProtoStub: MN -> ProtoStub]', msg);
     this._bus.postMessage(msg);
   }
 
@@ -240,12 +243,15 @@ class VertxProtoStub {
 
       _this._sock.onmessage = function(e) {
         let msg = JSON.parse(e.data);
+        console.log('[VertxProtoStub: MN -> SOCKET ON MESSAGE]', msg);
         if (msg.from === 'mn:/session') {
           if (_this._sessionCallback) {
             _this._sessionCallback(msg);
           }
         } else {
-          _this._deliver(msg);
+          if (_this._filter(msg)) {
+            _this._deliver(msg);
+          }
         }
       };
 

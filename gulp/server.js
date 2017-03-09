@@ -184,28 +184,34 @@ function devMiddleware(req, res, next) {
         var raw = getResources(info.type);
 
         if (raw) {
+          var filtered = Object.keys(raw);
 
           if (info.resource) {
-            var selectedResource = raw[info.resource];
+            var result = getDescriptorByObjectName(raw, filtered, info.resource);
 
-            if (selectedResource) {
-              res.writeHeader(200, {'Content-Type': 'application/json'});
+            if (result.length > 0) {
+              result = result[0];
 
+              console.log('Response: ', result.objectName.toString() + ' - ' + info.resource + ' - ' + result.sourcePackage.sourceCodeClassname);
               if (req.originalUrl.includes('cguid')) {
-                res.end(selectedResource.cguid.toString());
+                res.writeHeader(200, {'Content-Type': 'text/plain'});
+                res.end(result.cguid.toString());
               } else if (req.originalUrl.includes('version')) {
-                res.end(JSON.stringify(Number(selectedResource.version), '', 2));
+                res.writeHeader(200, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify(Number(result.version), '', 2));
               } else {
-                res.end(JSON.stringify(selectedResource, '', 2));
+                res.writeHeader(200, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify(result, '', 2));
               }
+
             } else {
               res.writeHeader(404, {'Content-Type': 'application/json'});
               res.end(JSON.stringify({
                 code: 404,
-                description: info.resource + ' not found;'
+                description: 'Please review your constraints',
+                url: req.originalUrl.toString()
               }, '', 2));
             }
-
           } else {
             var listOfResources = [];
             for (var key in raw) {
