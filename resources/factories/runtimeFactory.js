@@ -96,7 +96,10 @@ const runtimeFactory = Object.create({
   },
 
   runtimeCapabilities() {
-    this.capabilitiesManager = new RuntimeCapabilities(this.storage);
+    if (!this.capabilitiesManager) {
+      this.capabilitiesManager = new RuntimeCapabilities(this.storage);
+    }
+
     return this.capabilitiesManager;
   }
 
