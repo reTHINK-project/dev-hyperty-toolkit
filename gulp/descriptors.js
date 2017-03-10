@@ -188,7 +188,7 @@ var encode = function(opts) {
     }
 
     if (opts.descriptor === 'ProtoStubs' || opts.descriptor === 'IDPProxys') {
-      json[value].constraints = checkValues('constraints', {}, json[value]);
+      json[value].constraints = checkValues('constraints', opts.constraints, json[value]);
       json[value].interworking = checkValues('interworking', opts.interworking, json[value]);
     }
 

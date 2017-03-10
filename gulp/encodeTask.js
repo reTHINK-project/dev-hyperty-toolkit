@@ -138,6 +138,11 @@ function encodeStub(file) {
       transpileOpts.standalone = 'activate';
     }
 
+    resourceOpts.constraints = res.environment.reduce(function(prev, constraint) {
+      prev[constraint] = true;
+      return prev;
+    }, {});
+
     console.log(resourceOpts, transpileOpts);
     encode(file, resourceOpts, transpileOpts);
 
