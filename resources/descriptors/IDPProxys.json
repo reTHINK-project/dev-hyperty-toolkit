@@ -6,7 +6,7 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": "5-d7f1b404-0f29-1d83-145c-89186805ff1b0",
+    "cguid": "5-c460e2b8-4ece-9a74-24df-68adbd3512f20",
     "type": "IDPProxys",
     "version": "0.1",
     "description": "Description of OrangeProxyStub",
@@ -29,7 +29,7 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": "5-d7f1b404-0f29-1d83-145c-89186805ff1b1",
+    "cguid": "5-c460e2b8-4ece-9a74-24df-68adbd3512f21",
     "type": "IDPProxys",
     "version": 0.2,
     "description": "Description of MicrosoftProxyStub",
@@ -52,7 +52,7 @@
       "encoding": "base64",
       "signature": ""
     },
-    "cguid": "5-d7f1b404-0f29-1d83-145c-89186805ff1b2",
+    "cguid": "5-c460e2b8-4ece-9a74-24df-68adbd3512f22",
     "type": "IDPProxys",
     "version": 0.2,
     "description": "Description of IdpProxyStub",
@@ -76,7 +76,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "cguid": "5-d7f1b404-0f29-1d83-145c-89186805ff1b3",
+    "cguid": "5-c460e2b8-4ece-9a74-24df-68adbd3512f23",
     "version": 0.7,
     "description": "Description of SlackProxyStub",
     "language": "Javascript",
@@ -100,7 +100,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "cguid": "5-d7f1b404-0f29-1d83-145c-89186805ff1b6",
+    "cguid": "5-c460e2b8-4ece-9a74-24df-68adbd3512f24",
     "version": 0.5,
     "description": "Description of GoogleProxyStub",
     "language": "Javascript",
@@ -124,12 +124,17 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "cguid": "5-d7f1b404-0f29-1d83-145c-89186805ff1b7",
+    "cguid": "5-c460e2b8-4ece-9a74-24df-68adbd3512f25",
     "version": 0.30000000000000004,
     "description": "Description of IMSIWProxyStub",
     "language": "Javascript",
     "type": "IDPProxys",
-    "constraints": {},
+    "constraints": {
+      "browser": true,
+      "windowSandbox": true,
+      "mic": true,
+      "camera": true
+    },
     "interworking": true,
     "objectName": "rethink-project.eu",
     "configuration": {},
