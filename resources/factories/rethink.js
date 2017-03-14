@@ -112,8 +112,9 @@ const rethink = {
         let runtime = new Runtime(runtimeDescriptor, runtimeFactory, domain);
 
         window.runtime = runtime;
-        
+
         runtime.init().then((result) => {
+
           minibus.addListener('core:loadHyperty', function(msg) {
             console.log('Load Hyperty: ', msg);
 

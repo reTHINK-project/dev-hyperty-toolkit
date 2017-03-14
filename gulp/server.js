@@ -119,11 +119,14 @@ function devMiddleware(req, res, next) {
   gutil.log(req.method + ' | ' + req.originalUrl);
 
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', '*');
 
   if (req.method === 'GET') {
 
     if (req.originalUrl.includes('.well-known')) {
       var info = getResourceInfo(req.originalUrl);
+
+      console.log('Info:', info);
 
       if (req.originalUrl.includes('.html') || req.originalUrl.includes('.js')) {
 
@@ -134,6 +137,7 @@ function devMiddleware(req, res, next) {
           res.writeHeader(200, {'Content-Type': 'text/html'});
           res.end(fs.readFileSync('node_modules/runtime-browser/bin/index.html', 'utf8'));
         } else {
+          console.log('GET', info.resource);
           res.writeHeader(200, {'Content-Type': 'application/javascript'});
           res.end(fs.readFileSync('node_modules/runtime-browser/bin/' + info.resource, 'utf8'));
         }
