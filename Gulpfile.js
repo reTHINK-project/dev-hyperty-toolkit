@@ -24,6 +24,7 @@ var encode = require('./gulp/encodeTask').encode;
 var transpile = require('./gulp/transpile');
 var resource = require('./gulp/resources');
 var walk = require('./gulp/walk');
+var unixifyPath = require('./gulp/utils').unixifyPath;
 
 var dirname = __dirname;
 
@@ -60,7 +61,7 @@ gulp.task('build:hyperties', function(done) {
 
   });
 
-})
+});
 
 gulp.task('checkHyperties', function() {
 
@@ -173,7 +174,9 @@ function copyFiles(opts) {
       dest = opts.dest;
     }
 
-    var pathStructure = fileObject.dir.replace(path.resolve(dirname) + '/', '');
+    var unixify = unixifyPath(fileObject.dir);
+
+    var pathStructure = unixify.replace(path.resolve(dirname) + '/', '');
     var pathDirs = pathStructure.split('/');
     var validPaths = pathDirs.slice(1);
 
@@ -377,7 +380,7 @@ function createDescriptor() {
   try {
     data = JSON.parse(descriptor);
   } catch (error) {
-    data = {}; 
+    data = {};
   }
 
   return through.obj(function(chunk, enc, done) {

@@ -4,6 +4,8 @@ import runtimeFactory from './runtimeFactory';
 
 import MiniBus from 'runtime-core/dist/minibus';
 
+import IdentitiesGUI from './IdentitiesGUI';
+
 window.components = {};
 let minibus = new MiniBus();
 
@@ -114,6 +116,9 @@ const rethink = {
         window.runtime = runtime;
 
         runtime.init().then((result) => {
+
+          let identitiesGUI = new IdentitiesGUI(runtime.identityModule);
+          console.log('identitiesGUI: ', identitiesGUI);
 
           minibus.addListener('core:loadHyperty', function(msg) {
             console.log('Load Hyperty: ', msg);

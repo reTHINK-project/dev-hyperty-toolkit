@@ -1,9 +1,10 @@
 function replacePattern(str, value) {
   const regex = /%domain%/gm;
   const subst = value;
+  let strToReplace;
 
   try {
-    strToReplace = String(str)
+    strToReplace = String(str);
   } catch (error) {
     strToReplace = String(JSON.stringify(str));
   }
@@ -12,6 +13,20 @@ function replacePattern(str, value) {
   return strToReplace.replace(regex, subst);
 }
 
+// Normalize \\ paths to / paths.
+function unixifyPath(filepath) {
+
+  // Windows?
+  var win32 = process.platform === 'win32';
+
+  if (win32) {
+    return filepath.replace(/\\/g, '/');
+  } else {
+    return filepath;
+  }
+}
+
 module.exports = {
-  replacePattern: replacePattern
+  replacePattern: replacePattern,
+  unixifyPath: unixifyPath
 }
