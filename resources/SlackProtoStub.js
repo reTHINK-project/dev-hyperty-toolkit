@@ -1,5 +1,5 @@
 import slack from 'slack';
-import {Syncher} from 'service-framework/dist/Syncher';
+import { Syncher } from 'service-framework/dist/Syncher';
 import MessageBodyIdentity from 'service-framework/dist/IdentityFactory';
 
 class SlackProtoStub {
@@ -12,7 +12,7 @@ class SlackProtoStub {
     console.log('[SlackProtostub] Constructor Loaded');
 
     let _this = this;
-    this._MessageBodyIdentity = MessageBodyIdentity;
+
     this._subscribedList = [];
     this._usersList = [];
     this._groupsList = [];
@@ -31,7 +31,7 @@ class SlackProtoStub {
     this._runtimeSessionURL = config.runtimeURL;
     this._reOpen = false;
     this._slack = slack;
-    console.log('[SlackProtostub] instatiate syncher with runtimeUrl', runtimeProtoStubURL);
+    console.log('[SlackProtostub] instantiate syncher with runtimeUrl', runtimeProtoStubURL);
     this._syncher = new Syncher(runtimeProtoStubURL, bus, config);
 
     this._syncher.onNotification((event) => {
@@ -49,6 +49,7 @@ class SlackProtoStub {
           if (_this._filter(msg)) {
 
             console.log('[SlackProtostub] After Filter', msg);
+
             let schemaUrl = msg.body.schema;
             if (schemaUrl && msg.body.value.name) {
 
@@ -68,9 +69,18 @@ class SlackProtoStub {
                     userInfo.name,
                     '', 'slack.com');
 
-                  _this._subscribe(schemaUrl, msg.from, identity).then((result) => {
-                    console.log('[SlackProtostub] subscribe result', result);
+                    let subscriptionUrl = msg.from;
+
+                    // for session resume
+                    if (msg.body.resource) {
+                      subscriptionUrl = msg.body.resource + '/subscription';
+                    }
+
+                    console.log('[SlackProtostub] subscribing object', subscriptionUrl);
+
+                  _this._subscribe(schemaUrl, subscriptionUrl, identity).then((result) => {
                     if (result) {
+                      console.log('[SlackProtostub] subscribe result', result);
 
                       _this._token = token;
 
@@ -87,8 +97,28 @@ class SlackProtoStub {
           }
         });
       }
-
     });
+
+    /*this._syncher.resumeObservers({}).then((dataObjectObserver) => {
+      console.log('[SlackProtostub] resuming observers:', dataObjectObserver);
+
+      let subscription = {urlDataObj: dataObjectObserver.data.url, schema: dataObjectObserver.data.schema, subscribed: true};
+
+      _this._observer = dataObjectObserver;
+      _this._subscribedList.push(subscription);
+      dataObjectObserver.onAddChild((child) => {
+        console.info('[SlackProtostub] Observer - Add Child: ', child);
+        _this._deliver(child);
+      });
+
+      dataObjectObserver.onChange('*', (event) => {
+        console.log('[SlackProtostub] Observer - onChange: ', event);
+      });
+
+    }).catch((reason) => {
+      console.info('Resume Observer | ', reason);
+    });*/
+
 
   }
 
@@ -127,7 +157,7 @@ class SlackProtoStub {
         resolve(userInfo);
 
       }, function(error) {
-        console.err('[SlackProtostub] ', error);
+        console.error('[SlackProtostub] ', error);
         reject(error);
       });
 
@@ -215,7 +245,7 @@ class SlackProtoStub {
     return new Promise(function(resolve) {
       _this._slack.users.info({token: _this._token, user: user}, (err, data) => {
         if (err) {
-          console.err('[SlackProtostub] error', err);
+          console.error('[SlackProtostub] error', err);
         } else {
 
           console.log('[SlackProtostub getUserInfo] ', data);
@@ -267,7 +297,7 @@ class SlackProtoStub {
         resolve(true);
 
       }).catch((error) => {
-        console.err('[SlackProtostub] Subscribe', error);
+        console.error('[SlackProtostub] Subscribe', error);
         resolve(false);
       });
     });
@@ -284,7 +314,7 @@ class SlackProtoStub {
 
     _this._slack.channels.invite(toInvite, (err, data) => {
       if (err) {
-        console.err('[SlackProtostub] error', err);
+        console.error('[SlackProtostub] error', err);
       } else {
         _this._channelID = idChannel;
         console.log('[SlackProtostub] user invited with sucess', data);
@@ -306,7 +336,7 @@ class SlackProtoStub {
 
         _this._slack.chat.postMessage(message, function(err, data) {
           if (err) {
-            console.err('[SlackProtostub] error', err);
+            console.error('[SlackProtostub] error', err);
           } else {
             console.log('[SlackProtostub] PostMessage with Sucess', data);
           }
@@ -322,7 +352,7 @@ class SlackProtoStub {
       let toCreate = { token: _this._token, name: channelName };
       _this._slack.channels.create(toCreate, (err, data) => {
         if (err) {
-          console.err('[SlackProtostub] ', err);
+          console.error('[SlackProtostub] ', err);
         } else {
           if (data.ok) {
             console.log('[SlackProtostub] Channel Created with Sucess ', data);
