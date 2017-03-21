@@ -1,6 +1,6 @@
 import slack from 'slack';
 import {Syncher} from 'service-framework/dist/Syncher';
-import {MessageBodyIdentity} from 'service-framework/dist/IdentityFactory';
+import MessageBodyIdentity from 'service-framework/dist/IdentityFactory';
 
 class SlackProtoStub {
 
@@ -12,7 +12,7 @@ class SlackProtoStub {
     console.log('[SlackProtostub] Constructor Loaded');
 
     let _this = this;
-
+    this._MessageBodyIdentity = MessageBodyIdentity;
     this._subscribedList = [];
     this._usersList = [];
     this._groupsList = [];

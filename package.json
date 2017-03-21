@@ -26,8 +26,13 @@
   },
   "homepage": "https://github.com/reTHINK-project/dev-hyperty-toolkit#readme",
   "dependencies": {
-    "runtime-core": "github:rethink-project/dev-runtime-core#develop",
+    "babel-loader": "6.4.1",
+    "babel-preset-env": "1.2.2",
+    "cross-env": "3.2.4",
+    "deep-equal": "1.0.1",
     "runtime-browser": "github:rethink-project/dev-runtime-browser#develop",
+    "runtime-core": "github:rethink-project/dev-runtime-core#develop",
+    "searchjs": "0.8.0",
     "service-framework": "github:rethink-project/dev-service-framework#develop"
   },
   "devDependencies": {
