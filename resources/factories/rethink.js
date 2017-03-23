@@ -117,7 +117,10 @@ const rethink = {
 
         runtime.init().then((result) => {
 
-          let identitiesGUI = new IdentitiesGUI(runtime.identityModule);
+          let idmGuiURL = runtime.identityModule._runtimeURL + '/identity-gui';
+          let idmURL = runtime.identityModule._runtimeURL + '/idm';
+          let messageBus = runtime.identityModule.messageBus();
+          let identitiesGUI = new IdentitiesGUI(idmGuiURL, idmURL, messageBus);
           console.log('identitiesGUI: ', identitiesGUI);
 
           minibus.addListener('core:loadHyperty', function(msg) {
