@@ -119,7 +119,7 @@ const rethink = {
 
           let idmGuiURL = runtime.identityModule._runtimeURL + '/identity-gui';
           let idmURL = runtime.identityModule._runtimeURL + '/idm';
-          let messageBus = runtime.identityModule.messageBus();
+          let messageBus = runtime.messageBus;
           let identitiesGUI = new IdentitiesGUI(idmGuiURL, idmURL, messageBus);
           console.log('identitiesGUI: ', identitiesGUI);
 
