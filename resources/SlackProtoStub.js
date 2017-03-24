@@ -99,26 +99,7 @@ class SlackProtoStub {
       }
     });
 
-    /*this._syncher.resumeObservers({}).then((dataObjectObserver) => {
-      console.log('[SlackProtostub] resuming observers:', dataObjectObserver);
-
-      let subscription = {urlDataObj: dataObjectObserver.data.url, schema: dataObjectObserver.data.schema, subscribed: true};
-
-      _this._observer = dataObjectObserver;
-      _this._subscribedList.push(subscription);
-      dataObjectObserver.onAddChild((child) => {
-        console.info('[SlackProtostub] Observer - Add Child: ', child);
-        _this._deliver(child);
-      });
-
-      dataObjectObserver.onChange('*', (event) => {
-        console.log('[SlackProtostub] Observer - onChange: ', event);
-      });
-
-    }).catch((reason) => {
-      console.info('Resume Observer | ', reason);
-    });*/
-
+    _this._sendStatus('created');
 
   }
 
@@ -211,6 +192,7 @@ class SlackProtoStub {
     let _this = this;
 
     if (!_this._session) {
+      _this._sendStatus('in-progress');
       console.log('[SlackProtostub] new Session for token:', token);
       _this._session = _this._slack.rtm.client();
 
@@ -227,6 +209,8 @@ class SlackProtoStub {
           }
         }
       });
+      _this._sendStatus('live');
+
     } else {
       console.log('[SlackProtostub] session already exist');
     }
@@ -397,7 +381,31 @@ class SlackProtoStub {
       }
     });
   }
+
+  _sendStatus(value, reason) {
+    let _this = this;
+
+    console.log('[SlackProtostub status changed] to ', value);
+
+    _this._state = value;
+
+    let msg = {
+      type: 'update',
+      from: _this._runtimeProtoStubURL,
+      to: _this._runtimeProtoStubURL + '/status',
+      body: {
+        value: value
+      }
+    };
+
+    if (reason) {
+      msg.body.desc = reason;
+    }
+
+    _this._bus.postMessage(msg);
+  }
 }
+
 
 export default function activate(url, bus, config) {
   return {
