@@ -17,6 +17,7 @@ class IdentitiesGUI {
 
       if (funcName === 'openPopup') {
         let urlreceived = msg.body.params.urlreceived;
+        console.log('TIAGO openPopup on toolkit');
         _this._openPopup(urlreceived).then((returnedValue) => {
           let value = {type: 'execute', value: returnedValue, code: 200};
           let replyMsg = {id: msg.id, type: 'response', to: msg.from, from: msg.to, body: value};
