@@ -14,6 +14,7 @@ class SlackProtoStub {
     let _this = this;
 
     this._subscribedList = [];
+    this._messageHistoryControl = {};
     this._usersList = [];
     this._groupsList = [];
     this._channelsList = [];
@@ -251,14 +252,20 @@ class SlackProtoStub {
     let _this = this;
 
     return new Promise(function(resolve) {
-
+      let isSubscribed = false;
+      console.log('[SlackProtostub] Identity Subscribe ->', identity);
       _this._subscribedList.forEach(function(obj) {
-        if (obj.urlDataObj === urlDataObj && obj.subscribed) {
-          resolve(true);
+        console.log('[SlackProtostub] Subscription List ->', obj);
+        if (obj.urlDataObj === urlDataObj && obj.subscribed && obj.identity.userProfile.userURL === identity.userProfile.userURL) {
+          isSubscribed = true;
         }
       });
 
-      let subscription = {urlDataObj: urlDataObj, schema: schema, subscribed: true};
+      if (isSubscribed) {
+        console.log('[SlackProtostub] Already Subscribed');
+        return resolve(true);
+      }
+      let subscription = {urlDataObj: urlDataObj, schema: schema, subscribed: true, identity: identity};
 
       let objectDescURL = schema;
       let dataObjectUrl = urlDataObj.substring(0, urlDataObj.lastIndexOf('/'));
@@ -272,7 +279,22 @@ class SlackProtoStub {
         console.log('[SlackProtostub] Observer', observer);
         observer.onAddChild((child) => {
           console.info('[SlackProtostub] Observer - Add Child: ', child);
-          _this._deliver(child);
+          
+          //check if for each child message has been delivered, and control that for when we have more than one slack user subscribed
+          let currentID = child.childId.split('#')[1];
+          // check if this child already sent messages
+          if( _this._messageHistoryControl.hasOwnProperty(child.from)) {
+            // in that case check if the currentID its equal to oldID
+            let oldID = _this._messageHistoryControl[child.from].id;
+            if ( _this._messageHistoryControl[child.from].id !== currentID ) {
+              _this._messageHistoryControl[child.from].id = currentID;
+              _this._deliver(child);
+            }
+          } else {
+            _this._messageHistoryControl[child.from] = {id: currentID};
+            _this._deliver(child);
+          }
+
         });
 
         observer.onChange('*', (event) => {
