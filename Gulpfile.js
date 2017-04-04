@@ -175,12 +175,15 @@ function copyFiles(opts) {
     }
 
     var unixify = unixifyPath(fileObject.dir);
+    var unixifyDir = unixifyPath(dirname);
 
-    var pathStructure = unixify.replace(path.resolve(dirname) + '/', '');
+    var pathStructure = unixify.replace(unixifyDir + '/', '');
     var pathDirs = pathStructure.split('/');
-    var validPaths = pathDirs.slice(1);
+    var pathLength = pathDirs.length;
 
-    var dir = path.resolve(__dirname + '/' + dest + '/' + validPaths.join('/') + '/');
+    console.log('unixify:', unixify, dirname, pathDirs, pathLength);
+
+    var dir = path.join(__dirname, dest, pathDirs[pathLength - 1] || '/');
 
     gutil.log('Copy changes from ' + fileObject.base + ' to ' + dir);
 
@@ -188,14 +191,6 @@ function copyFiles(opts) {
     .pipe(gulp.dest(dir))
     .on('end', function() {
       done();
-      /*fs.readFile(dir + '/' + fileObject.base, function(err, data) {
-        if (err) throw err;
-        var a = chunk;
-        a.path = dir + '/' + fileObject.base;
-        a.contents = data;
-        done(null, a);
-      });
-*/
     });
 
   });

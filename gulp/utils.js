@@ -1,7 +1,7 @@
 function replacePattern(str, value) {
   const regex = /%domain%/gm;
   const subst = value;
-  let strToReplace;
+  var strToReplace;
 
   try {
     strToReplace = String(str);

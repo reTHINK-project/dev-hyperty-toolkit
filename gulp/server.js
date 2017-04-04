@@ -294,7 +294,7 @@ function processPost(req, res) {
     if (data.hasOwnProperty('constraints')) {
       var constraints = data.constraints;
       filtered = Object.keys(raw).filter((resource) => {
-        let found = 0;
+        var found = 0;
         Object.keys(raw[resource].constraints).forEach((constraint) => {
           if (constraints.hasOwnProperty(constraint) && constraints[constraint] === raw[resource].constraints[constraint]) {
             found++;
