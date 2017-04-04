@@ -177,7 +177,7 @@ function copyFiles(opts) {
     var unixify = unixifyPath(fileObject.dir);
     var unixifyDir = unixifyPath(dirname);
 
-    var pathStructure = unixify.replace(unixifyDir + '/', '');
+    var pathStructure = unixify.replace(path.join(unixifyDir, '/'), '');
     var pathDirs = pathStructure.split('/');
     var pathLength = pathDirs.length;
 
@@ -186,7 +186,6 @@ function copyFiles(opts) {
     var dir = path.join(__dirname, dest, pathDirs[pathLength - 1] || '/');
 
     gutil.log('Copy changes from ' + fileObject.base + ' to ' + dir);
-
     return gulp.src(chunk.path)
     .pipe(gulp.dest(dir))
     .on('end', function() {
