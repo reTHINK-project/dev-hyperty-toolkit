@@ -31,9 +31,9 @@
     "cross-env": "3.2.4",
     "deep-equal": "1.0.1",
     "runtime-browser": "github:rethink-project/dev-runtime-browser#develop",
-    "runtime-core": "github:rethink-project/dev-runtime-core#develop",
+    "runtime-core": "github:rethink-project/dev-runtime-core#dataobject-resume-childrens",
     "searchjs": "0.8.0",
-    "service-framework": "github:rethink-project/dev-service-framework#develop"
+    "service-framework": "github:rethink-project/dev-service-framework#dataobject-resume-childrens"
   },
   "devDependencies": {
     "babel-core": "^6.23.1",
