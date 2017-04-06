@@ -11,24 +11,39 @@
 * to the IdP Server. Alternatively some functionnalities can be done locally.
 *
 */
-var SOURCEURL = "https://energyq.idp.rethink.orange-labs.fr",
-    AUTHPATH = "/proxy/authorize",
-    VERIFYPATH = "/proxy/verify",
-    DONEPATH = "/proxy/done",
-    KEYPATH = '/proxy/key',
-    IDPATH = '/proxy/id',
-    PROXYTYPE = "rethink-oidc",
-    IDSCOPE = "openid",
-    FULLSCOPE = "openid webrtc",
-    TYPE       =   'id_token token';
+var SCHEME = "https://",
+    SOURCEURL = "energyq.idp.rethink.orange-labs.fr",
+    //SOURCEURL = '192.168.99.100:8080',
+    AUTHPATH    = "/proxy/authorize",
+    VERIFYPATH  = "/proxy/verify",
+    DONEPATH    = "/proxy/done",
+    KEYPATH     = '/proxy/key',
+    IDPATH      = '/proxy/id',
+    PROXYTYPE   = 'rethink-oidc',
+    IDSCOPE     = 'openid',
+    FULLSCOPE   = 'openid webrtc',
+    TYPE        = 'id_token token';
   //var TYPE       =   'code';
 
-var idp_addr = {'domain': "https://energyq.idp.rethink.orange-labs.fr", 'protocol': PROXYTYPE}
+var idp_addr = {'domain': SOURCEURL, 'protocol': PROXYTYPE}
 
 if (typeof console == "undefined") {
     this.console = {
-        log: function () {}
+        log: function () {},
+        warn: function () {}
     };
+}
+
+//function to parse the query string in the given URL to obatin certain values
+function urlParser(url, name) {
+  name = name.replace(/[\[]/, '\\\[').replace(/[\]]/, '\\\]');
+  let regexS = '[\\#&?]' + name + '=([^&#]*)';
+  let regex = new RegExp(regexS);
+  let results = regex.exec(url);
+  if (results === null)
+  return '';
+  else
+  return results[1];
 }
 
 function getProxyKey(){
@@ -40,7 +55,7 @@ function getProxyKey(){
         res.error != undefined ? reject(res.error) : resolve(res)
       }
     }
-    xmlhttp.open("GET", SOURCEURL+KEYPATH, true)
+    xmlhttp.open("GET", SCHEME+SOURCEURL+KEYPATH, true)
     xmlhttp.send()
   })
 }function getProxyID(){
@@ -52,7 +67,7 @@ function getProxyKey(){
          res.error != undefined ? reject(res.error) : resolve(res.key)
        }
      }
-     xmlhttp.open("GET", SOURCEURL+IDPATH, true)
+     xmlhttp.open("GET", SCHEME+SOURCEURL+IDPATH, true)
      xmlhttp.send()
    })
  }
@@ -65,7 +80,7 @@ function getProxyKey(){
          res.error != undefined ? reject(res.error) : resolve(res.key)
        }
      }
-     xmlhttp.open("GET", SOURCEURL+IDPATH, true)
+     xmlhttp.open("GET", SCHEME+SOURCEURL+IDPATH, true)
      xmlhttp.send()
    })
  }
@@ -87,54 +102,36 @@ var idp = {
   /**
   * Generation of an IdAssertion through OIDC IdP
   */
-  generateAssertion: (contents /*, origin, hint */) => {
-  // TODO : sign contents in the Id Token
-    return new Promise((resolve, reject) =>
-      getProxyID()
-      .then(ID => {
-        var _url = SOURCEURL+AUTHPATH+'?scope=' + FULLSCOPE + '&client_id=' + ID +
-                     '&redirect_uri=' + SOURCEURL + DONEPATH + '&response_type=' + TYPE +
-                     '&nonce=' + 'N-'+Math.random() + '&rtcsdp='+btoa(contents)
-        var myInit = { method: 'GET',
-                     //headers: myHeaders,
-                       credentials: 'same-origin',
-                       // we don't follow redirect so that if user is not logged (redirect)
-                       // we get an error an can return login URL to the application
-                       redirect: 'error'};
-        //var urlW = 'https://localhost:8080/proxy/authorize?scope=openid&client_id=LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZk1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTkFEQ0JpUUtCZ1FDY0Vnckx0WVRIUHAvdHFCQ3BUL1UwS1dJTQo0d2lkaGNFWEd1UkZCZDN3TlpPY0huMnRFanZaTkhmc3NvUXR0UjBOVEQ1USs5UGR0TWZJTFhxU3E3V3htMk5sCkNhNXJTVHpmT1k5NWhZQms3UVBZdTN6dEVQUHVOQ3B1Mld6QlQ2ZGg4YXpVOGUvRHZYV2RwbHpXdmpuTmduVGIKSHZOK01PWU84SGhLMkZWR2F3SURBUUFCCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=&redirect_uri=https://localhost:8080/proxy/done&response_type=id_token%20token&nonce=N-0.9316785699162342'
+  generateAssertion: (contents, origin, hint) => {
+    if(hint){
 
-        fetch(_url,myInit)
-        .then(response => response.text())
-        .then(hash => {
-        dump(hash)
-          var json = {}
-          var data = hash.split('&').toString().split(/[=,]+/);
-          for(var i=0; i<data.length; i+=2){
-            json[data[i]]=data[i+1];
-          }
+        let idToken = urlParser(hint, 'id_token');
 
-          resolve({'assertion': json.id_token, 'idp': idp_addr})
-        })
-      })
-      .catch(error => {
-          // We just login but we could do something better maybe?
-          // Handling authorizations and such
-          var loginURL = SOURCEURL+'/login'
-          reject({'name': 'IdPLoginError', 'loginUrl': loginURL})
-      })
-//              // this will open a window with the URL which will open a page
-//              // sent by IdP for the user to insert the credentials
-//              // the IdP validates the credentials then send a access token
-//          window.open(_url, 'openIDrequest', 'width=800, height=600')
-//              // respond to events
-//          this.addEventListener('message', event => {
-//            if(event.origin !== SOURCEURL) return;
-//
-//            resolve(JSON.parse(event.data).id_token)
-//            //idp.validateAssertion(res.id_token).then(
-//            //    response => resolve(response), error => reject(error))
-//          },false)
-  )},
+
+        let idpBundle = {domain: 'orange.fr', protocol: 'OIDC'};
+        let identityBundle = {assertion: idToken, idp: idpBundle};
+
+        return Promise.resolve(identityBundle);
+    } else {
+        //Compute nonce + content
+        var nonce = btoa(JSON.stringify({'sdp':contents,'n':Math.random()}))
+        return new Promise((resolve, reject) =>
+          getProxyID()
+          .then(ID => {
+            var _url = SCHEME+SOURCEURL+AUTHPATH+
+                       '?scope=' + IDSCOPE +
+                       '&client_id=' + ID +
+                       '&redirect_uri=' + SCHEME+SOURCEURL + DONEPATH +
+                       '&response_type=' + TYPE +
+                       '&nonce=' + nonce
+
+                       //removed Webrtc scope and rtcsdp
+
+            reject({'name': 'IdpLoginError', 'loginUrl': _url})
+          })
+        )
+    }
+  },
   /**
   * Verification of a received IdAssertion validity
   * Can also be used to validate token received by IdP
@@ -149,35 +146,35 @@ var idp = {
     signature = signature.replace(/_/g, "/").replace(/-/g, "+")
     return new Promise((resolve, reject) =>
       getProxyKey()
-        .then(Key =>
-      crypto.subtle.importKey('jwk',Key,{ name: 'RSASSA-PKCS1-v1_5',hash: {name: "SHA-256"}},true, ['verify'])
-        .then(JWK =>
-      //crypto.verify(algo, key, signature, text2verify);
-      crypto.subtle.verify('RSASSA-PKCS1-v1_5',
+      .then(Key => crypto.subtle.importKey('jwk',Key,{ name: 'RSASSA-PKCS1-v1_5',hash: {name: "SHA-256"}},true, ['verify']))
+      .then(JWK =>
+        //crypto.verify(algo, key, signature, text2verify);
+        crypto.subtle.verify('RSASSA-PKCS1-v1_5',
                            JWK,
                            str2ab(atob(signature)),   //ArrayBuffer of the signature,
-                           str2ab(header+"."+payload))//ArrayBuffer of the data
-        .then(result => {
-      if (!result) reject(new Error('Invalid signature on identity assertion'))
-      else {
-        var json = JSON.parse(atob(payload))
-        // hack to get only the name and remove any @mail.com
-        // Mozilla want us to provide a username with name@DOMAIN
-        // where DOMAIN is IdP Proxy DOMAIN
-        var name = json.sub.split('@')[0]
-        resolve({'identity': name+'@'+idp_addr.domain, 'contents': atob(json.rtcsdp)})
-      }})))
+                           str2ab(header+"."+payload)))//ArrayBuffer of the data
+      .then(result => {
+        if (!result) reject({'name':'IdpError', 'message':'Invalid signature on identity assertion'})
+        else {
+            var json = JSON.parse(atob(payload))
+            // hack to get only the name and remove any @mail.com
+            // Mozilla want us to provide a username with name@DOMAIN
+            // where DOMAIN is IdP Proxy DOMAIN
+            var name = json.sub.split('@')[0]
+            // Decode nonce to get contents
+            var contents = JSON.parse(atob(json.nonce)).sdp
+            resolve({'identity': name+'@'+idp_addr.domain, 'contents': contents})
+      }})
+      .catch(error => reject({'name':'IdpError', 'message':error}))
     )}
 }
 
-/*
-if (rtcIdentityProvider) {
+if (typeof rtcIdentityProvider != 'undefined') {
   rtcIdentityProvider.register(idp);
   console.log("Proxy loaded")
 } else {
   console.warn('IdP not running in the right sandbox');
 }
-*/
 
 /**
 * Identity Provider Proxy Protocol Stub
@@ -199,7 +196,7 @@ class RethinkOidcProtoStub {
    _this.config = config;
 
    _this.messageBus.addListener('*', function(msg) {
-     if (msg.to == 'domain-idp://orange.com') {
+     if (msg.to == 'domain-idp://orange.fr') {
        /*let newValue = IdpProxy.generateAssertion();
        let message = {id: msg.id, type: 'response', to: msg.from, from: msg.to,
                       body: {code: 200, value: newValue, bus: bus, runtimeProtoStubURL: runtimeProtoStubURL}};
@@ -208,6 +205,7 @@ class RethinkOidcProtoStub {
        _this.requestToIdp(msg);
      }
    });
+   _this._sendStatus('created');
  }
 
   /**
@@ -254,6 +252,30 @@ class RethinkOidcProtoStub {
 
     _this.messageBus.postMessage(message);
   }
+
+  _sendStatus(value, reason) {
+    let _this = this;
+
+    console.log('[GoogleIdpProxy.sendStatus] ', value);
+
+    _this._state = value;
+
+    let msg = {
+      type: 'update',
+      from: _this.runtimeProtoStubURL,
+      to: _this.runtimeProtoStubURL + '/status',
+      body: {
+        value: value
+      }
+    };
+
+    if (reason) {
+      msg.body.desc = reason;
+    }
+
+    _this.messageBus.postMessage(msg);
+  }
+
 }
 
 // export default IdpProxyProtoStub;
