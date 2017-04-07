@@ -279,7 +279,7 @@ class SlackProtoStub {
         console.log('[SlackProtostub] Observer', observer);
         observer.onAddChild((child) => {
           console.info('[SlackProtostub] Observer - Add Child: ', child);
-          
+
           //check if for each child message has been delivered, and control that for when we have more than one slack user subscribed
           let currentID = child.childId.split('#')[1];
           // check if this child already sent messages
