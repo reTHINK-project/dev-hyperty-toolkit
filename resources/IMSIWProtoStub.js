@@ -1,308 +1,4 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.activate = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events)
-    this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      } else {
-        // At least give some kind of context to the user
-        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-        err.context = er;
-        throw err;
-      }
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        args = Array.prototype.slice.call(arguments, 1);
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    args = Array.prototype.slice.call(arguments, 1);
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
-      return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else if (listeners) {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.prototype.listenerCount = function(type) {
-  if (this._events) {
-    var evlistener = this._events[type];
-
-    if (isFunction(evlistener))
-      return 1;
-    else if (evlistener)
-      return evlistener.length;
-  }
-  return 0;
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  return emitter.listenerCount(type);
-};
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
-},{}],2:[function(require,module,exports){
 var grammar = module.exports = {
   v: [{
       name: 'version',
@@ -583,7 +279,7 @@ Object.keys(grammar).forEach(function (key) {
   });
 });
 
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 var parser = require('./parser');
 var writer = require('./writer');
 
@@ -593,7 +289,7 @@ exports.parseFmtpConfig = parser.parseFmtpConfig;
 exports.parsePayloads = parser.parsePayloads;
 exports.parseRemoteCandidates = parser.parseRemoteCandidates;
 
-},{"./parser":4,"./writer":5}],4:[function(require,module,exports){
+},{"./parser":3,"./writer":4}],3:[function(require,module,exports){
 var toIntIfInt = function (v) {
   return String(Number(v)) === v ? Number(v) : v;
 };
@@ -688,7 +384,7 @@ exports.parseRemoteCandidates = function (str) {
   return candidates;
 };
 
-},{"./grammar":2}],5:[function(require,module,exports){
+},{"./grammar":1}],4:[function(require,module,exports){
 var grammar = require('./grammar');
 
 // customized util.format - discards excess arguments and can void middle ones
@@ -804,9 +500,9 @@ module.exports = function (session, opts) {
   return sdp.join('\r\n') + '\r\n';
 };
 
-},{"./grammar":2}],6:[function(require,module,exports){
+},{"./grammar":1}],5:[function(require,module,exports){
 // version: 0.5.1
-// date: Tue Mar 07 2017 16:18:13 GMT+0000 (WET)
+// date: Mon Mar 20 2017 15:36:05 GMT+0000 (WET)
 // licence: 
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
@@ -3289,10 +2985,9 @@ module.exports = exports['default'];
 /***/ })
 /******/ ]);
 });
-
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 // version: 0.5.1
-// date: Tue Mar 07 2017 16:18:13 GMT+0000 (WET)
+// date: Mon Mar 20 2017 15:36:05 GMT+0000 (WET)
 // licence: 
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
@@ -3530,10 +3225,9 @@ exports.default = function (instance, Constructor) {
 
 /******/ });
 });
-
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 // version: 0.5.1
-// date: Tue Mar 07 2017 16:18:13 GMT+0000 (WET)
+// date: Mon Mar 20 2017 15:36:05 GMT+0000 (WET)
 // licence: 
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
@@ -7929,7 +7623,7 @@ var Syncher = function () {
     bus.addListener(owner, function (msg) {
       //ignore msg sent by himself
       if (msg.from !== owner) {
-        console.info('[Syncher] Syncher-RCV: ', msg);
+        console.info('[Syncher] Syncher-RCV: ', msg, _this);
         switch (msg.type) {
           case 'forward':
             _this._onForward(msg);break;
@@ -7980,12 +7674,19 @@ var Syncher = function () {
         criteria.identity = identity;
       }
 
-      console.log('[syncher - create] - create Reporter - criteria: ', criteria);
-
       (0, _assign2.default)(criteria, { resume: false });
+
+      console.log('[syncher - create] - create Reporter - criteria: ', criteria);
 
       return _this._create(criteria);
     }
+
+    /**
+    * Request a DataObjectReporter creation. The URL will be be requested by the allocation mechanism.
+    * @param  {Object} criteria - (optional) identity data to be added to identity the user reporter. To be used for legacy identities.
+    * @return {Promise<DataObjectReporter>[]} Return a promise with a list of DataObjectReporter to be resumed;
+    */
+
   }, {
     key: 'resumeReporters',
     value: function resumeReporters(criteria) {
@@ -7994,7 +7695,7 @@ var Syncher = function () {
 
       (0, _assign2.default)(criteria, { resume: true });
 
-      return _this._create(criteria);
+      return _this._resumeCreate(criteria);
     }
 
     /**
@@ -8052,7 +7753,7 @@ var Syncher = function () {
 
       (0, _assign2.default)(_criteria, { resume: true });
 
-      return _this._subscribe(_criteria);
+      return _this._resumeSubscribe(_criteria);
     }
 
     /**
@@ -8126,11 +7827,7 @@ var Syncher = function () {
         if (criteria.observers) requestMsg.body.authorise = criteria.observers;
         if (criteria.identity) requestMsg.body.identity = criteria.identity;
 
-        if (resume) {
-          console.log('[syncher - create] - resume message: ', requestMsg);
-        } else {
-          console.log('[syncher - create] - create message: ', requestMsg);
-        }
+        console.log('[syncher - create] - create message: ', requestMsg);
 
         //request create to the allocation system. Can be rejected by the PolicyEngine.
         _this._bus.postMessage(requestMsg, function (reply) {
@@ -8148,6 +7845,67 @@ var Syncher = function () {
             _this._reporters[objURL] = newObj;
 
             resolve(newObj);
+          } else {
+            //reporter creation rejected
+            reject(reply.body.desc);
+          }
+        });
+      });
+    }
+  }, {
+    key: '_resumeCreate',
+    value: function _resumeCreate(criteria) {
+      var _this2 = this;
+
+      var _this = this;
+
+      return new _promise2.default(function (resolve, reject) {
+        var resume = criteria.resume;
+        var initialData = criteria.initialData || {};
+
+        //FLOW-OUT: this message will be sent to the runtime instance of SyncherManager -> _onCreate
+        var requestMsg = {
+          type: 'create', from: _this._owner, to: _this._subURL,
+          body: { resume: resume }
+        };
+
+        console.log('[syncher - create]: ', criteria, requestMsg);
+
+        requestMsg.body.value = initialData;
+        requestMsg.body.value.reporter = _this._owner;
+
+        if (criteria.p2p) requestMsg.body.p2p = criteria.p2p;
+        if (criteria.store) requestMsg.body.store = criteria.store;
+        if (criteria.observers) requestMsg.body.authorise = criteria.observers;
+        if (criteria.identity) requestMsg.body.identity = criteria.identity;
+
+        console.log('[syncher - create] - resume message: ', requestMsg);
+
+        //request create to the allocation system. Can be rejected by the PolicyEngine.
+        _this._bus.postMessage(requestMsg, function (reply) {
+          console.log('[syncher - create] - create-resumed-response: ', reply);
+          if (reply.body.code === 200) {
+
+            var listOfReporters = reply.body.value;
+
+            for (var index in listOfReporters) {
+
+              var dataObject = listOfReporters[index];
+
+              //reporter creation accepted
+              var objURL = dataObject.resource;
+              var schema = dataObject.schema;
+              var status = dataObject.status || 'on';
+              var _initialData = dataObject.data;
+              var childrenResources = dataObject.childrenResources;
+
+              var newObj = new _DataObjectReporter2.default(_this, objURL, schema, status, _initialData, childrenResources);
+              _this._reporters[objURL] = newObj;
+            }
+
+            resolve(_this._reporters);
+
+            if (_this2._onReportersResume) _this2._onReportersResume(_this2._reporters);
           } else {
             //reporter creation rejected
             reject(reply.body.desc);
@@ -8182,7 +7940,6 @@ var Syncher = function () {
           if (criteria.hasOwnProperty('schema')) subscribeMsg.body.schema = criteria.schema;
           if (criteria.hasOwnProperty('identity')) subscribeMsg.body.identity = criteria.identity;
           if (criteria.hasOwnProperty('resource')) subscribeMsg.body.resource = criteria.resource;
-          if (criteria.hasOwnProperty('identity')) subscribeMsg.body.identity = criteria.identity;
         }
 
         subscribeMsg.body.resume = criteria.resume;
@@ -8227,6 +7984,101 @@ var Syncher = function () {
 
             resolve(newObj);
             newProvisional.apply(newObj);
+          } else {
+            reject(reply.body.desc);
+          }
+        });
+      });
+    }
+  }, {
+    key: '_resumeSubscribe',
+    value: function _resumeSubscribe(criteria) {
+      var _this3 = this;
+
+      var _this = this;
+
+      return new _promise2.default(function (resolve, reject) {
+
+        //FLOW-OUT: this message will be sent to the runtime instance of SyncherManager -> _onLocalSubscribe
+        var subscribeMsg = {
+          type: 'subscribe', from: _this._owner, to: _this._subURL,
+          body: {}
+        };
+
+        // Hyperty request to be an Observer
+        // https://github.com/reTHINK-project/specs/blob/master/messages/data-sync-messages.md#hyperty-request-to-be-an-observer
+
+        // Resume Subscriptions for the same Hyperty URL
+        // https://github.com/reTHINK-project/specs/blob/master/messages/data-sync-messages.md#resume-subscriptions-for-the-same-hyperty-url
+
+        // Resume Subscriptions for a certain user and data schema independently of the Hyperty URL.
+        // https://github.com/reTHINK-project/specs/blob/master/messages/data-sync-messages.md#resume-subscriptions-for-a-certain-user-and-data-schema-independently-of-the-hyperty-url
+        if (criteria) {
+          if (criteria.hasOwnProperty('p2p')) subscribeMsg.body.p2p = criteria.p2p;
+          if (criteria.hasOwnProperty('store')) subscribeMsg.body.store = criteria.store;
+          if (criteria.hasOwnProperty('schema')) subscribeMsg.body.schema = criteria.schema;
+          if (criteria.hasOwnProperty('identity')) subscribeMsg.body.identity = criteria.identity;
+          if (criteria.hasOwnProperty('resource')) subscribeMsg.body.resource = criteria.resource;
+        }
+
+        subscribeMsg.body.resume = criteria.resume;
+
+        //TODO: For Further Study
+        var mutualAuthentication = criteria.mutual;
+        if (criteria.hasOwnProperty('mutual')) subscribeMsg.body.mutualAuthentication = mutualAuthentication;
+
+        console.log('[syncher] - subscribe message: ', criteria, subscribeMsg);
+
+        //request subscription
+        //Provisional data is applied to the DataObjectObserver after confirmation. Or discarded if there is no confirmation.
+        //for more info see the DataProvisional class documentation.
+        _this._bus.postMessage(subscribeMsg, function (reply) {
+          console.log('[syncher] - subscribe-resumed-response: ', reply);
+
+          var objURL = reply.body.resource;
+
+          var newProvisional = _this._provisionals[objURL];
+          delete _this._provisionals[objURL];
+          if (newProvisional) newProvisional._releaseListeners();
+
+          if (reply.body.code < 200) {
+
+            console.log('[syncher] - resume new DataProvisional: ', reply, objURL);
+            newProvisional = new _DataProvisional2.default(_this._owner, objURL, _this._bus, reply.body.childrenResources);
+            _this._provisionals[objURL] = newProvisional;
+          } else if (reply.body.code === 200) {
+
+            var listOfObservers = reply.body.value;
+
+            for (var index in listOfObservers) {
+
+              var dataObject = listOfObservers[index];
+              console.log('[syncher] - Resume Object Observer: ', reply, dataObject, _this._provisionals);
+
+              var schema = dataObject.schema;
+              var status = dataObject.status || 'on';
+              var _objURL = dataObject.resource;
+              var version = dataObject.version || 0;
+              var initialData = dataObject.data;
+              if (!initialData.hasOwnProperty('childrens')) {
+                initialData.childrens = {};
+              }
+              if (!initialData.hasOwnProperty('data')) {
+                initialData.data = {};
+              }
+
+              // let childrenResources = dataObject.childrenResources;
+
+              //TODO: mutualAuthentication For Further Study
+              var newObj = new _DataObjectObserver2.default(_this, _objURL, schema, status, initialData, _this._provisionals[_objURL].children, version, mutualAuthentication);
+              _this._observers[_objURL] = newObj;
+
+              _this._provisionals[_objURL].apply(newObj);
+            }
+
+            resolve(_this._observers);
+
+            if (_this3._onObserversResume) _this3._onObserversResume(_this._observers);
           } else {
             reject(reply.body.desc);
           }
@@ -8329,6 +8181,30 @@ var Syncher = function () {
           body: { code: 404, source: _this._owner }
         });
       }
+    }
+
+    /**
+    * Callback system to trigger the resumed reporters
+    * @param  {Function} callback - function callback which will be invoked
+    * @return {Object<URL, DataObjectReporter>} Return one object with all resumed reporters;
+    */
+
+  }, {
+    key: 'onReportersResume',
+    value: function onReportersResume(callback) {
+      this._onReportersResume = callback;
+    }
+
+    /**
+    * Callback system to trigger the resumed observers
+    * @param  {Function} callback - function callback which will be invoked
+    * @return {Object<URL, DataObjectObserver>} Return one object with all resumed observers;
+    */
+
+  }, {
+    key: 'onObserversResume',
+    value: function onObserversResume(callback) {
+      this._onObserversResume = callback;
     }
   }, {
     key: 'owner',
@@ -8667,7 +8543,7 @@ exports.DataObjectObserver = _DataObjectObserver2.default;
 /******/ ]);
 });
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -8680,7 +8556,7 @@ module.exports={
         "spec": "0.7.5",
         "type": "version"
       },
-      "/Users/dvilchez/workspace/rethink/dev-protostubs/src/protostub/ims_iw"
+      "C:\\Projectos\\reTHINK\\WP3\\git\\dev-protostubs\\src\\protostub\\ims_iw"
     ]
   ],
   "_from": "sip.js@0.7.5",
@@ -8714,7 +8590,7 @@ module.exports={
   "_shasum": "86ace7051594f91b4551bdb8120a16c44962d3a2",
   "_shrinkwrap": null,
   "_spec": "sip.js@0.7.5",
-  "_where": "/Users/dvilchez/workspace/rethink/dev-protostubs/src/protostub/ims_iw",
+  "_where": "C:\\Projectos\\reTHINK\\WP3\\git\\dev-protostubs\\src\\protostub\\ims_iw",
   "author": {
     "name": "OnSIP",
     "email": "developer@onsip.com",
@@ -8802,7 +8678,7 @@ module.exports={
   "version": "0.7.5"
 }
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 module.exports = function (SIP) {
 var ClientContext;
@@ -8907,7 +8783,7 @@ ClientContext.prototype.onTransportError = function () {
 SIP.ClientContext = ClientContext;
 };
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP Constants
@@ -9109,7 +8985,7 @@ return {
 };
 };
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 /**
@@ -9205,7 +9081,7 @@ RequestSender.prototype = {
 return RequestSender;
 };
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP Dialog
@@ -9465,7 +9341,7 @@ Dialog.C = C;
 SIP.Dialog = Dialog;
 };
 
-},{"./Dialog/RequestSender":12}],14:[function(require,module,exports){
+},{"./Dialog/RequestSender":11}],13:[function(require,module,exports){
 "use strict";
 
 /**
@@ -9636,7 +9512,7 @@ DigestAuthentication.prototype.updateNcHex = function() {
 return DigestAuthentication;
 };
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 var NodeEventEmitter = require('events').EventEmitter;
 
@@ -9676,7 +9552,7 @@ return EventEmitter;
 
 };
 
-},{"events":1}],16:[function(require,module,exports){
+},{"events":48}],15:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview Exceptions
@@ -9731,7 +9607,7 @@ module.exports = {
   }())
 };
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 var Grammar = require('./Grammar/dist/Grammar');
 
@@ -9751,7 +9627,7 @@ return {
 
 };
 
-},{"./Grammar/dist/Grammar":18}],18:[function(require,module,exports){
+},{"./Grammar/dist/Grammar":17}],17:[function(require,module,exports){
 module.exports = (function() {
   /*
    * Generated by PEG.js 0.8.0.
@@ -11103,7 +10979,7 @@ module.exports = (function() {
   };
 })();
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview Hacks - This file contains all of the things we
@@ -11217,7 +11093,7 @@ var Hacks = {
 };
 return Hacks;
 };
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 var levels = {
   'error': 0,
@@ -11333,7 +11209,7 @@ LoggerFactory.prototype.getLogger = function(category, label) {
 return LoggerFactory;
 };
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview MediaHandler
@@ -11378,7 +11254,7 @@ MediaHandler.prototype = Object.create(EventEmitter.prototype, {
 return MediaHandler;
 };
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP NameAddrHeader
@@ -11481,7 +11357,7 @@ NameAddrHeader.parse = function(name_addr_header) {
 SIP.NameAddrHeader = NameAddrHeader;
 };
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP Message Parser
@@ -11744,7 +11620,7 @@ Parser.parseMessage = function(data, ua) {
 SIP.Parser = Parser;
 };
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 module.exports = function (SIP) {
 
@@ -12030,7 +11906,7 @@ RegisterContext.prototype = {
 SIP.RegisterContext = RegisterContext;
 };
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 /**
@@ -12171,7 +12047,7 @@ RequestSender.prototype = {
 SIP.RequestSender = RequestSender;
 };
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /**
  * @name SIP
  * @namespace
@@ -12221,7 +12097,7 @@ SIP.Grammar = require('./Grammar')(SIP);
 return SIP;
 };
 
-},{"../package.json":9,"./ClientContext":10,"./Constants":11,"./Dialogs":13,"./DigestAuthentication":14,"./EventEmitter":15,"./Exceptions":16,"./Grammar":17,"./Hacks":19,"./LoggerFactory":20,"./MediaHandler":21,"./NameAddrHeader":22,"./Parser":23,"./RegisterContext":24,"./RequestSender":25,"./SIPMessage":27,"./SanityCheck":28,"./ServerContext":29,"./Session":30,"./Subscription":32,"./Timers":33,"./Transactions":34,"./UA":36,"./URI":37,"./Utils":38,"./WebRTC":39}],27:[function(require,module,exports){
+},{"../package.json":8,"./ClientContext":9,"./Constants":10,"./Dialogs":12,"./DigestAuthentication":13,"./EventEmitter":14,"./Exceptions":15,"./Grammar":16,"./Hacks":18,"./LoggerFactory":19,"./MediaHandler":20,"./NameAddrHeader":21,"./Parser":22,"./RegisterContext":23,"./RequestSender":24,"./SIPMessage":26,"./SanityCheck":27,"./ServerContext":28,"./Session":29,"./Subscription":31,"./Timers":32,"./Transactions":33,"./UA":35,"./URI":36,"./Utils":37,"./WebRTC":38}],26:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP Message
@@ -12764,7 +12640,7 @@ SIP.IncomingRequest = IncomingRequest;
 SIP.IncomingResponse = IncomingResponse;
 };
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview Incoming SIP Message Sanity Check
@@ -12994,7 +12870,7 @@ sanityCheck = function(m, u, t) {
 SIP.sanityCheck = sanityCheck;
 };
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 module.exports = function (SIP) {
 var ServerContext;
@@ -13086,7 +12962,7 @@ ServerContext.prototype.onTransportError = function () {
 SIP.ServerContext = ServerContext;
 };
 
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 module.exports = function (SIP, environment) {
 
@@ -15347,7 +15223,7 @@ SIP.InviteClientContext = InviteClientContext;
 
 };
 
-},{"./Session/DTMF":31}],31:[function(require,module,exports){
+},{"./Session/DTMF":30}],30:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview DTMF
@@ -15528,7 +15404,7 @@ DTMF.C = C;
 return DTMF;
 };
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 /**
@@ -15853,7 +15729,7 @@ SIP.Subscription.prototype = {
 };
 };
 
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP TIMERS
@@ -15896,7 +15772,7 @@ module.exports = function (timers) {
   return Timers;
 };
 
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP Transactions
@@ -16604,7 +16480,7 @@ SIP.Transactions = {
 
 };
 
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview Transport
@@ -16977,7 +16853,7 @@ Transport.C = C;
 return Transport;
 };
 
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 (function (global){
 "use strict";
 /**
@@ -18580,7 +18456,7 @@ SIP.UA = UA;
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP URI
@@ -18822,7 +18698,7 @@ URI.parse = function(uri) {
 SIP.URI = URI;
 };
 
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview Utils
@@ -19319,7 +19195,7 @@ Utils= {
 SIP.Utils = Utils;
 };
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview WebRTC
@@ -19360,7 +19236,7 @@ WebRTC.isSupported = function () {
 return WebRTC;
 };
 
-},{"./WebRTC/MediaHandler":40,"./WebRTC/MediaStreamManager":41}],40:[function(require,module,exports){
+},{"./WebRTC/MediaHandler":39,"./WebRTC/MediaStreamManager":40}],39:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview MediaHandler
@@ -19917,7 +19793,7 @@ MediaHandler.prototype = Object.create(SIP.MediaHandler.prototype, {
 return MediaHandler;
 };
 
-},{}],41:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview MediaStreamManager
@@ -20085,7 +19961,7 @@ MediaStreamManager.prototype = Object.create(SIP.EventEmitter.prototype, {
 return MediaStreamManager;
 };
 
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -20134,11 +20010,11 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./Transport":35}],43:[function(require,module,exports){
+},{"./Transport":34}],42:[function(require,module,exports){
 "use strict";
 module.exports = require('./SIP')(require('./environment'));
 
-},{"./SIP":26,"./environment":42}],44:[function(require,module,exports){
+},{"./SIP":25,"./environment":41}],43:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20280,11 +20156,11 @@ var ConnectionController = function () {
 exports.default = ConnectionController;
 module.exports = exports['default'];
 
-},{"./InviteClientContext":46,"./InviteServerContext":47,"./SIPUtils":48,"sip.js":43}],45:[function(require,module,exports){
+},{"./InviteClientContext":45,"./InviteServerContext":46,"./SIPUtils":47,"sip.js":42}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -20331,13 +20207,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                                                                                                                                            **/
 
 var Connection = function Connection(dataObjectUrl) {
-	_classCallCheck(this, Connection);
+  _classCallCheck(this, Connection);
 
-	this.name = 'Connection';
-	this.status = '';
-	this.owner = dataObjectUrl;
-	this.connectionDescription = {};
-	this.iceCandidates = [];
+  this.name = 'Connection';
+  this.status = '';
+  this.owner = dataObjectUrl;
+  this.connectionDescription = {};
+  this.iceCandidates = [];
 };
 
 /**
@@ -20347,133 +20223,158 @@ var Connection = function Connection(dataObjectUrl) {
 
 var IMSIWProtoStub = function () {
 
-	/**
-  * Initialise the protocol stub including as input parameters its allocated
-  * component runtime url, the runtime BUS postMessage function to be invoked
-  * on messages received by the protocol stub and required configuration retrieved from protocolStub descriptor.
-  * @param  {URL.runtimeProtoStubURL}                   runtimeProtoStubURL runtimeProtoSubURL
-  * @param  {Message.Message}                           busPostMessage     configuration
-  * @param  {ProtoStubDescriptor.ConfigurationDataList} configuration      configuration
-  */
-	function IMSIWProtoStub(runtimeProtoStubURL, miniBus, configuration) {
-		var _this = this;
+  /**
+   * Initialise the protocol stub including as input parameters its allocated
+   * component runtime url, the runtime BUS postMessage function to be invoked
+   * on messages received by the protocol stub and required configuration retrieved from protocolStub descriptor.
+   * @param  {URL.runtimeProtoStubURL}                   runtimeProtoStubURL runtimeProtoSubURL
+   * @param  {Message.Message}                           busPostMessage     configuration
+   * @param  {ProtoStubDescriptor.ConfigurationDataList} configuration      configuration
+   */
+  function IMSIWProtoStub(runtimeProtoStubURL, miniBus, configuration) {
+    var _this2 = this;
 
-		_classCallCheck(this, IMSIWProtoStub);
+    _classCallCheck(this, IMSIWProtoStub);
 
-		if (!runtimeProtoStubURL) throw new Error('The runtimeProtoStubURL is a required parameter');
-		if (!miniBus) throw new Error('The bus is a required parameter');
-		if (!configuration) throw new Error('The configuration is a required parameter');
-		if (!configuration.domain) throw new Error('The domain is a required parameter');
+    if (!runtimeProtoStubURL) throw new Error('The runtimeProtoStubURL is a required parameter');
+    if (!miniBus) throw new Error('The bus is a required parameter');
+    if (!configuration) throw new Error('The configuration is a required parameter');
+    if (!configuration.domain) throw new Error('The domain is a required parameter');
 
-		this._runtimeProtoStubURL = runtimeProtoStubURL;
-		this._discovery = new _Discovery2.default(runtimeProtoStubURL, miniBus);
-		this.schema = 'hyperty-catalogue://catalogue.' + configuration.domain + '/.well-known/dataschema/Connection';
-		this._connection = new _ConnectionController2.default(configuration, function (to, offer) {
-			_this._returnSDP(offer, _this._runtimeProtoStubURL, _this.schema, _this.source, 'offer');
-		}, function () {
-			_this.dataObjectObserver.delete();
-			_this.dataObjectReporter.delete();
-		});
-		this._bus = miniBus;
-		this._syncher = new _Syncher.Syncher(this._runtimeProtoStubURL, miniBus, configuration);
+    this._runtimeProtoStubURL = runtimeProtoStubURL;
+    this._discovery = new _Discovery2.default(runtimeProtoStubURL, miniBus);
+    this.schema = 'hyperty-catalogue://catalogue.' + configuration.domain + '/.well-known/dataschema/Connection';
+    this._connection = new _ConnectionController2.default(configuration, function (to, offer) {
+      _this2._returnSDP(offer, _this2._runtimeProtoStubURL, _this2.schema, _this2.source, 'offer');
+    }, function () {
+      _this2.dataObjectObserver.delete();
+      _this2.dataObjectReporter.delete();
+    });
+    this._bus = miniBus;
+    this._syncher = new _Syncher.Syncher(this._runtimeProtoStubURL, miniBus, configuration);
 
-		miniBus.addListener('*', function (msg) {
-			console.log('NEW MSG ->', msg);
-			switch (msg.type) {
-				case 'create':
-					if (_this._filter(msg) && msg.body.schema) {
-						_this._subscribe(msg);
-					}
-					break;
-				case 'init':
-					_this._identity = new _IdentityFactory2.default('anton', 'sip://rethink-project.eu/anton@rethink-project.eu', '', 'anton', '', 'rethink-project.eu');
-					console.log('myidentity', _this._identity);
-					_this._connection.connect(msg.body.identity.access_token);
-					_this.source = msg.body.source;
-					break;
-				case 'delete':
-					_this._connection.disconnect();
-					break;
-			}
-		});
-	}
+    miniBus.addListener('*', function (msg) {
+      console.log('NEW MSG ->', msg);
+      switch (msg.type) {
+        case 'create':
+          if (_this2._filter(msg) && msg.body.schema) {
+            _this2._subscribe(msg);
+          }
+          break;
+        case 'init':
+          _this2._identity = new _IdentityFactory2.default('anton', 'sip://rethink-project.eu/anton@rethink-project.eu', '', 'anton', '', 'rethink-project.eu');
+          console.log('myidentity', _this2._identity);
+          _this2._connection.connect(msg.body.identity.access_token);
+          _this2.source = msg.body.source;
+          break;
+        case 'delete':
+          _this2._connection.disconnect();
+          break;
+      }
+    });
+    this._sendStatus('created');
+  }
 
-	_createClass(IMSIWProtoStub, [{
-		key: '_subscribe',
-		value: function _subscribe(msg) {
-			var _this2 = this;
+  _createClass(IMSIWProtoStub, [{
+    key: '_sendStatus',
+    value: function _sendStatus(value, reason) {
+      var _this = this;
 
-			var dataObjectUrl = msg.from.substring(0, msg.from.lastIndexOf('/'));
+      console.log('[IMSIWProtostub status changed] to ', value);
 
-			this._syncher.subscribe(this.schema, dataObjectUrl).then(function (dataObjectObserver) {
-				_this2.dataObjectObserver = dataObjectObserver;
-				dataObjectObserver.onChange('*', function (event) {
-					return _this2._onCall(dataObjectObserver, dataObjectUrl, _this2.schema, msg);
-				});
-				return dataObjectObserver;
-			}).then(function (dataObjectObserver) {
-				return _this2._onCall(dataObjectObserver, dataObjectUrl, _this2.schema, msg);
-			});
-		}
-	}, {
-		key: '_onCall',
-		value: function _onCall(dataObjectObserver, dataObjectUrl, schema, msg) {
-			var _this3 = this;
+      _this._state = value;
 
-			console.log('_onCall', dataObjectObserver);
-			if (dataObjectObserver.data.connectionDescription) {
-				if (dataObjectObserver.data.connectionDescription.type === 'offer') {
-					console.log('_onCallUpdate offer');
-					this._connection.connect(msg.body.identity.access_token).then(function () {
-						console.log('sad', msg);
-						_this3._connection.invite(msg.to, dataObjectObserver).then(function (e) {
-							return _this3._returnSDP(e.body, dataObjectUrl, schema, msg.body.source, 'answer');
-						}).catch(function (e) {
-							console.log('fail', e);_this3.dataObjectObserver.delete();
-						});
-					});
-				} else if (dataObjectObserver.data.connectionDescription.type === 'answer') {
-					console.log('_onCallUpdate offer');
-					this._connection.accept(dataObjectObserver);
-				}
-			}
-		}
-	}, {
-		key: '_returnSDP',
-		value: function _returnSDP(offer, dataObjectUrl, schema, source, type) {
-			var _this4 = this;
+      var msg = {
+        type: 'update',
+        from: _this._runtimeProtoStubURL,
+        to: _this._runtimeProtoStubURL + '/status',
+        body: {
+          value: value
+        }
+      };
 
-			var dataObject = new Connection(dataObjectUrl);
+      if (reason) {
+        msg.body.desc = reason;
+      }
 
-			this._syncher.create(schema, [source], dataObject, false, false, this._identity).then(function (objReporter) {
-				_this4.dataObjectReporter = objReporter;
-				objReporter.onSubscription(function (event) {
-					console.info('-------- Receiver received subscription request --------- \n');
-					event.accept();
-				});
-				objReporter.data.connectionDescription = { type: type, sdp: offer };
-			});
-		}
-	}, {
-		key: '_filter',
-		value: function _filter(msg) {
-			if (msg.body && msg.body.via === this._runtimeProtoStubURL) return false;
-			return true;
-		}
-	}]);
+      _this._bus.postMessage(msg);
+    }
+  }, {
+    key: '_subscribe',
+    value: function _subscribe(msg) {
+      var _this3 = this;
 
-	return IMSIWProtoStub;
+      var dataObjectUrl = msg.from.substring(0, msg.from.lastIndexOf('/'));
+
+      this._syncher.subscribe(this.schema, dataObjectUrl).then(function (dataObjectObserver) {
+        _this3.dataObjectObserver = dataObjectObserver;
+        dataObjectObserver.onChange('*', function (event) {
+          return _this3._onCall(dataObjectObserver, dataObjectUrl, _this3.schema, msg);
+        });
+        return dataObjectObserver;
+      }).then(function (dataObjectObserver) {
+        return _this3._onCall(dataObjectObserver, dataObjectUrl, _this3.schema, msg);
+      });
+    }
+  }, {
+    key: '_onCall',
+    value: function _onCall(dataObjectObserver, dataObjectUrl, schema, msg) {
+      var _this4 = this;
+
+      console.log('_onCall', dataObjectObserver);
+      if (dataObjectObserver.data.connectionDescription) {
+        if (dataObjectObserver.data.connectionDescription.type === 'offer') {
+          console.log('_onCallUpdate offer');
+          this._connection.connect(msg.body.identity.access_token).then(function () {
+            console.log('sad', msg);
+            _this4._connection.invite(msg.to, dataObjectObserver).then(function (e) {
+              return _this4._returnSDP(e.body, dataObjectUrl, schema, msg.body.source, 'answer');
+            }).catch(function (e) {
+              console.log('fail', e);_this4.dataObjectObserver.delete();
+            });
+          });
+        } else if (dataObjectObserver.data.connectionDescription.type === 'answer') {
+          console.log('_onCallUpdate offer');
+          this._connection.accept(dataObjectObserver);
+        }
+      }
+    }
+  }, {
+    key: '_returnSDP',
+    value: function _returnSDP(offer, dataObjectUrl, schema, source, type) {
+      var _this5 = this;
+
+      var dataObject = new Connection(dataObjectUrl);
+
+      this._syncher.create(schema, [source], dataObject, false, false, this._identity).then(function (objReporter) {
+        _this5.dataObjectReporter = objReporter;
+        objReporter.onSubscription(function (event) {
+          console.info('-------- Receiver received subscription request --------- \n');
+          event.accept();
+        });
+        objReporter.data.connectionDescription = { type: type, sdp: offer };
+      });
+    }
+  }, {
+    key: '_filter',
+    value: function _filter(msg) {
+      if (msg.body && msg.body.via === this._runtimeProtoStubURL) return false;
+      return true;
+    }
+  }]);
+
+  return IMSIWProtoStub;
 }();
 
 function activate(url, bus, config) {
-	return {
-		name: 'IMSIWProtoStub',
-		instance: new IMSIWProtoStub(url, bus, config)
-	};
+  return {
+    name: 'IMSIWProtoStub',
+    instance: new IMSIWProtoStub(url, bus, config)
+  };
 }
 module.exports = exports['default'];
 
-},{"./ConnectionController":44,"service-framework/dist/Discovery":6,"service-framework/dist/IdentityFactory":7,"service-framework/dist/Syncher":8}],46:[function(require,module,exports){
+},{"./ConnectionController":43,"service-framework/dist/Discovery":5,"service-framework/dist/IdentityFactory":6,"service-framework/dist/Syncher":7}],45:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20870,7 +20771,7 @@ InviteClientContext.prototype = {
 exports.default = InviteClientContext;
 module.exports = exports['default'];
 
-},{"sip.js":43}],47:[function(require,module,exports){
+},{"sip.js":42}],46:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -21384,7 +21285,7 @@ InviteServerContext.prototype = {
 exports.default = InviteServerContext;
 module.exports = exports['default'];
 
-},{"sip.js":43}],48:[function(require,module,exports){
+},{"sip.js":42}],47:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -21437,5 +21338,309 @@ function addCandidatesToSDP(txtSdp, candidates) {
 	return _sdpTransform2.default.write(sdp);
 }
 
-},{"sdp-transform":3}]},{},[45])(45)
+},{"sdp-transform":2}],48:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      } else {
+        // At least give some kind of context to the user
+        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+        err.context = er;
+        throw err;
+      }
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        args = Array.prototype.slice.call(arguments, 1);
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    args = Array.prototype.slice.call(arguments, 1);
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else if (listeners) {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.prototype.listenerCount = function(type) {
+  if (this._events) {
+    var evlistener = this._events[type];
+
+    if (isFunction(evlistener))
+      return 1;
+    else if (evlistener)
+      return evlistener.length;
+  }
+  return 0;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  return emitter.listenerCount(type);
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+},{}]},{},[44])(44)
 });

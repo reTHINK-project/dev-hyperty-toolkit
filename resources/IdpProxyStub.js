@@ -1,6 +1,19 @@
 let identities = {};
 let nIdentity = 0;
 
+/*
+	So that an application can use Google's OAuth 2.0 authentication system for user login,
+	first is required to set up a project in the Google Developers Console to obtain OAuth 2.0 credentials and set a redirect URI.
+	A test account was created to set the project in the Google Developers Console to obtain OAuth 2.0 credentials,	with the following credentials:
+      	username: openidtest10@gmail.com
+        password: testOpenID10
+	To add more URI's, follow the steps:
+	1º choose the project ( can be the My OpenID Project)	 from  https://console.developers.google.com/projectselector/apis/credentials using the credentials provided above.
+	2º Open The Client Web 1 listed in OAuth 2.0 Client ID's
+	3º Add the URI  in the authorized redirect URI section.
+  4º change the REDIRECT parameter bellow with the pretended URI
+ */
+
 let googleInfo = {
   clientSecret:          'Xx4rKucb5ZYTaXlcZX9HLfZW',
   clientID:              '808329566012-tqr8qoh111942gd2kg007t0s8f277roi.apps.googleusercontent.com',
@@ -98,7 +111,21 @@ let IdpProxy = {
   * @return {Promise}      Returns a promise with the identity assertion validation result
   */
   validateAssertion: (assertion, origin) => {
+
+    //TODO check the values with the hash received
     return new Promise(function(resolve,reject) {
+
+      let decodedContent = atob(assertion);
+      let content = JSON.parse(decodedContent);
+
+      let idTokenSplited = content.tokenID.split('.');
+
+      let idToken = JSON.parse(atob(idTokenSplited[1]));
+
+      resolve({identity: idToken.email, contents: idToken.nonce});
+
+    });
+    /*return new Promise(function(resolve,reject) {
       let i = googleInfo;
 
       let decodedContent = atob(assertion);
@@ -114,7 +141,7 @@ let IdpProxy = {
 
         reject(err);
       });
-    });
+    });*/
   },
 
   /**
@@ -132,14 +159,14 @@ let IdpProxy = {
     //start the login phase
     //TODO later should be defined a better approach
     return new Promise(function(resolve, reject) {
-      if (!contents) {
+      if (!hint) {
         /*try {
           if (window) {
             resolve('url');
           }
         } catch (error) {*/
 
-        let requestUrl = i.authorisationEndpoint + 'scope=' + i.scope + '&client_id=' + i.clientID + '&redirect_uri=' + i.redirectURI + '&response_type=' + i.type + '&state=' + i.state + '&access_type=' + i.accessType;
+        let requestUrl = i.authorisationEndpoint + 'scope=' + i.scope + '&client_id=' + i.clientID + '&redirect_uri=' + i.redirectURI + '&response_type=' + i.type + '&state=' + i.state + '&access_type=' + i.accessType + '&nonce=' + contents;
 
         reject({name: 'IdPLoginError', loginUrl: requestUrl});
 
@@ -147,9 +174,9 @@ let IdpProxy = {
 
       } else {
         // the request have already been made, so idpPRoxy will exchange the tokens along to the idp, to obtain the information necessary
-        let accessToken = urlParser(contents, 'access_token');
-        let idToken = urlParser(contents, 'id_token');
-        let code = urlParser(contents, 'code');
+        let accessToken = urlParser(hint, 'access_token');
+        let idToken = urlParser(hint, 'id_token');
+        let code = urlParser(hint, 'code');
 
         exchangeCode(code).then(function(value) {
 
@@ -217,12 +244,15 @@ class IdpProxyProtoStub {
    _this.messageBus = bus;
    _this.config = config;
 
+   console.log('[Google IdpProxy] starting', runtimeProtoStubURL);
+
    _this.messageBus.addListener('*', function(msg) {
      if (msg.to === 'domain-idp://google.com') {
 
        _this.requestToIdp(msg);
      }
    });
+   _this._sendStatus('created');
  }
 
   /**
@@ -267,6 +297,29 @@ class IdpProxyProtoStub {
                    body: {code: 200, value: value}};
 
     _this.messageBus.postMessage(message);
+  }
+
+  _sendStatus(value, reason) {
+    let _this = this;
+
+    console.log('[GoogleIdpProxy.sendStatus] ', value);
+
+    _this._state = value;
+
+    let msg = {
+      type: 'update',
+      from: _this.runtimeProtoStubURL,
+      to: _this.runtimeProtoStubURL + '/status',
+      body: {
+        value: value
+      }
+    };
+
+    if (reason) {
+      msg.body.desc = reason;
+    }
+
+    _this.messageBus.postMessage(msg);
   }
 }
 

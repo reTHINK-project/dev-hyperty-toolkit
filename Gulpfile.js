@@ -179,25 +179,17 @@ function copyFiles(opts) {
 
     var pathStructure = unixify.replace(path.join(unixifyDir, '/'), '');
     var pathDirs = pathStructure.split('/');
-    var validPaths = pathDirs.slice(1);
+    var pathLength = pathDirs.length;
 
-    console.log('unixify: ', unixify, dirname, pathDirs, validPaths);
+    console.log('unixify:', unixify, dirname, pathDirs, pathLength);
 
-    var dir = path.join(__dirname, dest, pathDirs[pathDirs.length - 1] || '/');
+    var dir = path.join(__dirname, dest, pathDirs[pathLength - 1] || '/');
 
     gutil.log('Copy changes from ' + fileObject.base + ' to ' + dir);
     return gulp.src(chunk.path)
     .pipe(gulp.dest(dir))
     .on('end', function() {
       done();
-      /*fs.readFile(dir + '/' + fileObject.base, function(err, data) {
-        if (err) throw err;
-        var a = chunk;
-        a.path = dir + '/' + fileObject.base;
-        a.contents = data;
-        done(null, a);
-      });
-*/
     });
 
   });
