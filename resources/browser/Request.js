@@ -79,7 +79,7 @@ class Request {
         let xhr = event.currentTarget;
         if (xhr.readyState === 4) {
           // console.log("got response:", xhr);
-          if (xhr.status === 200) {
+          if (xhr.status >= 200 || xhr.status <= 299) {
             resolve(xhr.responseText);
           } else {
             // console.log("rejecting promise because of response code: 200 != ", xhr.status);
