@@ -5,7 +5,8 @@ var path = require('path');
 
 var gutil = require('gulp-util');
 var through = require('through2');
-var webpack = require('webpack-stream');
+var webpackStream = require('webpack-stream');
+var webpack = require('webpack');
 
 var getStage = require('./stage');
 var getEnvironment = require('./environment');
@@ -86,7 +87,7 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
   console.log(opts);
 
   return gulp.src(chunk.path)
-    .pipe(webpack({
+    .pipe(webpackStream({
       devtool: stage === 'develop' ? 'inline-source-map' : false,
       output: {
         path: path.join(opts.destination),
@@ -96,12 +97,23 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
         filename: fileObject.base
       },
       module: {
-        loaders: [
-          { test: /\.json$/, loader: 'json' },
-          { exclude: /node_modules/, test: /\.js$/, loader: 'babel-loader' }
+        rules: [
+          {
+            test: /\.json$/,
+            use: [
+              { loader: 'json-loader'}
+            ]
+          },
+          {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: [
+              { loader: 'babel-loader' }
+            ]
+          }
         ]
       }
-    }))
+    }, webpack))
     .on('error', function(err) {
       gutil.log(gutil.colors.red(err));
       this.emit('end');
@@ -121,7 +133,7 @@ function transpileNode(filename, opts, chunk, cb) {
   var stage = getStage();
 
   return gulp.src(chunk.path)
-    .pipe(webpack({
+    .pipe(webpackStream({
       target: 'node',
       devtool: stage === 'develop' ? 'inline-source-map' : false,
       output: {
@@ -137,7 +149,7 @@ function transpileNode(filename, opts, chunk, cb) {
           { exclude: /node_modules/, test: /\.js$/, loader: 'babel-loader' }
         ]
       }
-    }))
+    }, webpack))
     .on('error', function(err) {
       gutil.log(gutil.colors.red(err));
       this.emit('end');

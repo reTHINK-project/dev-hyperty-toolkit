@@ -74,7 +74,7 @@
     "vinyl-named": "^1.1.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.7.0",
-    "webpack": "^2.2.0-rc",
+    "webpack": "^2.3.3",
     "webpack-stream": "^3.2.0",
     "webrtc-adapter": "^2.0.5",
     "webrtc-adapter-test": "^0.2.10",
