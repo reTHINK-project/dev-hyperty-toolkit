@@ -10,14 +10,12 @@ class IdentitiesGUI {
     _this._idmURL = idmURL;
     _this._messageBus = messageBus;
 
+
     _this._messageBus.addListener(guiURL, msg => {
-      let identityInfo = msg.body.value;
       let funcName = msg.body.method;
-      let value;
 
       if (funcName === 'openPopup') {
         let urlreceived = msg.body.params.urlreceived;
-        console.log('TIAGO openPopup on toolkit');
         _this._openPopup(urlreceived).then((returnedValue) => {
           let value = {type: 'execute', value: returnedValue, code: 200};
           let replyMsg = {id: msg.id, type: 'response', to: msg.from, from: msg.to, body: value};
