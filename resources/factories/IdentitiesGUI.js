@@ -17,7 +17,6 @@ class IdentitiesGUI {
       if (funcName === 'openPopup') {
         let urlreceived = msg.body.params.urlreceived;
         _this._openPopup(urlreceived).then((returnedValue) => {
-          console.log('TIAGO openPopup listener', returnedValue);
           let value = {type: 'execute', value: returnedValue, code: 200};
           let replyMsg = {id: msg.id, type: 'response', to: msg.from, from: msg.to, body: value};
           _this._messageBus.postMessage(replyMsg);
@@ -28,8 +27,6 @@ class IdentitiesGUI {
   }
 
   _openPopup(urlreceived) {
-
-    console.log('TIAGO openPopup toolkit');
 
     return new Promise((resolve, reject) => {
 
@@ -64,7 +61,7 @@ class IdentitiesGUI {
             }
           } catch (e) {
             //return reject('openPopup error 2 - should not happen');
-            //console.log('TIAGO', e);
+            //console.log(e);
           }
         }, 500);
       }
