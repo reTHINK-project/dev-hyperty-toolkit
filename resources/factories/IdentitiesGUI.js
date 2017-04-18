@@ -39,14 +39,16 @@ class IdentitiesGUI {
 
           if (code || error) {
             win.close();
-            resolve(url);
+            return resolve(url);
+          } else {
+            return reject('openPopup error 1 - should not happen');
           }
         });
       } else {
         let pollTimer = setInterval(function() {
           try {
             if (win.closed) {
-              reject('Some error occured when trying to get identity.');
+              return reject('Some error occured when trying to get identity.');
               clearInterval(pollTimer);
             }
 
@@ -55,9 +57,10 @@ class IdentitiesGUI {
               let url =   win.document.URL;
 
               win.close();
-              resolve(url);
+              return resolve(url);
             }
           } catch (e) {
+            //return reject('openPopup error 2 - should not happen');
             //console.log(e);
           }
         }, 500);
