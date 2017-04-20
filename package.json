@@ -33,7 +33,9 @@
     "runtime-browser": "github:rethink-project/dev-runtime-browser#develop",
     "runtime-core": "github:rethink-project/dev-runtime-core#develop",
     "searchjs": "0.8.0",
-    "service-framework": "github:rethink-project/dev-service-framework#develop"
+    "service-framework": "github:rethink-project/dev-service-framework#develop",
+    "slack": "8.2.7",
+    "webpack": "2.4.1"
   },
   "devDependencies": {
     "babel-core": "^6.23.1",
