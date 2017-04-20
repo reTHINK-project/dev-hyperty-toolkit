@@ -191,8 +191,9 @@ class SlackProtoStub {
 
   _open(token, callback) {
     let _this = this;
-
+    let firstMessage = true;
     if (!_this._session) {
+      let sessionCreatedTime = new Date().getTime() / 1000;
       _this._sendStatus('in-progress');
       console.log('[SlackProtostub] new Session for token:', token);
       _this._session = _this._slack.rtm.client();
@@ -201,7 +202,7 @@ class SlackProtoStub {
 
       _this._session.message(message=> {
         console.log('[SlackProtostub] new message on session', message);
-        if (message.channel) {
+        if (message.channel && message.ts > sessionCreatedTime ) {
           if (message.channel === _this._channelID && message.user !== _this._id || (!message.hasOwnProperty('bot_id') && message.user === _this._id && message.channel === _this._channelID)) {
             console.log('[SlackProtostub] message to send', message.text);
 
