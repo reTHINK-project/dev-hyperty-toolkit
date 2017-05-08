@@ -191,8 +191,9 @@ class SlackProtoStub {
 
   _open(token, callback) {
     let _this = this;
-
+    let firstMessage = true;
     if (!_this._session) {
+      let sessionCreatedTime = new Date().getTime() / 1000;
       _this._sendStatus('in-progress');
       console.log('[SlackProtostub] new Session for token:', token);
       _this._session = _this._slack.rtm.client();
@@ -201,11 +202,21 @@ class SlackProtoStub {
 
       _this._session.message(message=> {
         console.log('[SlackProtostub] new message on session', message);
-        if (message.channel) {
+        if (message.channel && message.ts > sessionCreatedTime ) {
           if (message.channel === _this._channelID && message.user !== _this._id || (!message.hasOwnProperty('bot_id') && message.user === _this._id && message.channel === _this._channelID)) {
+            console.log('[SlackProtostub] message to send', message.text);
 
             _this._getUserInfo(message.user).then((identity) => {
-              _this._observer.addChild('chatmessages', { message: message.text}, identity);
+              let msg = {
+                url: _this._observer.data.url,
+                cseq: Object.keys(_this._observer._childrenObjects).length + 1,
+                reporter: _this._observer.data.reporter,
+                schema: _this._observer.data.schema,
+                name: _this._observer.data.name,
+                created : new Date().toJSON(),
+                type : "chat",
+                content : message.text}
+              _this._observer.addChild('resources', msg, identity);
             });
           }
         }
@@ -279,6 +290,7 @@ class SlackProtoStub {
         console.log('[SlackProtostub] Observer', observer);
         observer.onAddChild((child) => {
           console.info('[SlackProtostub] Observer - Add Child: ', child);
+          console.info('[SlackProtostub] Observer - Message History Control ', _this._messageHistoryControl);
 
           //check if for each child message has been delivered, and control that for when we have more than one slack user subscribed
           let currentID = child.childId.split('#')[1];
@@ -331,14 +343,14 @@ class SlackProtoStub {
   _deliver(child) {
     let _this = this;
 
-    if (_this._channelID !== '' && child.value.message) {
+    if (_this._channelID !== '' && child.value.content) {
 
       if (child.hasOwnProperty('identity') && child.identity.hasOwnProperty('userProfile')
       && child.identity.userProfile.hasOwnProperty('username') && child.identity.userProfile.username) {
 
-        let text = '' + child.identity.userProfile.username + ': ' + child.value.message;
+        let text = '' + child.identity.userProfile.username + ': ' + child.value.content;
         let message = { as_user: true, token: _this._token, channel: _this._channelID, text: text};
-        console.log('[SlackProtostub] (PostMessage slack api) token(', _this._token, ')  channel(', _this._channelID, ') text(',  child.value.message, ')');
+        console.log('[SlackProtostub] (PostMessage slack api) token(', _this._token, ')  channel(', _this._channelID, ') text(',  child.value.content, ')');
 
         _this._slack.chat.postMessage(message, function(err, data) {
           if (err) {

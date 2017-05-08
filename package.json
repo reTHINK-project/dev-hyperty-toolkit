@@ -32,10 +32,8 @@
     "deep-equal": "1.0.1",
     "runtime-browser": "github:rethink-project/dev-runtime-browser#develop",
     "runtime-core": "github:rethink-project/dev-runtime-core#develop",
-    "searchjs": "0.8.0",
     "service-framework": "github:rethink-project/dev-service-framework#develop",
-    "slack": "8.2.7",
-    "webpack": "2.4.1"
+    "searchjs": "0.8.0"
   },
   "devDependencies": {
     "babel-core": "^6.23.1",
@@ -68,7 +66,7 @@
     "node-env-file": "^0.1.8",
     "run-sequence": "^1.1.5",
     "sinon": "^1.17.6",
-    "slack": "^8.2.0",
+    "slack": "8.2.7",
     "through2": "^2.0.1",
     "tv4": "^1.2.7",
     "urijs": "^1.18.1",
@@ -76,7 +74,7 @@
     "vinyl-named": "^1.1.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.7.0",
-    "webpack": "^2.3.3",
+    "webpack": "2.4.1",
     "webpack-stream": "^3.2.0",
     "webrtc-adapter": "^2.0.5",
     "webrtc-adapter-test": "^0.2.10",
