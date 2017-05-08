@@ -1,10 +1,6 @@
 {
   "VertxProtoStub": {
-<<<<<<< HEAD
     "cguid": "4-c43350af-33a6-697e-c5a0-7c51af795e550",
-=======
-    "cguid": "4-38b3da70-28d4-8082-38f1-b1709f6ee7690",
->>>>>>> develop
     "type": "ProtoStubs",
     "version": 1.4,
     "sourcePackageURL": "/sourcePackage",
@@ -38,11 +34,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-<<<<<<< HEAD
     "cguid": "4-c43350af-33a6-697e-c5a0-7c51af795e551",
-=======
-    "cguid": "4-38b3da70-28d4-8082-38f1-b1709f6ee7691",
->>>>>>> develop
     "version": 1.9000000000000006,
     "description": "Description of VertxProtoStubNode",
     "language": "Javascript",
@@ -68,11 +60,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-<<<<<<< HEAD
     "cguid": "4-c43350af-33a6-697e-c5a0-7c51af795e552",
-=======
-    "cguid": "4-38b3da70-28d4-8082-38f1-b1709f6ee7692",
->>>>>>> develop
     "version": 0.7999999999999999,
     "description": "Description of P2PHandlerProtoStub",
     "language": "Javascript",
@@ -151,11 +139,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-<<<<<<< HEAD
     "cguid": "4-c43350af-33a6-697e-c5a0-7c51af795e553",
-=======
-    "cguid": "4-38b3da70-28d4-8082-38f1-b1709f6ee7693",
->>>>>>> develop
     "version": 0.7999999999999999,
     "description": "Description of P2PRequesterProtoStub",
     "language": "Javascript",
@@ -234,13 +218,8 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-<<<<<<< HEAD
     "cguid": "4-c43350af-33a6-697e-c5a0-7c51af795e554",
     "version": 5.099999999999998,
-=======
-    "cguid": "4-38b3da70-28d4-8082-38f1-b1709f6ee7694",
-    "version": 3.900000000000002,
->>>>>>> develop
     "description": "Description of SlackProtoStub",
     "language": "Javascript",
     "type": "ProtoStubs",
@@ -263,13 +242,8 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-<<<<<<< HEAD
-    "cguid": "4-c43350af-33a6-697e-c5a0-7c51af795e555",
-    "version": 1.7000000000000004,
-=======
     "cguid": "4-38b3da70-28d4-8082-38f1-b1709f6ee7695",
     "version": 1.9000000000000006,
->>>>>>> develop
     "description": "Description of IMSIWProtoStub",
     "language": "Javascript",
     "type": "ProtoStubs",

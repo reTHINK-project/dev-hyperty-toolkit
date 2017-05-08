@@ -7,13 +7,8 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-<<<<<<< HEAD
-    "cguid": "5-3cf89141-ed3b-3cc8-d32a-c9f5daea4d0b0",
-    "version": 0.4,
-=======
     "cguid": "5-09d77727-aee7-e0c2-42ab-b6279beec4330",
     "version": 0.7999999999999999,
->>>>>>> develop
     "description": "Description of IMSIWProxyStub",
     "language": "Javascript",
     "type": "IDPProxys",
@@ -36,11 +31,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-<<<<<<< HEAD
     "cguid": "5-3cf89141-ed3b-3cc8-d32a-c9f5daea4d0b1",
-=======
-    "cguid": "5-09d77727-aee7-e0c2-42ab-b6279beec4331",
->>>>>>> develop
     "version": 0.30000000000000004,
     "description": "Description of IdpProxyStub",
     "language": "Javascript",
@@ -64,13 +55,8 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-<<<<<<< HEAD
     "cguid": "5-3cf89141-ed3b-3cc8-d32a-c9f5daea4d0b2",
     "version": 0.30000000000000004,
-=======
-    "cguid": "5-09d77727-aee7-e0c2-42ab-b6279beec4332",
-    "version": 0.2,
->>>>>>> develop
     "description": "Description of SlackProxyStub",
     "language": "Javascript",
     "type": "IDPProxys",
@@ -93,11 +79,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-<<<<<<< HEAD
     "cguid": "5-3cf89141-ed3b-3cc8-d32a-c9f5daea4d0b3",
-=======
-    "cguid": "5-09d77727-aee7-e0c2-42ab-b6279beec4333",
->>>>>>> develop
     "version": 0.2,
     "description": "Description of MicrosoftProxyStub",
     "language": "Javascript",
@@ -121,11 +103,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-<<<<<<< HEAD
     "cguid": "5-3cf89141-ed3b-3cc8-d32a-c9f5daea4d0b4",
-=======
-    "cguid": "5-09d77727-aee7-e0c2-42ab-b6279beec4334",
->>>>>>> develop
     "version": 0.2,
     "description": "Description of OrangeProxyStub",
     "language": "Javascript",
@@ -149,11 +127,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-<<<<<<< HEAD
     "cguid": "5-3cf89141-ed3b-3cc8-d32a-c9f5daea4d0b5",
-=======
-    "cguid": "5-09d77727-aee7-e0c2-42ab-b6279beec4335",
->>>>>>> develop
     "version": 0.2,
     "description": "Description of NodejsProxyStub",
     "language": "Javascript",
