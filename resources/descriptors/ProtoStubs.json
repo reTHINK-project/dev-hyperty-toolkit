@@ -14,7 +14,7 @@
     "signature": "",
     "messageSchemas": "",
     "configuration": {
-      "url": "wss://localhost:9090/ws"
+      "url": "wss://msg-node.hysmart.rethink.ptinovacao.pt/localhost/ws"
     },
     "constraints": {
       "browser": true
