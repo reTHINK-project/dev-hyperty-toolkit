@@ -42,17 +42,42 @@ var IMSIWProxyStub = function () {
 				_this2.requestToIdp(msg);
 			}
 		});
-		_this._sendStatus('created');
+
+		this._sendStatus('created');
 	}
 
-	/**
-  * Function that see the intended method in the message received and call the respective function
-  *
-  * @param {message}  message received in the messageBus
-  */
-
-
 	_createClass(IMSIWProxyStub, [{
+		key: '_sendStatus',
+		value: function _sendStatus(value, reason) {
+			var _this = this;
+
+			console.log('[Slack Idp Proxy status changed] to ', value);
+
+			_this._state = value;
+
+			var msg = {
+				type: 'update',
+				from: _this.runtimeProtoStubURL,
+				to: _this.runtimeProtoStubURL + '/status',
+				body: {
+					value: value
+				}
+			};
+
+			if (reason) {
+				msg.body.desc = reason;
+			}
+
+			_this.messageBus.postMessage(msg);
+		}
+
+		/**
+   * Function that see the intended method in the message received and call the respective function
+   *
+   * @param {message}  message received in the messageBus
+   */
+
+	}, {
 		key: 'requestToIdp',
 		value: function requestToIdp(msg) {
 			var _this3 = this;
@@ -128,30 +153,6 @@ var IMSIWProxyStub = function () {
 			var message = { id: msg.id, type: 'response', to: msg.from, from: msg.to, body: { code: 200, value: value } };
 
 			this.messageBus.postMessage(message);
-		}
-	}, {
-		key: '_sendStatus',
-		value: function _sendStatus(value, reason) {
-			var _this = this;
-
-			console.log('[GoogleIdpProxy.sendStatus] ', value);
-
-			_this._state = value;
-
-			var msg = {
-				type: 'update',
-				from: _this.runtimeProtoStubURL,
-				to: _this.runtimeProtoStubURL + '/status',
-				body: {
-					value: value
-				}
-			};
-
-			if (reason) {
-				msg.body.desc = reason;
-			}
-
-			_this.messageBus.postMessage(msg);
 		}
 	}]);
 
