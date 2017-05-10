@@ -65,6 +65,9 @@ class VertxProtoStub {
       console.log('[VertxProtoStub] outgoing message: ', msg);
       _this._open(() => {
         if (_this._filter(msg)) {
+          if (!msg.body) {
+            msg.body = {};
+          }
           msg.body.via = this._runtimeProtoStubURL;
           console.log('[VertxProtoStub: ProtoStub -> MN]', msg);
           _this._sock.send(JSON.stringify(msg));
@@ -101,8 +104,6 @@ class VertxProtoStub {
    */
   disconnect() {
     let _this = this;
-
-    _this._sendStatus('disconnected');
 
     _this._continuousOpen = false;
     if (_this._sock) {
@@ -206,9 +207,12 @@ class VertxProtoStub {
   }
 
   _filter(msg) {
-    if (msg.body && msg.body.via === this._runtimeProtoStubURL)
+    if (msg.body && msg.body.via === this._runtimeProtoStubURL) {
       return false;
-    return true;
+    } else {
+      return true;
+    }
+
   }
 
   _deliver(msg) {

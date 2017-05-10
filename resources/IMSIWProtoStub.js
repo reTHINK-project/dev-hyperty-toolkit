@@ -1,4 +1,308 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.activate = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      } else {
+        // At least give some kind of context to the user
+        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+        err.context = er;
+        throw err;
+      }
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        args = Array.prototype.slice.call(arguments, 1);
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    args = Array.prototype.slice.call(arguments, 1);
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else if (listeners) {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.prototype.listenerCount = function(type) {
+  if (this._events) {
+    var evlistener = this._events[type];
+
+    if (isFunction(evlistener))
+      return 1;
+    else if (evlistener)
+      return evlistener.length;
+  }
+  return 0;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  return emitter.listenerCount(type);
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+},{}],2:[function(require,module,exports){
 var grammar = module.exports = {
   v: [{
       name: 'version',
@@ -279,7 +583,7 @@ Object.keys(grammar).forEach(function (key) {
   });
 });
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 var parser = require('./parser');
 var writer = require('./writer');
 
@@ -289,7 +593,7 @@ exports.parseFmtpConfig = parser.parseFmtpConfig;
 exports.parsePayloads = parser.parsePayloads;
 exports.parseRemoteCandidates = parser.parseRemoteCandidates;
 
-},{"./parser":3,"./writer":4}],3:[function(require,module,exports){
+},{"./parser":4,"./writer":5}],4:[function(require,module,exports){
 var toIntIfInt = function (v) {
   return String(Number(v)) === v ? Number(v) : v;
 };
@@ -384,7 +688,7 @@ exports.parseRemoteCandidates = function (str) {
   return candidates;
 };
 
-},{"./grammar":1}],4:[function(require,module,exports){
+},{"./grammar":2}],5:[function(require,module,exports){
 var grammar = require('./grammar');
 
 // customized util.format - discards excess arguments and can void middle ones
@@ -500,9 +804,9 @@ module.exports = function (session, opts) {
   return sdp.join('\r\n') + '\r\n';
 };
 
-},{"./grammar":1}],5:[function(require,module,exports){
+},{"./grammar":2}],6:[function(require,module,exports){
 // version: 0.5.1
-// date: Mon Mar 20 2017 15:36:05 GMT+0000 (WET)
+// date: Thu Apr 13 2017 23:51:28 GMT+0100 (GMT Daylight Time)
 // licence: 
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
@@ -603,7 +907,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 160);
+/******/ 	return __webpack_require__(__webpack_require__.s = 136);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1487,7 +1791,7 @@ module.exports = function(TO_STRING){
 /***/ (function(module, exports, __webpack_require__) {
 
 var ctx                = __webpack_require__(14)
-  , invoke             = __webpack_require__(88)
+  , invoke             = __webpack_require__(89)
   , html               = __webpack_require__(42)
   , cel                = __webpack_require__(17)
   , global             = __webpack_require__(1)
@@ -1618,17 +1922,289 @@ addToUnscopables('entries');
 /* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = { "default": __webpack_require__(80), __esModule: true };
+module.exports = { "default": __webpack_require__(81), __esModule: true };
 
 /***/ }),
 /* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = { "default": __webpack_require__(82), __esModule: true };
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _stringify = __webpack_require__(40);
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+var _keys = __webpack_require__(70);
+
+var _keys2 = _interopRequireDefault(_keys);
+
+exports.divideURL = divideURL;
+exports.divideEmail = divideEmail;
+exports.emptyObject = emptyObject;
+exports.deepClone = deepClone;
+exports.getUserURLFromEmail = getUserURLFromEmail;
+exports.getUserEmailFromURL = getUserEmailFromURL;
+exports.convertToUserURL = convertToUserURL;
+exports.checkAttribute = checkAttribute;
+exports.parseAttributes = parseAttributes;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+/**
+ * Support module with some functions will be useful
+ * @module utils
+ */
+
+/**
+ * @typedef divideURL
+ * @type Object
+ * @property {string} type The type of URL
+ * @property {string} domain The domain of URL
+ * @property {string} identity The identity of URL
+ */
+
+/**
+ * Divide an url in type, domain and identity
+ * @param  {URL.URL} url - url address
+ * @return {divideURL} the result of divideURL
+ */
+function divideURL(url) {
+
+  if (!url) throw Error('URL is needed to split');
+
+  function recurse(value) {
+    var regex = /([a-zA-Z-]*)(:\/\/(?:\.)?|:)([-a-zA-Z0-9@:%._\+~#=]{2,256})([-a-zA-Z0-9@:%._\+~#=\/]*)/gi;
+    var subst = '$1,$3,$4';
+    var parts = value.replace(regex, subst).split(',');
+    return parts;
+  }
+
+  var parts = recurse(url);
+
+  // If the url has no scheme
+  if (parts[0] === url && !parts[0].includes('@')) {
+
+    var _result = {
+      type: "",
+      domain: url,
+      identity: ""
+    };
+
+    console.error('[DivideURL] DivideURL don\'t support url without scheme. Please review your url address', url);
+
+    return _result;
+  }
+
+  // check if the url has the scheme and includes an @
+  if (parts[0] === url && parts[0].includes('@')) {
+    var scheme = parts[0] === url ? 'smtp' : parts[0];
+    parts = recurse(scheme + '://' + parts[0]);
+  }
+
+  // if the domain includes an @, divide it to domain and identity respectively
+  if (parts[1].includes('@')) {
+    parts[2] = parts[0] + '://' + parts[1];
+    parts[1] = parts[1].substr(parts[1].indexOf('@') + 1);
+  } /*else if (parts[2].includes('/')) {
+    parts[2] = parts[2].substr(parts[2].lastIndexOf('/')+1);
+    }*/
+
+  var result = {
+    type: parts[0],
+    domain: parts[1],
+    identity: parts[2]
+  };
+
+  return result;
+}
+
+function divideEmail(email) {
+  var indexOfAt = email.indexOf('@');
+
+  var result = {
+    username: email.substring(0, indexOfAt),
+    domain: email.substring(indexOfAt + 1, email.length)
+  };
+
+  return result;
+}
+
+/**
+ * Check if an Object is empty
+ * @param  {Object} object Object to be checked
+ * @return {Boolean}       status of Object, empty or not (true|false);
+ */
+function emptyObject(object) {
+  return (0, _keys2.default)(object).length > 0 ? false : true;
+}
+
+/**
+ * Make a COPY of the original data
+ * @param  {Object}  obj - object to be cloned
+ * @return {Object}
+ */
+function deepClone(obj) {
+  //TODO: simple but inefficient JSON deep clone...
+  if (obj) return JSON.parse((0, _stringify2.default)(obj));
+}
+
+/**
+ * Obtains the user URL that corresponds to a given email
+ * @param  {string} userEmail The user email
+ * @return {URL.URL} userURL The user URL
+ */
+function getUserURLFromEmail(userEmail) {
+  var indexOfAt = userEmail.indexOf('@');
+  return 'user://' + userEmail.substring(indexOfAt + 1, userEmail.length) + '/' + userEmail.substring(0, indexOfAt);
+}
+
+/**
+ * Obtains the user email that corresponds to a given URL
+ * @param  {URL.URL} userURL The user URL
+ * @return {string} userEmail The user email
+ */
+function getUserEmailFromURL(userURL) {
+  var url = divideURL(userURL);
+  return url.identity.replace('/', '') + '@' + url.domain; // identity field has '/exampleID' instead of 'exampleID'
+}
+
+/**
+ * Check if the user identifier is already in the URL format, if not, convert to URL format
+ * @param  {string}   identifier  user identifier
+ * @return {string}   userURL    the user URL
+ */
+function convertToUserURL(identifier) {
+
+  // check if the identifier is already in the url format
+  if (identifier.substring(0, 7) === 'user://') {
+    var dividedURL = divideURL(identifier);
+
+    //check if the url is well formated
+    if (dividedURL.domain && dividedURL.identity) {
+      return identifier;
+    } else {
+      throw 'userURL with wrong format';
+    }
+
+    //if not, convert the user email to URL format
+  } else {
+    return getUserURLFromEmail(identifier);
+  }
+}
+
+function checkAttribute(path) {
+
+  var regex = /((([a-zA-Z]+):\/\/([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})\/[a-zA-Z0-9\.]+@[a-zA-Z0-9]+(\-)?[a-zA-Z0-9]+(\.)?[a-zA-Z0-9]{2,10}?\.[a-zA-Z]{2,10})(.+(?=.identity))?/gm;
+
+  var list = [];
+  var final = [];
+  var test = path.match(regex);
+
+  if (test == null) {
+    final = path.split('.');
+  } else {
+    var m = void 0;
+    while ((m = regex.exec(path)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width matches
+      if (m.index === regex.lastIndex) {
+        regex.lastIndex++;
+      }
+
+      // The result can be accessed through the `m`-variable.
+      m.forEach(function (match, groupIndex) {
+        if (groupIndex === 0) {
+          list.push(match);
+        }
+      });
+    }
+    var result = void 0;
+    list.forEach(function (url) {
+      result = path.replace(url, '*+*');
+
+      final = result.split('.').map(function (item) {
+        if (item === '*+*') {
+          return url;
+        }
+        return item;
+      });
+    });
+  }
+
+  console.log('[ServiceFramework.Utils.checkAttribute]', final);
+  return final;
+}
+
+function parseAttributes(path) {
+  var regex = /([0-9a-zA-Z][-\w]*):\/\//g;
+
+  var string3 = 'identity';
+
+  if (!path.includes('://')) {
+    return path.split('.');
+  } else {
+    var string1 = path.split(regex)[0];
+
+    var array1 = string1.split('.');
+
+    var string2 = path.replace(string1, '');
+
+    if (path.includes(string3)) {
+
+      var array2 = string2.split(string3 + '.');
+
+      console.log('array2 ' + array2);
+
+      string2 = array2[0].slice('.', -1);
+
+      array2 = array2[1].split('.');
+
+      array1.push(string2, string3);
+
+      array1 = array1.concat(array2);
+    } else {
+      array1.push(string2);
+    }
+
+    return array1.filter(Boolean);
+  }
+}
 
 /***/ }),
-/* 72 */,
-/* 73 */
+/* 72 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(83), __esModule: true };
+
+/***/ }),
+/* 73 */,
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var classof   = __webpack_require__(55)
@@ -1641,33 +2217,33 @@ module.exports = __webpack_require__(0).getIteratorMethod = function(it){
 };
 
 /***/ }),
-/* 74 */,
 /* 75 */,
 /* 76 */,
 /* 77 */,
 /* 78 */,
 /* 79 */,
-/* 80 */
+/* 80 */,
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(102);
+__webpack_require__(103);
 module.exports = __webpack_require__(0).Object.keys;
 
 /***/ }),
-/* 81 */,
-/* 82 */
+/* 82 */,
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(54);
 __webpack_require__(50);
 __webpack_require__(51);
-__webpack_require__(104);
+__webpack_require__(105);
 module.exports = __webpack_require__(0).Promise;
 
 /***/ }),
-/* 83 */,
 /* 84 */,
-/* 85 */
+/* 85 */,
+/* 86 */
 /***/ (function(module, exports) {
 
 module.exports = function(it, Constructor, name, forbiddenField){
@@ -1677,16 +2253,16 @@ module.exports = function(it, Constructor, name, forbiddenField){
 };
 
 /***/ }),
-/* 86 */,
-/* 87 */
+/* 87 */,
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var ctx         = __webpack_require__(14)
-  , call        = __webpack_require__(91)
-  , isArrayIter = __webpack_require__(89)
+  , call        = __webpack_require__(92)
+  , isArrayIter = __webpack_require__(90)
   , anObject    = __webpack_require__(5)
   , toLength    = __webpack_require__(47)
-  , getIterFn   = __webpack_require__(73)
+  , getIterFn   = __webpack_require__(74)
   , BREAK       = {}
   , RETURN      = {};
 var exports = module.exports = function(iterable, entries, fn, that, ITERATOR){
@@ -1708,7 +2284,7 @@ exports.BREAK  = BREAK;
 exports.RETURN = RETURN;
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports) {
 
 // fast apply, http://jsperf.lnkit.com/fast-apply/5
@@ -1729,7 +2305,7 @@ module.exports = function(fn, args, that){
 };
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // check on default Array iterator
@@ -1742,8 +2318,8 @@ module.exports = function(it){
 };
 
 /***/ }),
-/* 90 */,
-/* 91 */
+/* 91 */,
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // call something on iterator step with safe closing on error
@@ -1760,7 +2336,7 @@ module.exports = function(iterator, fn, value, entries){
 };
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var ITERATOR     = __webpack_require__(3)('iterator')
@@ -1786,8 +2362,8 @@ module.exports = function(exec, skipClosing){
 };
 
 /***/ }),
-/* 93 */,
-/* 94 */
+/* 94 */,
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global    = __webpack_require__(1)
@@ -1860,8 +2436,8 @@ module.exports = function(){
 };
 
 /***/ }),
-/* 95 */,
-/* 96 */
+/* 96 */,
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var hide = __webpack_require__(7);
@@ -1873,8 +2449,8 @@ module.exports = function(target, src, safe){
 };
 
 /***/ }),
-/* 97 */,
-/* 98 */
+/* 98 */,
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1894,7 +2470,7 @@ module.exports = function(KEY){
 };
 
 /***/ }),
-/* 99 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 7.3.20 SpeciesConstructor(O, defaultConstructor)
@@ -1907,9 +2483,9 @@ module.exports = function(O, D){
 };
 
 /***/ }),
-/* 100 */,
 /* 101 */,
-/* 102 */
+/* 102 */,
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.14 Object.keys(O)
@@ -1923,8 +2499,8 @@ __webpack_require__(45)('keys', function(){
 });
 
 /***/ }),
-/* 103 */,
-/* 104 */
+/* 104 */,
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1936,11 +2512,11 @@ var LIBRARY            = __webpack_require__(26)
   , $export            = __webpack_require__(9)
   , isObject           = __webpack_require__(6)
   , aFunction          = __webpack_require__(19)
-  , anInstance         = __webpack_require__(85)
-  , forOf              = __webpack_require__(87)
-  , speciesConstructor = __webpack_require__(99)
+  , anInstance         = __webpack_require__(86)
+  , forOf              = __webpack_require__(88)
+  , speciesConstructor = __webpack_require__(100)
   , task               = __webpack_require__(67).set
-  , microtask          = __webpack_require__(94)()
+  , microtask          = __webpack_require__(95)()
   , PROMISE            = 'Promise'
   , TypeError          = global.TypeError
   , process            = global.process
@@ -2132,7 +2708,7 @@ if(!USE_NATIVE){
     this._h = 0;              // <- rejection state, 0 - default, 1 - handled, 2 - unhandled
     this._n = false;          // <- notify
   };
-  Internal.prototype = __webpack_require__(96)($Promise.prototype, {
+  Internal.prototype = __webpack_require__(97)($Promise.prototype, {
     // 25.4.5.3 Promise.prototype.then(onFulfilled, onRejected)
     then: function then(onFulfilled, onRejected){
       var reaction    = newPromiseCapability(speciesConstructor(this, $Promise));
@@ -2159,7 +2735,7 @@ if(!USE_NATIVE){
 
 $export($export.G + $export.W + $export.F * !USE_NATIVE, {Promise: $Promise});
 __webpack_require__(22)($Promise, PROMISE);
-__webpack_require__(98)(PROMISE);
+__webpack_require__(99)(PROMISE);
 Wrapper = __webpack_require__(0)[PROMISE];
 
 // statics
@@ -2183,7 +2759,7 @@ $export($export.S + $export.F * (LIBRARY || !USE_NATIVE), PROMISE, {
     return capability.promise;
   }
 });
-$export($export.S + $export.F * !(USE_NATIVE && __webpack_require__(92)(function(iter){
+$export($export.S + $export.F * !(USE_NATIVE && __webpack_require__(93)(function(iter){
   $Promise.all(iter)['catch'](empty);
 })), PROMISE, {
   // 25.4.4.1 Promise.all(iterable)
@@ -2229,203 +2805,10 @@ $export($export.S + $export.F * !(USE_NATIVE && __webpack_require__(92)(function
 });
 
 /***/ }),
-/* 105 */,
 /* 106 */,
 /* 107 */,
 /* 108 */,
-/* 109 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _stringify = __webpack_require__(40);
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-var _keys = __webpack_require__(70);
-
-var _keys2 = _interopRequireDefault(_keys);
-
-exports.divideURL = divideURL;
-exports.divideEmail = divideEmail;
-exports.emptyObject = emptyObject;
-exports.deepClone = deepClone;
-exports.getUserURLFromEmail = getUserURLFromEmail;
-exports.getUserEmailFromURL = getUserEmailFromURL;
-exports.convertToUserURL = convertToUserURL;
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
-* Copyright 2016 PT Inovação e Sistemas SA
-* Copyright 2016 INESC-ID
-* Copyright 2016 QUOBIS NETWORKS SL
-* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
-* Copyright 2016 ORANGE SA
-* Copyright 2016 Deutsche Telekom AG
-* Copyright 2016 Apizee
-* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-**/
-/**
- * Support module with some functions will be useful
- * @module utils
- */
-
-/**
- * @typedef divideURL
- * @type Object
- * @property {string} type The type of URL
- * @property {string} domain The domain of URL
- * @property {string} identity The identity of URL
- */
-
-/**
- * Divide an url in type, domain and identity
- * @param  {URL.URL} url - url address
- * @return {divideURL} the result of divideURL
- */
-function divideURL(url) {
-
-  if (!url) throw Error('URL is needed to split');
-
-  function recurse(value) {
-    var regex = /([a-zA-Z-]*)(:\/\/(?:\.)?|:)([-a-zA-Z0-9@:%._\+~#=]{2,256})([-a-zA-Z0-9@:%._\+~#=\/]*)/gi;
-    var subst = '$1,$3,$4';
-    var parts = value.replace(regex, subst).split(',');
-    return parts;
-  }
-
-  var parts = recurse(url);
-
-  // If the url has no scheme
-  if (parts[0] === url && !parts[0].includes('@')) {
-
-    var _result = {
-      type: "",
-      domain: url,
-      identity: ""
-    };
-
-    console.error('[DivideURL] DivideURL don\'t support url without scheme. Please review your url address', url);
-
-    return _result;
-  }
-
-  // check if the url has the scheme and includes an @
-  if (parts[0] === url && parts[0].includes('@')) {
-    var scheme = parts[0] === url ? 'smtp' : parts[0];
-    parts = recurse(scheme + '://' + parts[0]);
-  }
-
-  // if the domain includes an @, divide it to domain and identity respectively
-  if (parts[1].includes('@')) {
-    parts[2] = parts[0] + '://' + parts[1];
-    parts[1] = parts[1].substr(parts[1].indexOf('@') + 1);
-  } /*else if (parts[2].includes('/')) {
-    parts[2] = parts[2].substr(parts[2].lastIndexOf('/')+1);
-    }*/
-
-  var result = {
-    type: parts[0],
-    domain: parts[1],
-    identity: parts[2]
-  };
-
-  return result;
-}
-
-function divideEmail(email) {
-  var indexOfAt = email.indexOf('@');
-
-  var result = {
-    username: email.substring(0, indexOfAt),
-    domain: email.substring(indexOfAt + 1, email.length)
-  };
-
-  return result;
-}
-
-/**
- * Check if an Object is empty
- * @param  {Object} object Object to be checked
- * @return {Boolean}       status of Object, empty or not (true|false);
- */
-function emptyObject(object) {
-  return (0, _keys2.default)(object).length > 0 ? false : true;
-}
-
-/**
- * Make a COPY of the original data
- * @param  {Object}  obj - object to be cloned
- * @return {Object}
- */
-function deepClone(obj) {
-  //TODO: simple but inefficient JSON deep clone...
-  if (obj) return JSON.parse((0, _stringify2.default)(obj));
-}
-
-/**
- * Obtains the user URL that corresponds to a given email
- * @param  {string} userEmail The user email
- * @return {URL.URL} userURL The user URL
- */
-function getUserURLFromEmail(userEmail) {
-  var indexOfAt = userEmail.indexOf('@');
-  return 'user://' + userEmail.substring(indexOfAt + 1, userEmail.length) + '/' + userEmail.substring(0, indexOfAt);
-}
-
-/**
- * Obtains the user email that corresponds to a given URL
- * @param  {URL.URL} userURL The user URL
- * @return {string} userEmail The user email
- */
-function getUserEmailFromURL(userURL) {
-  var url = divideURL(userURL);
-  return url.identity.replace('/', '') + '@' + url.domain; // identity field has '/exampleID' instead of 'exampleID'
-}
-
-/**
- * Check if the user identifier is already in the URL format, if not, convert to URL format
- * @param  {string}   identifier  user identifier
- * @return {string}   userURL    the user URL
- */
-function convertToUserURL(identifier) {
-
-  // check if the identifier is already in the url format
-  if (identifier.substring(0, 7) === 'user://') {
-    var dividedURL = divideURL(identifier);
-
-    //check if the url is well formated
-    if (dividedURL.domain && dividedURL.identity) {
-      return identifier;
-    } else {
-      throw 'userURL with wrong format';
-    }
-
-    //if not, convert the user email to URL format
-  } else {
-    return getUserURLFromEmail(identifier);
-  }
-}
-
-/***/ }),
+/* 109 */,
 /* 110 */,
 /* 111 */,
 /* 112 */,
@@ -2453,7 +2836,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _promise = __webpack_require__(71);
+var _promise = __webpack_require__(72);
 
 var _promise2 = _interopRequireDefault(_promise);
 
@@ -2465,7 +2848,7 @@ var _createClass2 = __webpack_require__(10);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-var _utils = __webpack_require__(109);
+var _utils = __webpack_require__(71);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2481,47 +2864,364 @@ var Discovery = function () {
   * @param  {MessageBus}          msgbus                msgbus
   * @param  {RuntimeURL}          runtimeURL            runtimeURL
   */
-  function Discovery(hypertyURL, msgBus) {
+  function Discovery(hypertyURL, runtimeURL, msgBus) {
     (0, _classCallCheck3.default)(this, Discovery);
 
     var _this = this;
     _this.messageBus = msgBus;
+    _this.runtimeURL = runtimeURL;
 
     _this.domain = (0, _utils.divideURL)(hypertyURL).domain;
     _this.discoveryURL = hypertyURL;
   }
 
   /**
-  * function to request about an dataObject registered in domain registry with a given name, and
-  * return the dataObject information, if found.
-  * @param  {String}              name  dataObject URL
-  * @param  {String}            domain (Optional)
-  * @return {Promise}          Promise
+  * Advanced Search for Hyperties registered in domain registry associated with some user identifier (eg email, name ...)
+  * @param  {String}           userIdentifier
+  * @param  {Array<string>}    schema (Optional)     types of hyperties schemas
+  * @param  {Array<string>}    resources (Optional)  types of hyperties resources
   */
 
 
   (0, _createClass3.default)(Discovery, [{
-    key: 'discoverDataObjectPerName',
-    value: function discoverDataObjectPerName(name, domain) {
+    key: '_isLegacyUser',
+    value: function _isLegacyUser(userIdentifier) {
+      if (userIdentifier.includes(':') && !userIdentifier.includes('user://')) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    /**
+    * Advanced Search for Hyperties registered in domain registry associated with some user identifier (eg email, name ...)
+    * @param  {String}           userIdentifier
+    * @param  {Array<string>}    schema (Optional)     types of hyperties schemas
+    * @param  {Array<string>}    resources (Optional)  types of hyperties resources
+    */
+
+  }, {
+    key: 'discoverHypertiesPerUserProfileData',
+    value: function discoverHypertiesPerUserProfileData(userIdentifier, schema, resources) {
+      var _this = this;
+
+      var msg = {
+        type: 'read',
+        from: _this.discoveryURL,
+        to: _this.runtimeURL + '/discovery/',
+        body: {
+          resource: '/hyperty/userprofile/' + userIdentifier
+        }
+      };
+
+      if (schema || resources) {
+        msg.body['criteria'] = {
+          resources: resources,
+          dataSchemes: schema
+        };
+      }
+
+      return new _promise2.default(function (resolve, reject) {
+
+        if (!_this._isLegacyUser(userIdentifier)) {
+          // todo: to reomve when discovery of legcay users are supported
+          _this.messageBus.postMessage(msg, function (reply) {
+
+            if (reply.body.code === 200) {
+              console.log("Reply log: ", reply.body.value);
+              resolve(reply.body.value);
+            } else {
+              console.log("Error Log: ", reply.body.description);
+              reject(reply.body.description);
+            }
+          });
+        } else {
+          resolve({ hypertyID: userIdentifier });
+        }
+      });
+    }
+
+    /**
+    * Advanced Search for DataObjects registered in domain registry associated with some user identifier (eg email, name ...)
+    * @param  {String}           userIdentifier
+    * @param  {Array<string>}    schema (Optional)     types of hyperties schemas
+    * @param  {Array<string>}    resources (Optional)  types of hyperties resources
+    */
+
+  }, {
+    key: 'discoverDataObjectsPerUserProfileData',
+    value: function discoverDataObjectsPerUserProfileData(userIdentifier, schema, resources) {
+      var _this = this;
+
+      var msg = {
+        type: 'read',
+        from: _this.discoveryURL,
+        to: _this.runtimeURL + '/discovery/',
+        body: {
+          resource: '/dataObject/userprofile/' + userIdentifier
+        }
+      };
+
+      if (schema || resources) {
+        msg.body['criteria'] = {
+          resources: resources,
+          dataSchemes: schema
+        };
+      }
+
+      return new _promise2.default(function (resolve, reject) {
+
+        if (!_this._isLegacyUser(userIdentifier)) {
+          // todo: to reomve when discovery of legcay users are supported
+
+          _this.messageBus.postMessage(msg, function (reply) {
+
+            if (reply.body.code === 200) {
+              console.log("Reply log: ", reply.body.value);
+              resolve(reply.body.value);
+            } else {
+              console.log("Error Log: ", reply.body.description);
+              reject(reply.body.description);
+            }
+          });
+        } else {
+          resolve({ hypertyID: userIdentifier });
+        }
+      });
+    }
+
+    /**
+    * Advanced Search for Hyperties registered in domain registry associated with some GUID
+    * @param  {String}           guidURL                guid URL e.g user-guid://<unique-user-identifier>
+    * @param  {Array<string>}    schema (Optional)     types of hyperties schemas
+    * @param  {Array<string>}    resources (Optional)  types of hyperties resources
+    */
+
+  }, {
+    key: 'discoverHypertiesPerGUID',
+    value: function discoverHypertiesPerGUID(guidURL, schema, resources) {
+      var _this = this;
+
+      var msg = {
+        type: 'read',
+        from: _this.discoveryURL,
+        to: _this.runtimeURL + '/discovery/',
+        body: {
+          resource: '/hyperty/guid/' + guidURL
+        }
+      };
+
+      if (schema || resources) {
+        msg.body['criteria'] = {
+          resources: resources,
+          dataSchemes: schema
+        };
+      }
+
+      return new _promise2.default(function (resolve, reject) {
+
+        _this.messageBus.postMessage(msg, function (reply) {
+
+          if (reply.body.code === 200) {
+            console.log("Reply log: ", reply.body.value);
+            resolve(reply.body.value);
+          } else {
+            console.log("Error Log: ", reply.body.description);
+            reject(reply.body.description);
+          }
+        });
+      });
+    }
+
+    /**
+    * Advanced Search for DataObjects registered in domain registry associated with some GUID
+    * @param  {String}           guidURL                guid URL e.g user-guid://<unique-user-identifier>
+    * @param  {Array<string>}    schema (Optional)     types of hyperties schemas
+    * @param  {Array<string>}    resources (Optional)  types of hyperties resources
+    * @param  {String}           domain (Optional)     domain of the registry to search
+    */
+
+  }, {
+    key: 'discoverDataObjectsPerGUID',
+    value: function discoverDataObjectsPerGUID(guidURL, schema, resources) {
+      var _this = this;
+
+      var msg = {
+        type: 'read',
+        from: _this.discoveryURL,
+        to: _this.runtimeURL + '/discovery/',
+        body: {
+          resource: '/dataObject/guid/' + guidURL
+        }
+      };
+
+      if (schema || resources) {
+        msg.body['criteria'] = {
+          resources: resources,
+          dataSchemes: schema
+        };
+      }
+
+      return new _promise2.default(function (resolve, reject) {
+
+        _this.messageBus.postMessage(msg, function (reply) {
+
+          if (reply.body.code === 200) {
+            console.log("Reply log: ", reply.body.value);
+            resolve(reply.body.value);
+          } else {
+            console.log("Error Log: ", reply.body.description);
+            reject(reply.body.description);
+          }
+        });
+      });
+    }
+
+    /** Advanced Search for Hyperties registered in domain registry
+    * @param  {String}           user                  user identifier, either in url or email format
+    * @param  {Array<string>}    schema (Optional)     types of hyperties schemas
+    * @param  {Array<string>}    resources (Optional)  types of hyperties resources
+    * @param  {String}           domain (Optional)     domain of the registry to search
+    */
+
+  }, {
+    key: 'discoverHyperties',
+    value: function discoverHyperties(user, schema, resources, domain) {
       var _this = this;
       var activeDomain = void 0;
 
       activeDomain = !domain ? _this.domain : domain;
 
       var msg = {
-        type: 'read', from: _this.discoveryURL, to: 'domain://registry.' + activeDomain + '/', body: { resource: name }
+        type: 'read',
+        from: _this.discoveryURL,
+        to: _this.runtimeURL + '/discovery/',
+        body: {
+          resource: '/hyperty/user/' + user
+        }
+      };
+
+      if (schema || resources) {
+        msg.body['criteria'] = {
+          resources: resources,
+          dataSchemes: schema,
+          domain: activeDomain
+        };
+      } else {
+        msg.body['criteria'] = {
+          domain: activeDomain
+        };
+      }
+
+      return new _promise2.default(function (resolve, reject) {
+
+        if (!_this._isLegacyUser(user)) {
+          // todo: to reomve when discovery of legcay users are supported
+
+          _this.messageBus.postMessage(msg, function (reply) {
+
+            if (reply.body.code === 200) {
+              console.log("Reply log: ", reply.body.value);
+              resolve(reply.body.value);
+            } else {
+              console.log("Error Log: ", reply.body.description);
+              reject(reply.body.description);
+            }
+          });
+        } else {
+          resolve({ hypertyID: user });
+        }
+      });
+    }
+
+    /** Advanced Search for DataObjects registered in domain registry
+    * @param  {String}           user                  user identifier, either in url or email format
+    * @param  {Array<string>}    schema (Optional)     types of dataObjects schemas
+    * @param  {Array<string>}    resources (Optional)  types of dataObjects resources
+    * @param  {String}           domain (Optional)     domain of the registry to search
+    */
+
+  }, {
+    key: 'discoverDataObjects',
+    value: function discoverDataObjects(user, schema, resources, domain) {
+      var _this = this;
+      var activeDomain = void 0;
+
+      activeDomain = !domain ? _this.domain : domain;
+
+      var msg = {
+        type: 'read',
+        from: _this.discoveryURL,
+        to: _this.runtimeURL + '/discovery/',
+        body: {
+          resource: '/dataObject/user/' + user
+        }
+      };
+
+      if (schema || resources) {
+        msg.body['criteria'] = {
+          resources: resources,
+          dataSchemes: schema,
+          domain: activeDomain
+        };
+      } else {
+        msg.body['criteria'] = {
+          domain: activeDomain
+        };
+      }
+
+      return new _promise2.default(function (resolve, reject) {
+
+        _this.messageBus.postMessage(msg, function (reply) {
+
+          if (reply.body.code === 200) {
+            console.log("Reply Value Log: ", reply.body.value);
+            resolve(reply.body.value);
+          } else {
+            console.log("Error Log: ", reply.body.description);
+            reject(reply.body.description);
+          }
+        });
+      });
+    }
+
+    /**
+    * function to request about hyperties registered in domain registry, and
+    * return the hyperty information, if found.
+    * @param  {String}              url  hyperty URL
+    * @param  {String}            domain (Optional)
+    */
+
+  }, {
+    key: 'discoverHypertyPerURL',
+    value: function discoverHypertyPerURL(url, domain) {
+      var _this = this;
+      var activeDomain = void 0;
+
+      activeDomain = !domain ? _this.domain : domain;
+
+      var msg = {
+        type: 'read',
+        from: _this.discoveryURL,
+        to: _this.runtimeURL + '/discovery/',
+        body: {
+          resource: '/hyperty/url/' + url,
+          criteria: {
+            domain: activeDomain
+          }
+        }
       };
 
       return new _promise2.default(function (resolve, reject) {
 
         _this.messageBus.postMessage(msg, function (reply) {
 
-          var dataObject = reply.body.value;
-
-          if (dataObject) {
-            resolve(dataObject);
+          if (reply.body.code === 200) {
+            console.log("Reply Value Log: ", reply.body.value);
+            resolve(reply.body.value);
           } else {
-            reject('DataObject not found');
+            console.log("Error Log: ", reply.body.description);
+            reject(reply.body.description);
           }
         });
       });
@@ -2532,7 +3232,6 @@ var Discovery = function () {
     * return the dataObject information, if found.
     * @param  {String}              url  dataObject URL
     * @param  {String}            domain (Optional)
-    * @return {Promise}          Promise
     */
 
   }, {
@@ -2541,63 +3240,83 @@ var Discovery = function () {
       var _this = this;
       var activeDomain = void 0;
 
-      if (!domain) {
-        activeDomain = _this.domain;
-      } else {
-        activeDomain = domain;
-      }
+      activeDomain = !domain ? _this.domain : domain;
 
       var msg = {
-        type: 'read', from: _this.discoveryURL, to: 'domain://registry.' + activeDomain + '/', body: { resource: url }
+        type: 'read',
+        from: _this.discoveryURL,
+        to: _this.runtimeURL + '/discovery/',
+        body: {
+          resource: '/dataObject/url/' + url,
+          criteria: {
+            domain: activeDomain
+          }
+        }
       };
 
       return new _promise2.default(function (resolve, reject) {
 
         _this.messageBus.postMessage(msg, function (reply) {
 
-          var dataObject = reply.body.value;
-
-          if (dataObject) {
-            resolve(dataObject);
+          if (reply.body.code === 200) {
+            console.log("Reply Value Log: ", reply.body.value);
+            resolve(reply.body.value);
           } else {
-            reject('DataObject not found');
+            console.log("Error Log: ", reply.body.description);
+            reject(reply.body.description);
           }
         });
       });
     }
 
     /**
-    *  function to delete an Data Object registered in the Domain Registry
-    *  @param   {String}           url              dataObject url
-    *  @param   {domain}           domain         (Optional)
-    *  @return  {Promise}          Promise          result
+    * function to request about an dataObjects registered in domain registry with a given name, and
+    * return the dataObjects information, if found.
+    * @param  {String}              name  dataObject URL
+    * @param  {Array<string>}    schema (Optional)     types of dataObjects schemas
+    * @param  {Array<string>}    resources (Optional)  types of dataObjects resources
+    * @param  {String}            domain (Optional)
     */
 
   }, {
-    key: 'deleteDataObject',
-    value: function deleteDataObject(url, domain) {
+    key: 'discoverDataObjectsPerName',
+    value: function discoverDataObjectsPerName(name, schema, resources, domain) {
       var _this = this;
       var activeDomain = void 0;
 
-      if (!domain) {
-        activeDomain = _this.domain;
-      } else {
-        activeDomain = domain;
-      }
+      activeDomain = !domain ? _this.domain : domain;
 
       var msg = {
-        type: 'delete', from: _this.discoveryURL, to: 'domain://registry.' + activeDomain + '/', body: { value: { name: url } } };
+        type: 'read',
+        from: _this.discoveryURL,
+        to: _this.runtimeURL + '/discovery/',
+        body: {
+          resource: '/dataObject/name/' + name
+        }
+      };
+
+      if (schema || resources) {
+        msg.body['criteria'] = {
+          resources: resources,
+          dataSchemes: schema,
+          domain: activeDomain
+        };
+      } else {
+        msg.body['criteria'] = {
+          domain: activeDomain
+        };
+      }
 
       return new _promise2.default(function (resolve, reject) {
 
         _this.messageBus.postMessage(msg, function (reply) {
 
-          var response = reply.body.code;
-
-          if (response === 200) {
-            resolve(response);
+          if (reply.body.code === 200) {
+            console.log("Reply Value Log: ", reply.body.value);
+            resolve(reply.body.value);
           } else {
-            reject('Error on deleting dataObject');
+            console.log("Error Log: ", reply.body.description);
+            reject(reply.body.description);
           }
         });
       });
@@ -2607,43 +3326,58 @@ var Discovery = function () {
     * function to request about specific reporter dataObject registered in domain registry, and
     * return the dataObjects from that reporter.
     * @param  {String}           reporter     dataObject reporter
+    * @param  {Array<string>}    schema (Optional)     types of dataObjects schemas
+    * @param  {Array<string>}    resources (Optional)  types of dataObjects resources
     * @param  {String}           domain       (Optional)
-    * @return {Array}           Promise       DataObjects
     */
 
   }, {
-    key: 'discoverDataObjectPerReporter',
-    value: function discoverDataObjectPerReporter(reporter, domain) {
+    key: 'discoverDataObjectsPerReporter',
+    value: function discoverDataObjectsPerReporter(reporter, schema, resources, domain) {
       var _this = this;
       var activeDomain = void 0;
 
-      if (!domain) {
-        activeDomain = _this.domain;
-      } else {
-        activeDomain = domain;
-      }
+      activeDomain = !domain ? _this.domain : domain;
 
       var msg = {
-        type: 'read', from: _this.discoveryURL, to: 'domain://registry.' + activeDomain + '/', body: { resource: reporter }
+        type: 'read',
+        from: _this.discoveryURL,
+        to: _this.runtimeURL + '/discovery/',
+        body: {
+          resource: '/dataObject/reporter/' + reporter
+        }
       };
+
+      if (schema || resources) {
+        msg.body['criteria'] = {
+          resources: resources,
+          dataSchemes: schema,
+          domain: activeDomain
+        };
+      } else {
+        msg.body['criteria'] = {
+          domain: activeDomain
+        };
+      }
 
       return new _promise2.default(function (resolve, reject) {
 
         _this.messageBus.postMessage(msg, function (reply) {
 
-          var dataObjects = reply.body.value;
-
-          if (dataObjects) {
-            resolve(dataObjects);
+          if (reply.body.code === 200) {
+            console.log("Reply Value Log: ", reply.body.value);
+            resolve(reply.body.value);
           } else {
-            reject('No dataObject was found');
+            console.log("Error Log: ", reply.body.description);
+            reject(reply.body.description);
           }
         });
       });
     }
 
     /** Advanced Search for dataObjects registered in domain registry
-    * @param  {String}           user                  user identifier, either in url or email format
+    * @deprecated Deprecated. Use discoverDataObjectsPerName instead
+    * @param  {String}           name                  name of the dataObject
     * @param  {Array<string>}    schema (Optional)     types of dataObject schemas
     * @param  {Array<string>}    resources (Optional)  types of dataObject resources
     * @param  {String}           domain (Optional)     domain of the registry to search
@@ -2680,6 +3414,7 @@ var Discovery = function () {
     }
 
     /** Advanced Search for Hyperties registered in domain registry
+    * @deprecated Deprecated. Use discoverHyperties instead
     * @param  {String}           user                  user identifier, either in url or email format
     * @param  {Array<string>}    schema (Optional)     types of hyperties schemas
     * @param  {Array<string>}    resources (Optional)  types of hyperties resources
@@ -2732,9 +3467,9 @@ var Discovery = function () {
     /**
     * function to request about users registered in domain registry, and
     * return the last hyperty instance registered by the user.
+    * @deprecated Deprecated. Use discoverHyperty instead
     * @param  {email}              email
     * @param  {domain}            domain (Optional)
-    * @return {Promise}          Promise
     */
 
   }, {
@@ -2815,9 +3550,9 @@ var Discovery = function () {
     /**
     * function to request about users registered in domain registry, and
     * return the all the hyperties registered by the user
+    * @deprecated Deprecated. Use discoverHyperty instead
     * @param  {email}              email
     * @param  {domain}            domain (Optional)
-    * @return {Promise}          Promise
     */
 
   }, {
@@ -2825,7 +3560,7 @@ var Discovery = function () {
     value: function discoverHypertiesPerUser(email, domain) {
       var _this = this;
       var activeDomain = void 0;
-
+      console.log('on Function->', email);
       return new _promise2.default(function (resolve, reject) {
 
         if (email.includes(':') && !email.includes('user://')) {
@@ -2847,7 +3582,7 @@ var Discovery = function () {
           type: 'read', from: _this.discoveryURL, to: 'domain://registry.' + activeDomain + '/', body: { resource: identityURL }
         };
 
-        console.info('[Discovery] Message discoverHypertiesPerUser: ', message, activeDomain, identityURL);
+        console.log('[Discovery] Message discoverHypertiesPerUser: ', message, activeDomain, identityURL);
 
         //console.info('[Discovery] message READ', message);
 
@@ -2861,44 +3596,6 @@ var Discovery = function () {
           }
 
           resolve(value);
-        });
-      });
-    }
-
-    /**
-    *  function to delete an hypertyInstance in the Domain Registry
-    *  @param   {String}           user              user url
-    *  @param   {String}           hypertyInstance   HypertyInsntance url
-    *  @param   {domain}           domain (Optional)
-    *  @return  {Promise}          Promise          result
-    */
-
-  }, {
-    key: 'deleteHyperty',
-    value: function deleteHyperty(user, hypertyInstance, domain) {
-      var _this = this;
-      var activeDomain = void 0;
-
-      if (!domain) {
-        activeDomain = _this.domain;
-      } else {
-        activeDomain = domain;
-      }
-
-      var msg = {
-        type: 'delete', from: _this.discoveryURL, to: 'domain://registry.' + activeDomain + '/', body: { value: { user: user, url: hypertyInstance } } };
-
-      return new _promise2.default(function (resolve, reject) {
-
-        _this.messageBus.postMessage(msg, function (reply) {
-
-          var response = reply.body.code;
-
-          if (response) {
-            resolve('Hyperty successfully deleted');
-          } else {
-            reject('Error on deleting hyperty');
-          }
         });
       });
     }
@@ -2939,31 +3636,7 @@ module.exports = exports['default'];
 /* 133 */,
 /* 134 */,
 /* 135 */,
-/* 136 */,
-/* 137 */,
-/* 138 */,
-/* 139 */,
-/* 140 */,
-/* 141 */,
-/* 142 */,
-/* 143 */,
-/* 144 */,
-/* 145 */,
-/* 146 */,
-/* 147 */,
-/* 148 */,
-/* 149 */,
-/* 150 */,
-/* 151 */,
-/* 152 */,
-/* 153 */,
-/* 154 */,
-/* 155 */,
-/* 156 */,
-/* 157 */,
-/* 158 */,
-/* 159 */,
-/* 160 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2985,9 +3658,10 @@ module.exports = exports['default'];
 /***/ })
 /******/ ]);
 });
-},{}],6:[function(require,module,exports){
+
+},{}],7:[function(require,module,exports){
 // version: 0.5.1
-// date: Mon Mar 20 2017 15:36:05 GMT+0000 (WET)
+// date: Thu Apr 13 2017 23:51:28 GMT+0100 (GMT Daylight Time)
 // licence: 
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
@@ -3088,12 +3762,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 161);
+/******/ 	return __webpack_require__(__webpack_require__.s = 137);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 119:
+/***/ 120:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3139,39 +3813,39 @@ module.exports = exports["default"];
 
 /***/ }),
 
-/***/ 128:
+/***/ 129:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _classCallCheck2 = __webpack_require__(8);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _UserProfile = __webpack_require__(119);
+var _UserProfile = __webpack_require__(120);
 
 var _UserProfile2 = _interopRequireDefault(_UserProfile);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var MessageBodyIdentity = function MessageBodyIdentity(username, userURL, avatar, cn, locale, idp, assertion) {
-  (0, _classCallCheck3.default)(this, MessageBodyIdentity);
+    (0, _classCallCheck3.default)(this, MessageBodyIdentity);
 
 
-  if (!idp) throw new Error('IDP should be a parameter');
-  if (!username) throw new Error('username should be a parameter');
+    if (!idp) throw new Error('IDP should be a parameter');
+    if (!username) throw new Error('username should be a parameter');
 
-  this.idp = idp;
+    this.idp = idp;
 
-  if (assertion) {
-    this.assertion = assertion;
-  }
-  this.userProfile = new _UserProfile2.default(username, userURL, avatar, cn, locale);
+    if (assertion) {
+        this.assertion = assertion;
+    }
+    this.userProfile = new _UserProfile2.default(username, userURL, avatar, cn, locale);
 }; /**
    * The Identity info to be added to Message.Body.Identity
    */
@@ -3181,7 +3855,7 @@ module.exports = exports['default'];
 
 /***/ }),
 
-/***/ 161:
+/***/ 137:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3192,11 +3866,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.UserProfile = undefined;
 
-var _UserProfile = __webpack_require__(119);
+var _UserProfile = __webpack_require__(120);
 
 var _UserProfile2 = _interopRequireDefault(_UserProfile);
 
-var _MessageBodyIdentity = __webpack_require__(128);
+var _MessageBodyIdentity = __webpack_require__(129);
 
 var _MessageBodyIdentity2 = _interopRequireDefault(_MessageBodyIdentity);
 
@@ -3225,9 +3899,10 @@ exports.default = function (instance, Constructor) {
 
 /******/ });
 });
-},{}],7:[function(require,module,exports){
+
+},{}],8:[function(require,module,exports){
 // version: 0.5.1
-// date: Mon Mar 20 2017 15:36:05 GMT+0000 (WET)
+// date: Thu Apr 13 2017 23:51:28 GMT+0100 (GMT Daylight Time)
 // licence: 
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
@@ -3328,7 +4003,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 166);
+/******/ 	return __webpack_require__(__webpack_require__.s = 142);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -3765,7 +4440,7 @@ module.exports = function(key){
 /* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = { "default": __webpack_require__(79), __esModule: true };
+module.exports = { "default": __webpack_require__(80), __esModule: true };
 
 /***/ }),
 /* 32 */
@@ -3792,11 +4467,11 @@ module.exports = { "default": __webpack_require__(36), __esModule: true };
 
 exports.__esModule = true;
 
-var _setPrototypeOf = __webpack_require__(75);
+var _setPrototypeOf = __webpack_require__(76);
 
 var _setPrototypeOf2 = _interopRequireDefault(_setPrototypeOf);
 
-var _create = __webpack_require__(74);
+var _create = __webpack_require__(75);
 
 var _create2 = _interopRequireDefault(_create);
 
@@ -4228,11 +4903,11 @@ exports.f = Object.getOwnPropertySymbols;
 
 exports.__esModule = true;
 
-var _iterator = __webpack_require__(77);
+var _iterator = __webpack_require__(78);
 
 var _iterator2 = _interopRequireDefault(_iterator);
 
-var _symbol = __webpack_require__(76);
+var _symbol = __webpack_require__(77);
 
 var _symbol2 = _interopRequireDefault(_symbol);
 
@@ -4362,7 +5037,7 @@ module.exports = function(TO_STRING){
 /***/ (function(module, exports, __webpack_require__) {
 
 var ctx                = __webpack_require__(14)
-  , invoke             = __webpack_require__(88)
+  , invoke             = __webpack_require__(89)
   , html               = __webpack_require__(42)
   , cel                = __webpack_require__(17)
   , global             = __webpack_require__(1)
@@ -4493,16 +5168,288 @@ addToUnscopables('entries');
 /* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = { "default": __webpack_require__(80), __esModule: true };
+module.exports = { "default": __webpack_require__(81), __esModule: true };
 
 /***/ }),
 /* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = { "default": __webpack_require__(82), __esModule: true };
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _stringify = __webpack_require__(40);
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+var _keys = __webpack_require__(70);
+
+var _keys2 = _interopRequireDefault(_keys);
+
+exports.divideURL = divideURL;
+exports.divideEmail = divideEmail;
+exports.emptyObject = emptyObject;
+exports.deepClone = deepClone;
+exports.getUserURLFromEmail = getUserURLFromEmail;
+exports.getUserEmailFromURL = getUserEmailFromURL;
+exports.convertToUserURL = convertToUserURL;
+exports.checkAttribute = checkAttribute;
+exports.parseAttributes = parseAttributes;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+/**
+ * Support module with some functions will be useful
+ * @module utils
+ */
+
+/**
+ * @typedef divideURL
+ * @type Object
+ * @property {string} type The type of URL
+ * @property {string} domain The domain of URL
+ * @property {string} identity The identity of URL
+ */
+
+/**
+ * Divide an url in type, domain and identity
+ * @param  {URL.URL} url - url address
+ * @return {divideURL} the result of divideURL
+ */
+function divideURL(url) {
+
+  if (!url) throw Error('URL is needed to split');
+
+  function recurse(value) {
+    var regex = /([a-zA-Z-]*)(:\/\/(?:\.)?|:)([-a-zA-Z0-9@:%._\+~#=]{2,256})([-a-zA-Z0-9@:%._\+~#=\/]*)/gi;
+    var subst = '$1,$3,$4';
+    var parts = value.replace(regex, subst).split(',');
+    return parts;
+  }
+
+  var parts = recurse(url);
+
+  // If the url has no scheme
+  if (parts[0] === url && !parts[0].includes('@')) {
+
+    var _result = {
+      type: "",
+      domain: url,
+      identity: ""
+    };
+
+    console.error('[DivideURL] DivideURL don\'t support url without scheme. Please review your url address', url);
+
+    return _result;
+  }
+
+  // check if the url has the scheme and includes an @
+  if (parts[0] === url && parts[0].includes('@')) {
+    var scheme = parts[0] === url ? 'smtp' : parts[0];
+    parts = recurse(scheme + '://' + parts[0]);
+  }
+
+  // if the domain includes an @, divide it to domain and identity respectively
+  if (parts[1].includes('@')) {
+    parts[2] = parts[0] + '://' + parts[1];
+    parts[1] = parts[1].substr(parts[1].indexOf('@') + 1);
+  } /*else if (parts[2].includes('/')) {
+    parts[2] = parts[2].substr(parts[2].lastIndexOf('/')+1);
+    }*/
+
+  var result = {
+    type: parts[0],
+    domain: parts[1],
+    identity: parts[2]
+  };
+
+  return result;
+}
+
+function divideEmail(email) {
+  var indexOfAt = email.indexOf('@');
+
+  var result = {
+    username: email.substring(0, indexOfAt),
+    domain: email.substring(indexOfAt + 1, email.length)
+  };
+
+  return result;
+}
+
+/**
+ * Check if an Object is empty
+ * @param  {Object} object Object to be checked
+ * @return {Boolean}       status of Object, empty or not (true|false);
+ */
+function emptyObject(object) {
+  return (0, _keys2.default)(object).length > 0 ? false : true;
+}
+
+/**
+ * Make a COPY of the original data
+ * @param  {Object}  obj - object to be cloned
+ * @return {Object}
+ */
+function deepClone(obj) {
+  //TODO: simple but inefficient JSON deep clone...
+  if (obj) return JSON.parse((0, _stringify2.default)(obj));
+}
+
+/**
+ * Obtains the user URL that corresponds to a given email
+ * @param  {string} userEmail The user email
+ * @return {URL.URL} userURL The user URL
+ */
+function getUserURLFromEmail(userEmail) {
+  var indexOfAt = userEmail.indexOf('@');
+  return 'user://' + userEmail.substring(indexOfAt + 1, userEmail.length) + '/' + userEmail.substring(0, indexOfAt);
+}
+
+/**
+ * Obtains the user email that corresponds to a given URL
+ * @param  {URL.URL} userURL The user URL
+ * @return {string} userEmail The user email
+ */
+function getUserEmailFromURL(userURL) {
+  var url = divideURL(userURL);
+  return url.identity.replace('/', '') + '@' + url.domain; // identity field has '/exampleID' instead of 'exampleID'
+}
+
+/**
+ * Check if the user identifier is already in the URL format, if not, convert to URL format
+ * @param  {string}   identifier  user identifier
+ * @return {string}   userURL    the user URL
+ */
+function convertToUserURL(identifier) {
+
+  // check if the identifier is already in the url format
+  if (identifier.substring(0, 7) === 'user://') {
+    var dividedURL = divideURL(identifier);
+
+    //check if the url is well formated
+    if (dividedURL.domain && dividedURL.identity) {
+      return identifier;
+    } else {
+      throw 'userURL with wrong format';
+    }
+
+    //if not, convert the user email to URL format
+  } else {
+    return getUserURLFromEmail(identifier);
+  }
+}
+
+function checkAttribute(path) {
+
+  var regex = /((([a-zA-Z]+):\/\/([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})\/[a-zA-Z0-9\.]+@[a-zA-Z0-9]+(\-)?[a-zA-Z0-9]+(\.)?[a-zA-Z0-9]{2,10}?\.[a-zA-Z]{2,10})(.+(?=.identity))?/gm;
+
+  var list = [];
+  var final = [];
+  var test = path.match(regex);
+
+  if (test == null) {
+    final = path.split('.');
+  } else {
+    var m = void 0;
+    while ((m = regex.exec(path)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width matches
+      if (m.index === regex.lastIndex) {
+        regex.lastIndex++;
+      }
+
+      // The result can be accessed through the `m`-variable.
+      m.forEach(function (match, groupIndex) {
+        if (groupIndex === 0) {
+          list.push(match);
+        }
+      });
+    }
+    var result = void 0;
+    list.forEach(function (url) {
+      result = path.replace(url, '*+*');
+
+      final = result.split('.').map(function (item) {
+        if (item === '*+*') {
+          return url;
+        }
+        return item;
+      });
+    });
+  }
+
+  console.log('[ServiceFramework.Utils.checkAttribute]', final);
+  return final;
+}
+
+function parseAttributes(path) {
+  var regex = /([0-9a-zA-Z][-\w]*):\/\//g;
+
+  var string3 = 'identity';
+
+  if (!path.includes('://')) {
+    return path.split('.');
+  } else {
+    var string1 = path.split(regex)[0];
+
+    var array1 = string1.split('.');
+
+    var string2 = path.replace(string1, '');
+
+    if (path.includes(string3)) {
+
+      var array2 = string2.split(string3 + '.');
+
+      console.log('array2 ' + array2);
+
+      string2 = array2[0].slice('.', -1);
+
+      array2 = array2[1].split('.');
+
+      array1.push(string2, string3);
+
+      array1 = array1.concat(array2);
+    } else {
+      array1.push(string2);
+    }
+
+    return array1.filter(Boolean);
+  }
+}
 
 /***/ }),
 /* 72 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(83), __esModule: true };
+
+/***/ }),
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var META     = __webpack_require__(23)('meta')
@@ -4560,7 +5507,7 @@ var meta = module.exports = {
 };
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var classof   = __webpack_require__(55)
@@ -4573,22 +5520,16 @@ module.exports = __webpack_require__(0).getIteratorMethod = function(it){
 };
 
 /***/ }),
-/* 74 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = { "default": __webpack_require__(78), __esModule: true };
-
-/***/ }),
 /* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = { "default": __webpack_require__(81), __esModule: true };
+module.exports = { "default": __webpack_require__(79), __esModule: true };
 
 /***/ }),
 /* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = { "default": __webpack_require__(83), __esModule: true };
+module.exports = { "default": __webpack_require__(82), __esModule: true };
 
 /***/ }),
 /* 77 */
@@ -4600,55 +5541,61 @@ module.exports = { "default": __webpack_require__(84), __esModule: true };
 /* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(100);
-var $Object = __webpack_require__(0).Object;
-module.exports = function create(P, D){
-  return $Object.create(P, D);
-};
+module.exports = { "default": __webpack_require__(85), __esModule: true };
 
 /***/ }),
 /* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(101);
-module.exports = __webpack_require__(0).Object.getPrototypeOf;
+var $Object = __webpack_require__(0).Object;
+module.exports = function create(P, D){
+  return $Object.create(P, D);
+};
 
 /***/ }),
 /* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(102);
-module.exports = __webpack_require__(0).Object.keys;
+module.exports = __webpack_require__(0).Object.getPrototypeOf;
 
 /***/ }),
 /* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(103);
-module.exports = __webpack_require__(0).Object.setPrototypeOf;
+module.exports = __webpack_require__(0).Object.keys;
 
 /***/ }),
 /* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(54);
-__webpack_require__(50);
-__webpack_require__(51);
 __webpack_require__(104);
-module.exports = __webpack_require__(0).Promise;
+module.exports = __webpack_require__(0).Object.setPrototypeOf;
 
 /***/ }),
 /* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(105);
 __webpack_require__(54);
-__webpack_require__(106);
-__webpack_require__(107);
-module.exports = __webpack_require__(0).Symbol;
+__webpack_require__(50);
+__webpack_require__(51);
+__webpack_require__(105);
+module.exports = __webpack_require__(0).Promise;
 
 /***/ }),
 /* 84 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(106);
+__webpack_require__(54);
+__webpack_require__(107);
+__webpack_require__(108);
+module.exports = __webpack_require__(0).Symbol;
+
+/***/ }),
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(50);
@@ -4656,7 +5603,7 @@ __webpack_require__(51);
 module.exports = __webpack_require__(49).f('iterator');
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports) {
 
 module.exports = function(it, Constructor, name, forbiddenField){
@@ -4666,7 +5613,7 @@ module.exports = function(it, Constructor, name, forbiddenField){
 };
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // all enumerable object keys, includes symbols
@@ -4686,15 +5633,15 @@ module.exports = function(it){
 };
 
 /***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var ctx         = __webpack_require__(14)
-  , call        = __webpack_require__(91)
-  , isArrayIter = __webpack_require__(89)
+  , call        = __webpack_require__(92)
+  , isArrayIter = __webpack_require__(90)
   , anObject    = __webpack_require__(5)
   , toLength    = __webpack_require__(47)
-  , getIterFn   = __webpack_require__(73)
+  , getIterFn   = __webpack_require__(74)
   , BREAK       = {}
   , RETURN      = {};
 var exports = module.exports = function(iterable, entries, fn, that, ITERATOR){
@@ -4716,7 +5663,7 @@ exports.BREAK  = BREAK;
 exports.RETURN = RETURN;
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports) {
 
 // fast apply, http://jsperf.lnkit.com/fast-apply/5
@@ -4737,7 +5684,7 @@ module.exports = function(fn, args, that){
 };
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // check on default Array iterator
@@ -4750,7 +5697,7 @@ module.exports = function(it){
 };
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 7.2.2 IsArray(argument)
@@ -4760,7 +5707,7 @@ module.exports = Array.isArray || function isArray(arg){
 };
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // call something on iterator step with safe closing on error
@@ -4777,7 +5724,7 @@ module.exports = function(iterator, fn, value, entries){
 };
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var ITERATOR     = __webpack_require__(3)('iterator')
@@ -4803,7 +5750,7 @@ module.exports = function(exec, skipClosing){
 };
 
 /***/ }),
-/* 93 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var getKeys   = __webpack_require__(18)
@@ -4818,7 +5765,7 @@ module.exports = function(object, el){
 };
 
 /***/ }),
-/* 94 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global    = __webpack_require__(1)
@@ -4891,7 +5838,7 @@ module.exports = function(){
 };
 
 /***/ }),
-/* 95 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
@@ -4916,7 +5863,7 @@ module.exports.f = function getOwnPropertyNames(it){
 
 
 /***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var hide = __webpack_require__(7);
@@ -4928,7 +5875,7 @@ module.exports = function(target, src, safe){
 };
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Works with __proto__ only. Old v8 can't work with null proto objects.
@@ -4958,7 +5905,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4978,7 +5925,7 @@ module.exports = function(KEY){
 };
 
 /***/ }),
-/* 99 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 7.3.20 SpeciesConstructor(O, defaultConstructor)
@@ -4991,7 +5938,7 @@ module.exports = function(O, D){
 };
 
 /***/ }),
-/* 100 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var $export = __webpack_require__(9)
@@ -4999,7 +5946,7 @@ var $export = __webpack_require__(9)
 $export($export.S, 'Object', {create: __webpack_require__(37)});
 
 /***/ }),
-/* 101 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.9 Object.getPrototypeOf(O)
@@ -5013,7 +5960,7 @@ __webpack_require__(45)('getPrototypeOf', function(){
 });
 
 /***/ }),
-/* 102 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.14 Object.keys(O)
@@ -5027,15 +5974,15 @@ __webpack_require__(45)('keys', function(){
 });
 
 /***/ }),
-/* 103 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.3.19 Object.setPrototypeOf(O, proto)
 var $export = __webpack_require__(9);
-$export($export.S, 'Object', {setPrototypeOf: __webpack_require__(97).set});
+$export($export.S, 'Object', {setPrototypeOf: __webpack_require__(98).set});
 
 /***/ }),
-/* 104 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5047,11 +5994,11 @@ var LIBRARY            = __webpack_require__(26)
   , $export            = __webpack_require__(9)
   , isObject           = __webpack_require__(6)
   , aFunction          = __webpack_require__(19)
-  , anInstance         = __webpack_require__(85)
-  , forOf              = __webpack_require__(87)
-  , speciesConstructor = __webpack_require__(99)
+  , anInstance         = __webpack_require__(86)
+  , forOf              = __webpack_require__(88)
+  , speciesConstructor = __webpack_require__(100)
   , task               = __webpack_require__(67).set
-  , microtask          = __webpack_require__(94)()
+  , microtask          = __webpack_require__(95)()
   , PROMISE            = 'Promise'
   , TypeError          = global.TypeError
   , process            = global.process
@@ -5243,7 +6190,7 @@ if(!USE_NATIVE){
     this._h = 0;              // <- rejection state, 0 - default, 1 - handled, 2 - unhandled
     this._n = false;          // <- notify
   };
-  Internal.prototype = __webpack_require__(96)($Promise.prototype, {
+  Internal.prototype = __webpack_require__(97)($Promise.prototype, {
     // 25.4.5.3 Promise.prototype.then(onFulfilled, onRejected)
     then: function then(onFulfilled, onRejected){
       var reaction    = newPromiseCapability(speciesConstructor(this, $Promise));
@@ -5270,7 +6217,7 @@ if(!USE_NATIVE){
 
 $export($export.G + $export.W + $export.F * !USE_NATIVE, {Promise: $Promise});
 __webpack_require__(22)($Promise, PROMISE);
-__webpack_require__(98)(PROMISE);
+__webpack_require__(99)(PROMISE);
 Wrapper = __webpack_require__(0)[PROMISE];
 
 // statics
@@ -5294,7 +6241,7 @@ $export($export.S + $export.F * (LIBRARY || !USE_NATIVE), PROMISE, {
     return capability.promise;
   }
 });
-$export($export.S + $export.F * !(USE_NATIVE && __webpack_require__(92)(function(iter){
+$export($export.S + $export.F * !(USE_NATIVE && __webpack_require__(93)(function(iter){
   $Promise.all(iter)['catch'](empty);
 })), PROMISE, {
   // 25.4.4.1 Promise.all(iterable)
@@ -5340,7 +6287,7 @@ $export($export.S + $export.F * !(USE_NATIVE && __webpack_require__(92)(function
 });
 
 /***/ }),
-/* 105 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5351,7 +6298,7 @@ var global         = __webpack_require__(1)
   , DESCRIPTORS    = __webpack_require__(2)
   , $export        = __webpack_require__(9)
   , redefine       = __webpack_require__(46)
-  , META           = __webpack_require__(72).KEY
+  , META           = __webpack_require__(73).KEY
   , $fails         = __webpack_require__(11)
   , shared         = __webpack_require__(30)
   , setToStringTag = __webpack_require__(22)
@@ -5359,15 +6306,15 @@ var global         = __webpack_require__(1)
   , wks            = __webpack_require__(3)
   , wksExt         = __webpack_require__(49)
   , wksDefine      = __webpack_require__(48)
-  , keyOf          = __webpack_require__(93)
-  , enumKeys       = __webpack_require__(86)
-  , isArray        = __webpack_require__(90)
+  , keyOf          = __webpack_require__(94)
+  , enumKeys       = __webpack_require__(87)
+  , isArray        = __webpack_require__(91)
   , anObject       = __webpack_require__(5)
   , toIObject      = __webpack_require__(13)
   , toPrimitive    = __webpack_require__(21)
   , createDesc     = __webpack_require__(15)
   , _create        = __webpack_require__(37)
-  , gOPNExt        = __webpack_require__(95)
+  , gOPNExt        = __webpack_require__(96)
   , $GOPD          = __webpack_require__(57)
   , $DP            = __webpack_require__(4)
   , $keys          = __webpack_require__(18)
@@ -5581,212 +6528,19 @@ setToStringTag(Math, 'Math', true);
 setToStringTag(global.JSON, 'JSON', true);
 
 /***/ }),
-/* 106 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(48)('asyncIterator');
 
 /***/ }),
-/* 107 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(48)('observable');
 
 /***/ }),
-/* 108 */,
-/* 109 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _stringify = __webpack_require__(40);
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-var _keys = __webpack_require__(70);
-
-var _keys2 = _interopRequireDefault(_keys);
-
-exports.divideURL = divideURL;
-exports.divideEmail = divideEmail;
-exports.emptyObject = emptyObject;
-exports.deepClone = deepClone;
-exports.getUserURLFromEmail = getUserURLFromEmail;
-exports.getUserEmailFromURL = getUserEmailFromURL;
-exports.convertToUserURL = convertToUserURL;
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
-* Copyright 2016 PT Inovação e Sistemas SA
-* Copyright 2016 INESC-ID
-* Copyright 2016 QUOBIS NETWORKS SL
-* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
-* Copyright 2016 ORANGE SA
-* Copyright 2016 Deutsche Telekom AG
-* Copyright 2016 Apizee
-* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-**/
-/**
- * Support module with some functions will be useful
- * @module utils
- */
-
-/**
- * @typedef divideURL
- * @type Object
- * @property {string} type The type of URL
- * @property {string} domain The domain of URL
- * @property {string} identity The identity of URL
- */
-
-/**
- * Divide an url in type, domain and identity
- * @param  {URL.URL} url - url address
- * @return {divideURL} the result of divideURL
- */
-function divideURL(url) {
-
-  if (!url) throw Error('URL is needed to split');
-
-  function recurse(value) {
-    var regex = /([a-zA-Z-]*)(:\/\/(?:\.)?|:)([-a-zA-Z0-9@:%._\+~#=]{2,256})([-a-zA-Z0-9@:%._\+~#=\/]*)/gi;
-    var subst = '$1,$3,$4';
-    var parts = value.replace(regex, subst).split(',');
-    return parts;
-  }
-
-  var parts = recurse(url);
-
-  // If the url has no scheme
-  if (parts[0] === url && !parts[0].includes('@')) {
-
-    var _result = {
-      type: "",
-      domain: url,
-      identity: ""
-    };
-
-    console.error('[DivideURL] DivideURL don\'t support url without scheme. Please review your url address', url);
-
-    return _result;
-  }
-
-  // check if the url has the scheme and includes an @
-  if (parts[0] === url && parts[0].includes('@')) {
-    var scheme = parts[0] === url ? 'smtp' : parts[0];
-    parts = recurse(scheme + '://' + parts[0]);
-  }
-
-  // if the domain includes an @, divide it to domain and identity respectively
-  if (parts[1].includes('@')) {
-    parts[2] = parts[0] + '://' + parts[1];
-    parts[1] = parts[1].substr(parts[1].indexOf('@') + 1);
-  } /*else if (parts[2].includes('/')) {
-    parts[2] = parts[2].substr(parts[2].lastIndexOf('/')+1);
-    }*/
-
-  var result = {
-    type: parts[0],
-    domain: parts[1],
-    identity: parts[2]
-  };
-
-  return result;
-}
-
-function divideEmail(email) {
-  var indexOfAt = email.indexOf('@');
-
-  var result = {
-    username: email.substring(0, indexOfAt),
-    domain: email.substring(indexOfAt + 1, email.length)
-  };
-
-  return result;
-}
-
-/**
- * Check if an Object is empty
- * @param  {Object} object Object to be checked
- * @return {Boolean}       status of Object, empty or not (true|false);
- */
-function emptyObject(object) {
-  return (0, _keys2.default)(object).length > 0 ? false : true;
-}
-
-/**
- * Make a COPY of the original data
- * @param  {Object}  obj - object to be cloned
- * @return {Object}
- */
-function deepClone(obj) {
-  //TODO: simple but inefficient JSON deep clone...
-  if (obj) return JSON.parse((0, _stringify2.default)(obj));
-}
-
-/**
- * Obtains the user URL that corresponds to a given email
- * @param  {string} userEmail The user email
- * @return {URL.URL} userURL The user URL
- */
-function getUserURLFromEmail(userEmail) {
-  var indexOfAt = userEmail.indexOf('@');
-  return 'user://' + userEmail.substring(indexOfAt + 1, userEmail.length) + '/' + userEmail.substring(0, indexOfAt);
-}
-
-/**
- * Obtains the user email that corresponds to a given URL
- * @param  {URL.URL} userURL The user URL
- * @return {string} userEmail The user email
- */
-function getUserEmailFromURL(userURL) {
-  var url = divideURL(userURL);
-  return url.identity.replace('/', '') + '@' + url.domain; // identity field has '/exampleID' instead of 'exampleID'
-}
-
-/**
- * Check if the user identifier is already in the URL format, if not, convert to URL format
- * @param  {string}   identifier  user identifier
- * @return {string}   userURL    the user URL
- */
-function convertToUserURL(identifier) {
-
-  // check if the identifier is already in the url format
-  if (identifier.substring(0, 7) === 'user://') {
-    var dividedURL = divideURL(identifier);
-
-    //check if the url is well formated
-    if (dividedURL.domain && dividedURL.identity) {
-      return identifier;
-    } else {
-      throw 'userURL with wrong format';
-    }
-
-    //if not, convert the user email to URL format
-  } else {
-    return getUserURLFromEmail(identifier);
-  }
-}
-
-/***/ }),
+/* 109 */,
 /* 110 */,
 /* 111 */,
 /* 112 */,
@@ -5796,6 +6550,218 @@ function convertToUserURL(identifier) {
 /* 116 */,
 /* 117 */,
 /* 118 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _classCallCheck2 = __webpack_require__(8);
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = __webpack_require__(10);
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _ProxyObject = __webpack_require__(124);
+
+var _ProxyObject2 = _interopRequireDefault(_ProxyObject);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * The class returned from the DataObject addChildren call or from onAddChildren if remotely created.
+ * Children object synchronization is a a fast forward mechanism, no need for direct subscriptions, it uses the already authorized subscription from the parent DataObject.
+ */
+var DataObjectChild /* implements SyncStatus */ = function () {
+  /* private
+    ----event handlers----
+  _onResponseHandler: (event) => void
+  */
+
+  /**
+   * @ignore
+   * Should not be used directly by Hyperties. It's called by the DataObject.addChildren
+   */
+  function DataObjectChild(parent, childId, initialData, owner, msgId) {
+    (0, _classCallCheck3.default)(this, DataObjectChild);
+
+    var _this = this;
+
+    _this._parent = parent;
+    _this._childId = childId;
+    _this._owner = owner;
+    _this._msgId = msgId;
+
+    _this._syncObj = new _ProxyObject2.default(initialData);
+
+    console.log('[DataObjectChild -  Constructor] - ', _this._syncObj);
+
+    _this._bus = parent._bus;
+    _this._allocateListeners();
+  }
+
+  (0, _createClass3.default)(DataObjectChild, [{
+    key: '_allocateListeners',
+    value: function _allocateListeners() {
+      var _this = this;
+
+      //this is only needed for children reporters
+      if (_this._owner) {
+        _this._listener = _this._bus.addListener(_this._owner, function (msg) {
+          if (msg.type === 'response' && msg.id === _this._msgId) {
+            console.log('DataObjectChild.onResponse:', msg);
+            _this._onResponse(msg);
+          }
+        });
+      }
+    }
+  }, {
+    key: '_releaseListeners',
+    value: function _releaseListeners() {
+      var _this = this;
+
+      if (_this._listener) {
+        _this._listener.remove();
+      }
+    }
+
+    /**
+     * Release and delete object data
+     */
+
+  }, {
+    key: 'delete',
+    value: function _delete() {
+      var _this = this;
+
+      delete _this._parent._children[_this._childId];
+
+      _this._releaseListeners();
+
+      //TODO: send delete message ?
+    }
+
+    /**
+     * Children ID generated on addChildren. Unique identifier
+     * @type {URL} - URL of the format <HypertyURL>#<numeric-sequence>
+     */
+
+  }, {
+    key: 'onChange',
+
+
+    /**
+     * Register the change listeners sent by the reporter child
+     * @param {function(event: MsgEvent)} callback
+     */
+    value: function onChange(callback) {
+      this._syncObj.observe(function (event) {
+        console.log('[DataObjectChild - observer] - ', event);
+        callback(event);
+      });
+    }
+
+    /**
+     * Setup the callback to process response notifications of the creates
+     * @param {function(event: MsgEvent)} callback
+     */
+
+  }, {
+    key: 'onResponse',
+    value: function onResponse(callback) {
+      this._onResponseHandler = callback;
+    }
+
+    //FLOW-IN: message received from a remote DataObject -> _onChildCreate
+
+  }, {
+    key: '_onResponse',
+    value: function _onResponse(msg) {
+      var _this = this;
+
+      var event = {
+        type: msg.type,
+        url: msg.body.source,
+        code: msg.body.code
+      };
+
+      if (_this._onResponseHandler) {
+        _this._onResponseHandler(event);
+      }
+    }
+  }, {
+    key: 'childId',
+    get: function get() {
+      return this._childId;
+    }
+
+    /**
+     * Data Structure to be synchronized.
+     * @type {JSON} - JSON structure that should follow the defined schema, if any.
+     */
+
+  }, {
+    key: 'data',
+    get: function get() {
+      return this._syncObj.data;
+    }
+
+    /**
+     * Set for this dataObjectChild an identity
+     * @method identity
+     * @param  {Identity} identity identity from who created the message
+     */
+
+  }, {
+    key: 'identity',
+    set: function set(identity) {
+      this._identity = identity;
+    }
+
+    /**
+     * Get for this dataObjectChild an identity
+     * @method identity
+     * @return {Identity} identity from who created the message
+     */
+    ,
+    get: function get() {
+      return this._identity;
+    }
+  }]);
+  return DataObjectChild;
+}(); /**
+     * Copyright 2016 PT Inovação e Sistemas SA
+     * Copyright 2016 INESC-ID
+     * Copyright 2016 QUOBIS NETWORKS SL
+     * Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+     * Copyright 2016 ORANGE SA
+     * Copyright 2016 Deutsche Telekom AG
+     * Copyright 2016 Apizee
+     * Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+     *
+     * Licensed under the Apache License, Version 2.0 (the "License");
+     * you may not use this file except in compliance with the License.
+     * You may obtain a copy of the License at
+     *
+     *   http://www.apache.org/licenses/LICENSE-2.0
+     *
+     * Unless required by applicable law or agreed to in writing, software
+     * distributed under the License is distributed on an "AS IS" BASIS,
+     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     * See the License for the specific language governing permissions and
+     * limitations under the License.
+     **/
+
+exports.default = DataObjectChild;
+module.exports = exports['default'];
+
+/***/ }),
+/* 119 */
 /***/ (function(module, exports) {
 
 //     proxy-observe v0.0.18
@@ -6088,8 +7054,8 @@ function convertToUserURL(identifier) {
 
 
 /***/ }),
-/* 119 */,
-/* 120 */
+/* 120 */,
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6127,16 +7093,24 @@ var _inherits2 = __webpack_require__(34);
 
 var _inherits3 = _interopRequireDefault(_inherits2);
 
-var _DataObject2 = __webpack_require__(122);
+var _utils = __webpack_require__(71);
+
+var _DataObject2 = __webpack_require__(123);
 
 var _DataObject3 = _interopRequireDefault(_DataObject2);
 
-var _DataObjectChild = __webpack_require__(123);
+var _DataObjectChild = __webpack_require__(118);
 
 var _DataObjectChild2 = _interopRequireDefault(_DataObjectChild);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var FilterType = { ANY: 'any', START: 'start', EXACT: 'exact' };
+
+/**
+ * The class returned from the Syncher subscribe call.
+ * To be used as an observation point from a DataObjectReporter change.
+ */
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
 * Copyright 2016 INESC-ID
@@ -6160,19 +7134,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 * limitations under the License.
 **/
 
-var FilterType = { ANY: 'any', START: 'start', EXACT: 'exact' };
-
-/**
- * The class returned from the Syncher subscribe call.
- * To be used as an observation point from a DataObjectReporter change.
- */
-
 var DataObjectObserver = function (_DataObject) {
   (0, _inherits3.default)(DataObjectObserver, _DataObject);
 
   /* private
   _changeListener: MsgListener
-   ----event handlers----
+    ----event handlers----
   _filters: {<filter>: {type: <start, exact>, callback: <function>} }
   */
 
@@ -6183,9 +7150,10 @@ var DataObjectObserver = function (_DataObject) {
 
   //TODO: For Further Study
   function DataObjectObserver(syncher, url, schema, initialStatus, initialData, childrens, initialVersion, mutual) {
+    var resumed = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : false;
     (0, _classCallCheck3.default)(this, DataObjectObserver);
 
-    var _this2 = (0, _possibleConstructorReturn3.default)(this, (DataObjectObserver.__proto__ || (0, _getPrototypeOf2.default)(DataObjectObserver)).call(this, syncher, url, schema, initialStatus, initialData.data, childrens, mutual));
+    var _this2 = (0, _possibleConstructorReturn3.default)(this, (DataObjectObserver.__proto__ || (0, _getPrototypeOf2.default)(DataObjectObserver)).call(this, syncher, url, schema, initialStatus, initialData.data, childrens, mutual, resumed));
 
     var _this = _this2;
 
@@ -6196,11 +7164,33 @@ var DataObjectObserver = function (_DataObject) {
       _this._onFilter(event);
     });
 
+    var childIdString = _this._owner + '#' + _this._childId;
+
     //setup childrens data from subscription
-    (0, _keys2.default)(initialData.childrens).forEach(function (childId) {
-      var childData = initialData.childrens[childId];
-      _this._childrenObjects[childId] = new _DataObjectChild2.default(_this, childId, childData);
+    (0, _keys2.default)(initialData.childrens).forEach(function (childrenResource) {
+      var children = initialData.childrens[childrenResource];
+      console.log('[DataObjectObserver - new DataObjectChild]: ', childrenResource, children, _this._resumed);
+      if (_this._resumed) {
+
+        // if is resumed
+        (0, _keys2.default)(children).forEach(function (childId) {
+          _this._childrenObjects[childId] = new _DataObjectChild2.default(_this, childId, children[childId].value);
+          _this._childrenObjects[childId].identity = children[childId].identity;
+
+          if (childId > childIdString) {
+            childIdString = childId;
+          }
+
+          console.log('[DataObjectObserver - new DataObjectChild] - resumed: ', _this._childrenObjects[childId], childId, children[childId].value);
+        });
+      } else {
+        // if is not resumed
+        _this._childrenObjects[childrenResource] = new _DataObjectChild2.default(_this, childrenResource, children);
+        console.log('[DataObjectObserver - new DataObjectChild] - not resumed: ', _this._childrenObjects[childrenResource]);
+      }
     });
+
+    _this._childId = Number(childIdString.split('#')[1]);
 
     _this._allocateListeners();
     return _this2;
@@ -6323,7 +7313,7 @@ exports.default = DataObjectObserver;
 module.exports = exports['default'];
 
 /***/ }),
-/* 121 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6361,11 +7351,15 @@ var _inherits2 = __webpack_require__(34);
 
 var _inherits3 = _interopRequireDefault(_inherits2);
 
-var _DataObject2 = __webpack_require__(122);
+var _DataObject2 = __webpack_require__(123);
 
 var _DataObject3 = _interopRequireDefault(_DataObject2);
 
-var _utils = __webpack_require__(109);
+var _DataObjectChild = __webpack_require__(118);
+
+var _DataObjectChild2 = _interopRequireDefault(_DataObjectChild);
+
+var _utils = __webpack_require__(71);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6373,35 +7367,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * The class returned from the Syncher create call.
  * To be used as a reporter point, changes will be submited to DataObjectObserver instances.
  */
-/**
-* Copyright 2016 PT Inovação e Sistemas SA
-* Copyright 2016 INESC-ID
-* Copyright 2016 QUOBIS NETWORKS SL
-* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
-* Copyright 2016 ORANGE SA
-* Copyright 2016 Deutsche Telekom AG
-* Copyright 2016 Apizee
-* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-**/
-
 var DataObjectReporter = function (_DataObject) {
   (0, _inherits3.default)(DataObjectReporter, _DataObject);
 
   /* private
   _subscriptions: <hypertyUrl: { status: string } }>
-   ----event handlers----
+    ----event handlers----
   _onSubscriptionHandler: (event) => void
   _onResponseHandler: (event) => void
   _onReadHandler: (event) => void
@@ -6411,10 +7382,11 @@ var DataObjectReporter = function (_DataObject) {
    * @ignore
    * Should not be used directly by Hyperties. It's called by the Syncher.create method
    */
-  function DataObjectReporter(syncher, url, schema, initialStatus, initialData, childrens) {
+  function DataObjectReporter(syncher, url, schema, initialStatus, initialData, childrens, mutual) {
+    var resumed = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : false;
     (0, _classCallCheck3.default)(this, DataObjectReporter);
 
-    var _this2 = (0, _possibleConstructorReturn3.default)(this, (DataObjectReporter.__proto__ || (0, _getPrototypeOf2.default)(DataObjectReporter)).call(this, syncher, url, schema, initialStatus, initialData, childrens));
+    var _this2 = (0, _possibleConstructorReturn3.default)(this, (DataObjectReporter.__proto__ || (0, _getPrototypeOf2.default)(DataObjectReporter)).call(this, syncher, url, schema, initialStatus, initialData, childrens, mutual, resumed));
 
     var _this = _this2;
 
@@ -6452,6 +7424,38 @@ var DataObjectReporter = function (_DataObject) {
       var _this = this;
 
       _this._objectListener.remove();
+    }
+
+    /**
+     *
+     */
+
+  }, {
+    key: 'resumeChildrens',
+    value: function resumeChildrens(childrens) {
+      var _this3 = this;
+
+      var childIdString = this._owner + '#' + this._childId;
+
+      //setup childrens data from subscription
+      (0, _keys2.default)(childrens).forEach(function (childrenResource) {
+        var children = childrens[childrenResource];
+        console.log('[DataObjectReporter - new DataObjectChild]: ', childrenResource, children, _this3._resumed);
+
+        // if is resumed
+        (0, _keys2.default)(children).forEach(function (childId) {
+          _this3._childrenObjects[childId] = new _DataObjectChild2.default(_this3, childId, children[childId].value);
+          _this3._childrenObjects[childId].identity = children[childId].identity;
+
+          if (childId > childIdString) {
+            childIdString = childId;
+          }
+
+          console.log('[DataObjectReporter - new DataObjectChild] - resumed: ', _this3._childrenObjects[childId], childId, children[childId].value);
+        });
+      });
+
+      this._childId = Number(childIdString.split('#')[1]);
     }
 
     /**
@@ -6557,7 +7561,7 @@ var DataObjectReporter = function (_DataObject) {
   }, {
     key: '_onSubscribe',
     value: function _onSubscribe(msg) {
-      var _this3 = this;
+      var _this4 = this;
 
       var _this = this;
       var hypertyUrl = msg.body.from;
@@ -6588,8 +7592,8 @@ var DataObjectReporter = function (_DataObject) {
 
           //TODO: For Further Study
           if (msg.body.hasOwnProperty('mutualAuthentication') && !msg.body.mutualAuthentication) {
-            sendMsg.body.mutualAuthentication = _this3._mutualAuthentication;
-            _this3._mutualAuthentication = msg.body.mutualAuthentication;
+            sendMsg.body.mutualAuthentication = _this4._mutualAuthentication;
+            _this4._mutualAuthentication = msg.body.mutualAuthentication;
           }
 
           //send ok response message
@@ -6693,13 +7697,34 @@ var DataObjectReporter = function (_DataObject) {
     }
   }]);
   return DataObjectReporter;
-}(_DataObject3.default /* implements SyncStatus */);
+}(_DataObject3.default /* implements SyncStatus */); /**
+                                                     * Copyright 2016 PT Inovação e Sistemas SA
+                                                     * Copyright 2016 INESC-ID
+                                                     * Copyright 2016 QUOBIS NETWORKS SL
+                                                     * Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+                                                     * Copyright 2016 ORANGE SA
+                                                     * Copyright 2016 Deutsche Telekom AG
+                                                     * Copyright 2016 Apizee
+                                                     * Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+                                                     *
+                                                     * Licensed under the Apache License, Version 2.0 (the "License");
+                                                     * you may not use this file except in compliance with the License.
+                                                     * You may obtain a copy of the License at
+                                                     *
+                                                     *   http://www.apache.org/licenses/LICENSE-2.0
+                                                     *
+                                                     * Unless required by applicable law or agreed to in writing, software
+                                                     * distributed under the License is distributed on an "AS IS" BASIS,
+                                                     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                     * See the License for the specific language governing permissions and
+                                                     * limitations under the License.
+                                                     **/
 
 exports.default = DataObjectReporter;
 module.exports = exports['default'];
 
 /***/ }),
-/* 122 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6709,7 +7734,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _promise = __webpack_require__(71);
+var _promise = __webpack_require__(72);
 
 var _promise2 = _interopRequireDefault(_promise);
 
@@ -6729,11 +7754,11 @@ var _ProxyObject = __webpack_require__(124);
 
 var _ProxyObject2 = _interopRequireDefault(_ProxyObject);
 
-var _DataObjectChild = __webpack_require__(123);
+var _DataObjectChild = __webpack_require__(118);
 
 var _DataObjectChild2 = _interopRequireDefault(_DataObjectChild);
 
-var _utils = __webpack_require__(109);
+var _utils = __webpack_require__(71);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6744,15 +7769,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var DataObject = function () {
   /* private
   _version: number
-   _owner: HypertyURL
+    _owner: HypertyURL
   _url: ObjectURL
   _schema: Schema
   _bus: MiniBus
   _status: on | paused
   _syncObj: SyncData
-   _children: { id: DataObjectChild }
+    _children: { id: DataObjectChild }
   _childrenListeners: [MsgListener]
-   ----event handlers----
+    ----event handlers----
   _onAddChildHandler: (event) => void
   */
 
@@ -6762,6 +7787,7 @@ var DataObject = function () {
    */
   function DataObject(syncher, url, schema, initialStatus, initialData, childrens) {
     var mutual = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : true;
+    var resumed = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : false;
     (0, _classCallCheck3.default)(this, DataObject);
 
     var _this = this;
@@ -6781,11 +7807,34 @@ var DataObject = function () {
     _this._childrenObjects = {};
     _this._childrenListeners = [];
 
+    _this._resumed = resumed;
+
     _this._owner = syncher._owner;
     _this._bus = syncher._bus;
+
+    /*if (resumed && childrens) {
+      _this._childId = _this._getLastChildId();
+      console.log('[Data Object resumed] last ChildId: ', _this._childId);
+    }*/
   }
 
   (0, _createClass3.default)(DataObject, [{
+    key: '_getLastChildId',
+    value: function _getLastChildId() {
+      var _this = this;
+
+      var childIdInt = 0;
+      var childIdString = _this._owner + '#' + childIdInt;
+
+      (0, _keys2.default)(_this._childrens).filter(function (key) {
+        if (_this._childrens[key].childId > childIdString) {
+          childIdString = _this._childrens[key].childId;
+        }
+      });
+
+      return childIdInt = Number(childIdString.split('#')[1]);
+    }
+  }, {
     key: '_allocateListeners',
     value: function _allocateListeners() {
       var _this2 = this;
@@ -7141,193 +8190,6 @@ exports.default = DataObject;
 module.exports = exports['default'];
 
 /***/ }),
-/* 123 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _classCallCheck2 = __webpack_require__(8);
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = __webpack_require__(10);
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-var _ProxyObject = __webpack_require__(124);
-
-var _ProxyObject2 = _interopRequireDefault(_ProxyObject);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * The class returned from the DataObject addChildren call or from onAddChildren if remotely created.
- * Children object synchronization is a a fast forward mechanism, no need for direct subscriptions, it uses the already authorized subscription from the parent DataObject.
- */
-var DataObjectChild /* implements SyncStatus */ = function () {
-  /* private
-   ----event handlers----
-  _onResponseHandler: (event) => void
-  */
-
-  /**
-   * @ignore
-   * Should not be used directly by Hyperties. It's called by the DataObject.addChildren
-   */
-  function DataObjectChild(parent, childId, initialData, owner, msgId) {
-    (0, _classCallCheck3.default)(this, DataObjectChild);
-
-    var _this = this;
-
-    _this._parent = parent;
-    _this._childId = childId;
-    _this._owner = owner;
-    _this._msgId = msgId;
-
-    _this._syncObj = new _ProxyObject2.default(initialData);
-
-    _this._bus = parent._bus;
-    _this._allocateListeners();
-  }
-
-  (0, _createClass3.default)(DataObjectChild, [{
-    key: '_allocateListeners',
-    value: function _allocateListeners() {
-      var _this = this;
-
-      //this is only needed for children reporters
-      if (_this._owner) {
-        _this._listener = _this._bus.addListener(_this._owner, function (msg) {
-          if (msg.type === 'response' && msg.id === _this._msgId) {
-            console.log('DataObjectChild.onResponse:', msg);
-            _this._onResponse(msg);
-          }
-        });
-      }
-    }
-  }, {
-    key: '_releaseListeners',
-    value: function _releaseListeners() {
-      var _this = this;
-
-      if (_this._listener) {
-        _this._listener.remove();
-      }
-    }
-
-    /**
-     * Release and delete object data
-     */
-
-  }, {
-    key: 'delete',
-    value: function _delete() {
-      var _this = this;
-
-      delete _this._parent._children[_this._childId];
-
-      _this._releaseListeners();
-
-      //TODO: send delete message ?
-    }
-
-    /**
-     * Children ID generated on addChildren. Unique identifier
-     * @type {URL} - URL of the format <HypertyURL>#<numeric-sequence>
-     */
-
-  }, {
-    key: 'onChange',
-
-
-    /**
-     * Register the change listeners sent by the reporter child
-     * @param {function(event: MsgEvent)} callback
-     */
-    value: function onChange(callback) {
-      this._syncObj.observe(function (event) {
-        callback(event);
-      });
-    }
-
-    /**
-     * Setup the callback to process response notifications of the creates
-     * @param {function(event: MsgEvent)} callback
-     */
-
-  }, {
-    key: 'onResponse',
-    value: function onResponse(callback) {
-      this._onResponseHandler = callback;
-    }
-
-    //FLOW-IN: message received from a remote DataObject -> _onChildCreate
-
-  }, {
-    key: '_onResponse',
-    value: function _onResponse(msg) {
-      var _this = this;
-
-      var event = {
-        type: msg.type,
-        url: msg.body.source,
-        code: msg.body.code
-      };
-
-      if (_this._onResponseHandler) {
-        _this._onResponseHandler(event);
-      }
-    }
-  }, {
-    key: 'childId',
-    get: function get() {
-      return this._childId;
-    }
-
-    /**
-     * Data Structure to be synchronized.
-     * @type {JSON} - JSON structure that should follow the defined schema, if any.
-     */
-
-  }, {
-    key: 'data',
-    get: function get() {
-      return this._syncObj.data;
-    }
-  }]);
-  return DataObjectChild;
-}(); /**
-     * Copyright 2016 PT Inovação e Sistemas SA
-     * Copyright 2016 INESC-ID
-     * Copyright 2016 QUOBIS NETWORKS SL
-     * Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
-     * Copyright 2016 ORANGE SA
-     * Copyright 2016 Deutsche Telekom AG
-     * Copyright 2016 Apizee
-     * Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *   http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     * See the License for the specific language governing permissions and
-     * limitations under the License.
-     **/
-
-exports.default = DataObjectChild;
-module.exports = exports['default'];
-
-/***/ }),
 /* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7347,7 +8209,9 @@ var _createClass2 = __webpack_require__(10);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-__webpack_require__(118);
+__webpack_require__(119);
+
+var _utils = __webpack_require__(71);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7381,7 +8245,7 @@ var SyncObject = function () {
   }, {
     key: 'find',
     value: function find(path) {
-      var list = path.split('.');
+      var list = (0, _utils.parseAttributes)(path);
 
       return this._findWithSplit(list);
     }
@@ -7389,7 +8253,7 @@ var SyncObject = function () {
     key: 'findBefore',
     value: function findBefore(path) {
       var result = {};
-      var list = path.split('.');
+      var list = (0, _utils.parseAttributes)(path);
       result.last = list.pop();
       result.obj = this._findWithSplit(list);
 
@@ -7503,7 +8367,7 @@ var _getPrototypeOf = __webpack_require__(31);
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
 
-var _getOwnPropertyDescriptor = __webpack_require__(142);
+var _getOwnPropertyDescriptor = __webpack_require__(153);
 
 var _getOwnPropertyDescriptor2 = _interopRequireDefault(_getOwnPropertyDescriptor);
 
@@ -7552,11 +8416,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _promise = __webpack_require__(71);
+var _promise = __webpack_require__(72);
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _assign = __webpack_require__(140);
+var _assign = __webpack_require__(151);
 
 var _assign2 = _interopRequireDefault(_assign);
 
@@ -7568,15 +8432,17 @@ var _createClass2 = __webpack_require__(10);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-var _DataObjectReporter = __webpack_require__(121);
+var _utils = __webpack_require__(71);
+
+var _DataObjectReporter = __webpack_require__(122);
 
 var _DataObjectReporter2 = _interopRequireDefault(_DataObjectReporter);
 
-var _DataObjectObserver = __webpack_require__(120);
+var _DataObjectObserver = __webpack_require__(121);
 
 var _DataObjectObserver2 = _interopRequireDefault(_DataObjectObserver);
 
-var _DataProvisional = __webpack_require__(137);
+var _DataProvisional = __webpack_require__(148);
 
 var _DataProvisional2 = _interopRequireDefault(_DataProvisional);
 
@@ -7587,15 +8453,37 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 * The Syncher is a singleton class per Hyperty/URL and it is the owner of all created Data Sync Objects according to the Reporter - Observer pattern.
 * Main functionality is to create reporters and to subscribe to existing ones.
 */
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
 var Syncher = function () {
   /* private
   _owner: URL
   _bus: MiniBus
-   _subURL: URL
-   _reporters: <url: DataObjectReporter>
+    _subURL: URL
+    _reporters: <url: DataObjectReporter>
   _observers: <url: DataObjectObserver>
   _provisionals: <url: DataProvisional>
-   ----event handlers----
+    ----event handlers----
   _onNotificationHandler: (event) => void
   _onResume: (event) => void
   */
@@ -7660,6 +8548,11 @@ var Syncher = function () {
       var store = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
       var p2p = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
       var identity = arguments[5];
+
+
+      if (!schema) throw Error('[Syncher - Create] - You need specify the data object schema');
+      if (!observers) throw Error('[Syncher - Create] -The observers should be defined');
+      if (!initialData) throw Error('[Syncher - Create] - You initialData should be defined');
 
       var _this = this;
       var criteria = {};
@@ -7804,7 +8697,10 @@ var Syncher = function () {
       return new _promise2.default(function (resolve, reject) {
         var resume = criteria.resume;
         var initialData = criteria.initialData || {};
-        var schema = void 0;
+        var schema = criteria.schema;
+
+        initialData.reporter = _this._owner;
+        initialData.schema = criteria.schema;
 
         //FLOW-OUT: this message will be sent to the runtime instance of SyncherManager -> _onCreate
         var requestMsg = {
@@ -7815,12 +8711,8 @@ var Syncher = function () {
         console.log('[syncher - create]: ', criteria, requestMsg);
 
         requestMsg.body.value = initialData;
-        requestMsg.body.value.reporter = _this._owner;
-
-        if (criteria.schema) {
-          schema = criteria.schema;
-          requestMsg.body.schema = criteria.schema;
-        }
+        requestMsg.body.reporter = _this._owner;
+        requestMsg.body.schema = criteria.schema;
 
         if (criteria.p2p) requestMsg.body.p2p = criteria.p2p;
         if (criteria.store) requestMsg.body.store = criteria.store;
@@ -7835,11 +8727,6 @@ var Syncher = function () {
           if (reply.body.code === 200) {
             //reporter creation accepted
             var objURL = reply.body.resource;
-
-            if (resume) {
-              schema = reply.body.schema;
-              initialData = reply.body.value;
-            }
 
             var newObj = new _DataObjectReporter2.default(_this, objURL, schema, 'on', initialData, reply.body.childrenResources);
             _this._reporters[objURL] = newObj;
@@ -7896,15 +8783,21 @@ var Syncher = function () {
               var objURL = dataObject.resource;
               var schema = dataObject.schema;
               var status = dataObject.status || 'on';
-              var _initialData = dataObject.data;
               var childrenResources = dataObject.childrenResources;
 
-              var newObj = new _DataObjectReporter2.default(_this, objURL, schema, status, _initialData, childrenResources);
+              // initialData.childrens = deepClone(dataObject.childrens) || {};
+              // initialData = deepClone(dataObject.data) || {};
+              var init = (0, _utils.deepClone)(dataObject.data) || {};
+              var childrens = (0, _utils.deepClone)(dataObject.childrens) || {};
+
+              console.log('[syncher - create] - create-resumed-dataObjectReporter', objURL, status, init);
+
+              var newObj = new _DataObjectReporter2.default(_this, objURL, schema, status, init, childrenResources, false, true);
+              newObj.resumeChildrens(childrens);
               _this._reporters[objURL] = newObj;
             }
 
             resolve(_this._reporters);
-
             if (_this2._onReportersResume) _this2._onReportersResume(_this2._reporters);
           } else {
             //reporter creation rejected
@@ -8059,18 +8952,16 @@ var Syncher = function () {
               var status = dataObject.status || 'on';
               var _objURL = dataObject.resource;
               var version = dataObject.version || 0;
-              var initialData = dataObject.data;
-              if (!initialData.hasOwnProperty('childrens')) {
-                initialData.childrens = {};
-              }
-              if (!initialData.hasOwnProperty('data')) {
-                initialData.data = {};
-              }
+              var childrenResources = dataObject.childrenResources;
 
-              // let childrenResources = dataObject.childrenResources;
+              var initialData = {};
+              initialData.childrens = (0, _utils.deepClone)(dataObject.childrens) || {};
+              initialData.data = (0, _utils.deepClone)(dataObject.data) || {};
 
               //TODO: mutualAuthentication For Further Study
-              var newObj = new _DataObjectObserver2.default(_this, _objURL, schema, status, initialData, _this._provisionals[_objURL].children, version, mutualAuthentication);
+              console.log('[syncher - resume subscribe] - create new dataObject: ', status, initialData, childrenResources, version);
+              var newObj = new _DataObjectObserver2.default(_this, _objURL, schema, status, initialData, childrenResources, version, mutualAuthentication, true);
+
               _this._observers[_objURL] = newObj;
 
               _this._provisionals[_objURL].apply(newObj);
@@ -8235,28 +9126,7 @@ var Syncher = function () {
     }
   }]);
   return Syncher;
-}(); /**
-     * Copyright 2016 PT Inovação e Sistemas SA
-     * Copyright 2016 INESC-ID
-     * Copyright 2016 QUOBIS NETWORKS SL
-     * Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
-     * Copyright 2016 ORANGE SA
-     * Copyright 2016 Deutsche Telekom AG
-     * Copyright 2016 Apizee
-     * Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *   http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     * See the License for the specific language governing permissions and
-     * limitations under the License.
-     **/
+}();
 
 exports.default = Syncher;
 module.exports = exports['default'];
@@ -8265,7 +9135,47 @@ module.exports = exports['default'];
 /* 134 */,
 /* 135 */,
 /* 136 */,
-/* 137 */
+/* 137 */,
+/* 138 */,
+/* 139 */,
+/* 140 */,
+/* 141 */,
+/* 142 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.DataObjectObserver = exports.DataObjectReporter = exports.Syncher = undefined;
+
+var _Syncher = __webpack_require__(133);
+
+var _Syncher2 = _interopRequireDefault(_Syncher);
+
+var _DataObjectReporter = __webpack_require__(122);
+
+var _DataObjectReporter2 = _interopRequireDefault(_DataObjectReporter);
+
+var _DataObjectObserver = __webpack_require__(121);
+
+var _DataObjectObserver2 = _interopRequireDefault(_DataObjectObserver);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.Syncher = _Syncher2.default;
+exports.DataObjectReporter = _DataObjectReporter2.default;
+exports.DataObjectObserver = _DataObjectObserver2.default;
+
+/***/ }),
+/* 143 */,
+/* 144 */,
+/* 145 */,
+/* 146 */,
+/* 147 */,
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8323,7 +9233,7 @@ var DataProvisional = function () {
   /* private
   _childrenListeners: [MsgListener]
   _listener: MsgListener
-   _changes: []
+    _changes: []
   */
 
   function DataProvisional(owner, url, bus, children) {
@@ -8362,7 +9272,7 @@ var DataProvisional = function () {
               console.log(msg);
             }
           });
-           _this._childrenListeners.push(listener);
+            _this._childrenListeners.push(listener);
         });
       }*/
     }
@@ -8398,44 +9308,44 @@ exports.default = DataProvisional;
 module.exports = exports['default'];
 
 /***/ }),
-/* 138 */,
-/* 139 */,
-/* 140 */
+/* 149 */,
+/* 150 */,
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = { "default": __webpack_require__(147), __esModule: true };
+module.exports = { "default": __webpack_require__(158), __esModule: true };
 
 /***/ }),
-/* 141 */,
-/* 142 */
+/* 152 */,
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = { "default": __webpack_require__(149), __esModule: true };
+module.exports = { "default": __webpack_require__(160), __esModule: true };
 
 /***/ }),
-/* 143 */,
-/* 144 */,
-/* 145 */,
-/* 146 */,
-/* 147 */
+/* 154 */,
+/* 155 */,
+/* 156 */,
+/* 157 */,
+/* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(153);
+__webpack_require__(164);
 module.exports = __webpack_require__(0).Object.assign;
 
 /***/ }),
-/* 148 */,
-/* 149 */
+/* 159 */,
+/* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(155);
+__webpack_require__(166);
 var $Object = __webpack_require__(0).Object;
 module.exports = function getOwnPropertyDescriptor(it, key){
   return $Object.getOwnPropertyDescriptor(it, key);
 };
 
 /***/ }),
-/* 150 */
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8474,19 +9384,19 @@ module.exports = !$assign || __webpack_require__(11)(function(){
 } : $assign;
 
 /***/ }),
-/* 151 */,
-/* 152 */,
-/* 153 */
+/* 162 */,
+/* 163 */,
+/* 164 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.3.1 Object.assign(target, source)
 var $export = __webpack_require__(9);
 
-$export($export.S + $export.F, 'Object', {assign: __webpack_require__(150)});
+$export($export.S + $export.F, 'Object', {assign: __webpack_require__(161)});
 
 /***/ }),
-/* 154 */,
-/* 155 */
+/* 165 */,
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
@@ -8499,51 +9409,11 @@ __webpack_require__(45)('getOwnPropertyDescriptor', function(){
   };
 });
 
-/***/ }),
-/* 156 */,
-/* 157 */,
-/* 158 */,
-/* 159 */,
-/* 160 */,
-/* 161 */,
-/* 162 */,
-/* 163 */,
-/* 164 */,
-/* 165 */,
-/* 166 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.DataObjectObserver = exports.DataObjectReporter = exports.Syncher = undefined;
-
-var _Syncher = __webpack_require__(133);
-
-var _Syncher2 = _interopRequireDefault(_Syncher);
-
-var _DataObjectReporter = __webpack_require__(121);
-
-var _DataObjectReporter2 = _interopRequireDefault(_DataObjectReporter);
-
-var _DataObjectObserver = __webpack_require__(120);
-
-var _DataObjectObserver2 = _interopRequireDefault(_DataObjectObserver);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.Syncher = _Syncher2.default;
-exports.DataObjectReporter = _DataObjectReporter2.default;
-exports.DataObjectObserver = _DataObjectObserver2.default;
-
 /***/ })
 /******/ ]);
 });
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -8556,7 +9426,7 @@ module.exports={
         "spec": "0.7.5",
         "type": "version"
       },
-      "C:\\Projectos\\reTHINK\\WP3\\git\\dev-protostubs\\src\\protostub\\ims_iw"
+      "/Users/dvilchez/workspace/rethink/dev-protostubs/src/protostub/ims_iw"
     ]
   ],
   "_from": "sip.js@0.7.5",
@@ -8590,7 +9460,7 @@ module.exports={
   "_shasum": "86ace7051594f91b4551bdb8120a16c44962d3a2",
   "_shrinkwrap": null,
   "_spec": "sip.js@0.7.5",
-  "_where": "C:\\Projectos\\reTHINK\\WP3\\git\\dev-protostubs\\src\\protostub\\ims_iw",
+  "_where": "/Users/dvilchez/workspace/rethink/dev-protostubs/src/protostub/ims_iw",
   "author": {
     "name": "OnSIP",
     "email": "developer@onsip.com",
@@ -8678,7 +9548,7 @@ module.exports={
   "version": "0.7.5"
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 module.exports = function (SIP) {
 var ClientContext;
@@ -8783,7 +9653,7 @@ ClientContext.prototype.onTransportError = function () {
 SIP.ClientContext = ClientContext;
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP Constants
@@ -8985,7 +9855,7 @@ return {
 };
 };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 /**
@@ -9081,7 +9951,7 @@ RequestSender.prototype = {
 return RequestSender;
 };
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP Dialog
@@ -9341,7 +10211,7 @@ Dialog.C = C;
 SIP.Dialog = Dialog;
 };
 
-},{"./Dialog/RequestSender":11}],13:[function(require,module,exports){
+},{"./Dialog/RequestSender":12}],14:[function(require,module,exports){
 "use strict";
 
 /**
@@ -9512,7 +10382,7 @@ DigestAuthentication.prototype.updateNcHex = function() {
 return DigestAuthentication;
 };
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 var NodeEventEmitter = require('events').EventEmitter;
 
@@ -9552,7 +10422,7 @@ return EventEmitter;
 
 };
 
-},{"events":48}],15:[function(require,module,exports){
+},{"events":1}],16:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview Exceptions
@@ -9607,7 +10477,7 @@ module.exports = {
   }())
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 var Grammar = require('./Grammar/dist/Grammar');
 
@@ -9627,7 +10497,7 @@ return {
 
 };
 
-},{"./Grammar/dist/Grammar":17}],17:[function(require,module,exports){
+},{"./Grammar/dist/Grammar":18}],18:[function(require,module,exports){
 module.exports = (function() {
   /*
    * Generated by PEG.js 0.8.0.
@@ -10979,7 +11849,7 @@ module.exports = (function() {
   };
 })();
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview Hacks - This file contains all of the things we
@@ -11093,7 +11963,7 @@ var Hacks = {
 };
 return Hacks;
 };
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 var levels = {
   'error': 0,
@@ -11209,7 +12079,7 @@ LoggerFactory.prototype.getLogger = function(category, label) {
 return LoggerFactory;
 };
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview MediaHandler
@@ -11254,7 +12124,7 @@ MediaHandler.prototype = Object.create(EventEmitter.prototype, {
 return MediaHandler;
 };
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP NameAddrHeader
@@ -11357,7 +12227,7 @@ NameAddrHeader.parse = function(name_addr_header) {
 SIP.NameAddrHeader = NameAddrHeader;
 };
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP Message Parser
@@ -11620,7 +12490,7 @@ Parser.parseMessage = function(data, ua) {
 SIP.Parser = Parser;
 };
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 module.exports = function (SIP) {
 
@@ -11906,7 +12776,7 @@ RegisterContext.prototype = {
 SIP.RegisterContext = RegisterContext;
 };
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 /**
@@ -12047,7 +12917,7 @@ RequestSender.prototype = {
 SIP.RequestSender = RequestSender;
 };
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /**
  * @name SIP
  * @namespace
@@ -12097,7 +12967,7 @@ SIP.Grammar = require('./Grammar')(SIP);
 return SIP;
 };
 
-},{"../package.json":8,"./ClientContext":9,"./Constants":10,"./Dialogs":12,"./DigestAuthentication":13,"./EventEmitter":14,"./Exceptions":15,"./Grammar":16,"./Hacks":18,"./LoggerFactory":19,"./MediaHandler":20,"./NameAddrHeader":21,"./Parser":22,"./RegisterContext":23,"./RequestSender":24,"./SIPMessage":26,"./SanityCheck":27,"./ServerContext":28,"./Session":29,"./Subscription":31,"./Timers":32,"./Transactions":33,"./UA":35,"./URI":36,"./Utils":37,"./WebRTC":38}],26:[function(require,module,exports){
+},{"../package.json":9,"./ClientContext":10,"./Constants":11,"./Dialogs":13,"./DigestAuthentication":14,"./EventEmitter":15,"./Exceptions":16,"./Grammar":17,"./Hacks":19,"./LoggerFactory":20,"./MediaHandler":21,"./NameAddrHeader":22,"./Parser":23,"./RegisterContext":24,"./RequestSender":25,"./SIPMessage":27,"./SanityCheck":28,"./ServerContext":29,"./Session":30,"./Subscription":32,"./Timers":33,"./Transactions":34,"./UA":36,"./URI":37,"./Utils":38,"./WebRTC":39}],27:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP Message
@@ -12640,7 +13510,7 @@ SIP.IncomingRequest = IncomingRequest;
 SIP.IncomingResponse = IncomingResponse;
 };
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview Incoming SIP Message Sanity Check
@@ -12870,7 +13740,7 @@ sanityCheck = function(m, u, t) {
 SIP.sanityCheck = sanityCheck;
 };
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 module.exports = function (SIP) {
 var ServerContext;
@@ -12962,7 +13832,7 @@ ServerContext.prototype.onTransportError = function () {
 SIP.ServerContext = ServerContext;
 };
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 module.exports = function (SIP, environment) {
 
@@ -15223,7 +16093,7 @@ SIP.InviteClientContext = InviteClientContext;
 
 };
 
-},{"./Session/DTMF":30}],30:[function(require,module,exports){
+},{"./Session/DTMF":31}],31:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview DTMF
@@ -15404,7 +16274,7 @@ DTMF.C = C;
 return DTMF;
 };
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 /**
@@ -15729,7 +16599,7 @@ SIP.Subscription.prototype = {
 };
 };
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP TIMERS
@@ -15772,7 +16642,7 @@ module.exports = function (timers) {
   return Timers;
 };
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP Transactions
@@ -16480,7 +17350,7 @@ SIP.Transactions = {
 
 };
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview Transport
@@ -16853,7 +17723,7 @@ Transport.C = C;
 return Transport;
 };
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 (function (global){
 "use strict";
 /**
@@ -18456,7 +19326,7 @@ SIP.UA = UA;
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview SIP URI
@@ -18698,7 +19568,7 @@ URI.parse = function(uri) {
 SIP.URI = URI;
 };
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview Utils
@@ -19195,7 +20065,7 @@ Utils= {
 SIP.Utils = Utils;
 };
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview WebRTC
@@ -19236,7 +20106,7 @@ WebRTC.isSupported = function () {
 return WebRTC;
 };
 
-},{"./WebRTC/MediaHandler":39,"./WebRTC/MediaStreamManager":40}],39:[function(require,module,exports){
+},{"./WebRTC/MediaHandler":40,"./WebRTC/MediaStreamManager":41}],40:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview MediaHandler
@@ -19793,7 +20663,7 @@ MediaHandler.prototype = Object.create(SIP.MediaHandler.prototype, {
 return MediaHandler;
 };
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview MediaStreamManager
@@ -19961,7 +20831,7 @@ MediaStreamManager.prototype = Object.create(SIP.EventEmitter.prototype, {
 return MediaStreamManager;
 };
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -20010,11 +20880,11 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./Transport":34}],42:[function(require,module,exports){
+},{"./Transport":35}],43:[function(require,module,exports){
 "use strict";
 module.exports = require('./SIP')(require('./environment'));
 
-},{"./SIP":25,"./environment":41}],43:[function(require,module,exports){
+},{"./SIP":26,"./environment":42}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20156,7 +21026,7 @@ var ConnectionController = function () {
 exports.default = ConnectionController;
 module.exports = exports['default'];
 
-},{"./InviteClientContext":45,"./InviteServerContext":46,"./SIPUtils":47,"sip.js":42}],44:[function(require,module,exports){
+},{"./InviteClientContext":46,"./InviteServerContext":47,"./SIPUtils":48,"sip.js":43}],45:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20374,7 +21244,7 @@ function activate(url, bus, config) {
 }
 module.exports = exports['default'];
 
-},{"./ConnectionController":43,"service-framework/dist/Discovery":5,"service-framework/dist/IdentityFactory":6,"service-framework/dist/Syncher":7}],45:[function(require,module,exports){
+},{"./ConnectionController":44,"service-framework/dist/Discovery":6,"service-framework/dist/IdentityFactory":7,"service-framework/dist/Syncher":8}],46:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20771,7 +21641,7 @@ InviteClientContext.prototype = {
 exports.default = InviteClientContext;
 module.exports = exports['default'];
 
-},{"sip.js":42}],46:[function(require,module,exports){
+},{"sip.js":43}],47:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -21285,7 +22155,7 @@ InviteServerContext.prototype = {
 exports.default = InviteServerContext;
 module.exports = exports['default'];
 
-},{"sip.js":42}],47:[function(require,module,exports){
+},{"sip.js":43}],48:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -21338,309 +22208,5 @@ function addCandidatesToSDP(txtSdp, candidates) {
 	return _sdpTransform2.default.write(sdp);
 }
 
-},{"sdp-transform":2}],48:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events)
-    this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      } else {
-        // At least give some kind of context to the user
-        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-        err.context = er;
-        throw err;
-      }
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        args = Array.prototype.slice.call(arguments, 1);
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    args = Array.prototype.slice.call(arguments, 1);
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
-      return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else if (listeners) {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.prototype.listenerCount = function(type) {
-  if (this._events) {
-    var evlistener = this._events[type];
-
-    if (isFunction(evlistener))
-      return 1;
-    else if (evlistener)
-      return evlistener.length;
-  }
-  return 0;
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  return emitter.listenerCount(type);
-};
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
-},{}]},{},[44])(44)
+},{"sdp-transform":3}]},{},[45])(45)
 });
