@@ -151,10 +151,13 @@ gulp.task('stage', function() {
     RUNTIME_URL: process.env.RUNTIME_URL,
     DOMAIN: process.env.DOMAIN || 'localhost',
     HYPERTY_REPO: process.env.HYPERTY_REPO || '../dev-hyperty',
-    ENVIRONMENT: process.env.ENVIRONMENT || 'core'
+    ENVIRONMENT: process.env.ENVIRONMENT || 'core',
+    INDEX_URL: process.env.INDEX_URL,
+    SANDBOX_URL: process.env.SANDBOX_URL
   };
 
-  return gulp.src('./')
+  return gulp.src('./config.json')
+  .pipe(clean())
   .pipe(createFile('config.json', new Buffer(JSON.stringify(configuration, null, 2))))
   .pipe(gulp.dest('./'))
   .on('end', function() {
@@ -219,6 +222,8 @@ gulp.task('watch', function() {
     .resume()
     .on('end', browserSync.reload);
   });
+
+  gulp.watch('env', ['stage']);
 
   gulp.watch(['./src/**/*.js'], function(event) {
     var fileObject = path.parse(event.path);
