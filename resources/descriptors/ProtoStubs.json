@@ -14,7 +14,7 @@
     "signature": "",
     "messageSchemas": "",
     "configuration": {
-      "url": "wss://msg-node.hysmart.rethink.ptinovacao.pt/localhost/ws"
+      "url": "wss://msg-node.hysmart.rethink.ptinovacao.pt/ws"
     },
     "constraints": {
       "browser": true
@@ -41,7 +41,7 @@
     "type": "ProtoStubs",
     "objectName": "default",
     "configuration": {
-      "url": "wss://msg-node.hysmart.rethink.ptinovacao.pt/localhost/ws"
+      "url": "wss://msg-node.hysmart.rethink.ptinovacao.pt/ws"
     },
     "messageSchemas": "",
     "signature": "",
