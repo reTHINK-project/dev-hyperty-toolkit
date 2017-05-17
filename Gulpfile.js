@@ -9,7 +9,8 @@ var through = require('through2');
 var inquirer = require('inquirer');
 var gutil = require('gulp-util');
 var runSequence = require('run-sequence');
-var clean = require('gulp-clean');
+var vinylPaths = require('vinyl-paths');
+var del = require('del');
 
 var replacePattern = require('./gulp/utils').replacePattern;
 var getEnvironment = require('./gulp/environment');
@@ -34,7 +35,7 @@ gulp.task('serve', function(done) {
 
   var stage = getStage();
 
-  var sequence = ['stage', 'clean', 'src-hyperties', 'checkHyperties', 'descriptor', 'checkDataSchemas', 'schemas', 'js', 'hyperties', 'server'];
+  var sequence = ['clean', 'stage', 'src-hyperties', 'checkHyperties', 'descriptor', 'checkDataSchemas', 'schemas', 'js', 'hyperties', 'server'];
   if (stage !== 'production') {
 
     env(path.join(process.cwd(), '.env.server'));
@@ -52,7 +53,7 @@ gulp.task('build:hyperties', function(done) {
   env(path.join(process.cwd(), '.env.server'));
   env(path.join(process.cwd(), 'env'));
 
-  var sequence = ['stage', 'clean', 'checkHyperties', 'src-hyperties', 'descriptor', 'hyperties'];
+  var sequence = ['clean', 'stage', 'checkHyperties', 'src-hyperties', 'descriptor', 'hyperties'];
   runSequence.apply(runSequence, sequence, function() {
 
     return gulp.src('./src/**/*.js')
@@ -131,8 +132,9 @@ gulp.task('clean', function() {
   return gulp.src([
     'src',
     'app',
+    'config.json',
     'resources/descriptors/Hyperties.json',
-    'resources/descriptors/DataSchemas.json'], {read: false}).pipe(clean());
+    'resources/descriptors/DataSchemas.json'], {read: false}).pipe(vinylPaths(del));
 });
 
 gulp.task('copy-src', copySrc);
@@ -151,7 +153,9 @@ gulp.task('stage', function() {
     RUNTIME_URL: process.env.RUNTIME_URL,
     DOMAIN: process.env.DOMAIN || 'localhost',
     HYPERTY_REPO: process.env.HYPERTY_REPO || '../dev-hyperty',
-    ENVIRONMENT: process.env.ENVIRONMENT || 'core'
+    ENVIRONMENT: process.env.ENVIRONMENT || 'core',
+    INDEX_URL: process.env.INDEX_URL,
+    SANDBOX_URL: process.env.SANDBOX_URL
   };
 
   return gulp.src('./')
@@ -219,6 +223,8 @@ gulp.task('watch', function() {
     .resume()
     .on('end', browserSync.reload);
   });
+
+  gulp.watch('env', ['stage']);
 
   gulp.watch(['./src/**/*.js'], function(event) {
     var fileObject = path.parse(event.path);

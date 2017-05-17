@@ -18,7 +18,9 @@ let domain = browserConfig.DOMAIN;
 let config = {
   development: browserConfig.DEVELOPMENT,
   runtimeURL: browserConfig.RUNTIME_URL,
-  domain: browserConfig.DOMAIN
+  domain: browserConfig.DOMAIN,
+  indexURL: browserConfig.INDEX_URL,
+  sandboxURL: browserConfig.SANDBOX_URL
 };
 
 let runtimeLoader;
