@@ -5,17 +5,7 @@
 var fs = require('fs');
 var path = require('path');
 
-// Windows?
-var win32 = process.platform === 'win32';
-
-// Normalize \\ paths to / paths.
-function unixifyPath(filepath) {
-  if (win32) {
-    return filepath.replace(/\\/g, '/');
-  } else {
-    return filepath;
-  }
-}
+var unixifyPath = require('./utils').unixifyPath;
 
 function walk(rootdir, callback, subdir) {
   var abspath = subdir ? path.join(rootdir, subdir) : rootdir;

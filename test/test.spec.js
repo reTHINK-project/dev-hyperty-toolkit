@@ -2,7 +2,13 @@ import chai from 'chai';
 import sinon from 'sinon';
 import chaiAsPromised from 'chai-as-promised';
 
-import configs from '../config.json';
+import browserConfig from '../config.json';
+let domain = browserConfig.DOMAIN;
+let config = {
+  development: browserConfig.DEVELOPMENT,
+  runtimeURL: browserConfig.RUNTIME_URL,
+  domain: browserConfig.DOMAIN
+};
 
 let expect = chai.expect;
 
@@ -12,7 +18,6 @@ import rethink from '../resources/factories/rethink';
 
 describe('Install Runtime', function() {
 
-  let config = configs;
   let runtimeLoader;
   let msgNodeAddress;
   let runtimeHyperty;
@@ -59,7 +64,7 @@ describe('Install Runtime', function() {
     window.runtime.identityModule.getIdentityAssertion.restore();
   });
 
-  it('should load an stub', (done) => {
+  it('should load a protocolstub', (done) => {
 
     let stub = config.domain;
 
@@ -85,8 +90,8 @@ describe('Install Runtime', function() {
   it('should load diferent protostub', (done) => {
 
     let stubList = [
-      'https://catalogue.rethink.tlabscloud.com/.well-known/protocolstub/default',
-      'https://catalogue.rethink.quobis.com/.well-known/protocolstub/default'
+      'https://rethink.tlabscloud.com/.well-known/protocolstub/default',
+      'https://rethink.quobis.com/.well-known/protocolstub/default'
     ];
 
     stubList.forEach((stub) => {
@@ -101,7 +106,7 @@ describe('Install Runtime', function() {
 
     this.timeout(100000);
 
-    let hyperty = 'https://catalogue.' + config.domain + '/.well-known/hyperty/Connector';
+    let hyperty = 'https://catalogue.' + config.domain + '/.well-known/hyperty/HelloWorldObserver';
 
     expect(runtimeLoader.requireHyperty(hyperty).then((result) => {
       console.log('HYPERTY: ', result);
@@ -114,7 +119,7 @@ describe('Install Runtime', function() {
 
   });
 
-  it('should load multiple hyperties', function(done) {
+  it.skip('should load multiple hyperties', function(done) {
     this.timeout(100000);
 
     let hyperties = [
@@ -130,13 +135,13 @@ describe('Install Runtime', function() {
 
   });
 
-  it('should send multiple read messages', function(done) {
+  it.skip('should send multiple read messages', function(done) {
 
     let seq = 0;
-    let time = 100;
-    let limit = 10;
+    let time = 500;
+    let limit = 3;
 
-    this.timeout(1000 * (limit + 2));
+    this.timeout(1000 * (limit + 10));
 
     // expect(runtimeHyperty.instance.discovery.discoverHyperty('vitorsilva@boldint.com', ['connection'], ['audio', 'video']))
     // .to.be.fulfilled.and.notify(done);
@@ -162,32 +167,34 @@ describe('Install Runtime', function() {
 
     let b = setInterval(function() {
 
-      if (seq < limit) {
-        msg.id = seq + 1;
-        console.info('[MSG READ] Post Message: ', msg);
-        numOfMsgsSend.push(msg);
-        window.runtime.messageBus.postMessage(msg, function(reply) {
-          numOfMsgsReply.push(reply);
-          setTimeout(function() {
-            console.info('[MSG READ] Reply Message: ', reply);
-            expect(reply.from).to.eq(msgTo);
-            expect(reply.to).to.eq(msgFrom);
-            expect(reply.type).to.eq('response');
-            expect(reply.body.code).to.eq(200);
-          });
-        });
-      } else {
+      if (seq > limit) {
         clearInterval(b);
-        expect(numOfMsgsReply).to.have.lengthOf(numOfMsgsSend.length);
-        done();
       }
+
+      msg.id = seq;
+      console.info('[MSG READ] Post Message: ', msg.id);
+      numOfMsgsSend.push(msg);
+      window.runtime.messageBus.postMessage(msg, function(reply) {
+        numOfMsgsReply.push(reply);
+        setTimeout(function() {
+          console.info('[MSG READ] Reply Message: ', reply.id);
+          expect(reply.from).to.eq(msgTo);
+          expect(reply.to).to.eq(msgFrom);
+          expect(reply.type).to.eq('response');
+          expect(reply.body.code).to.eq(200);
+          expect(numOfMsgsReply).to.have.lengthOf(numOfMsgsSend.length);
+          if (reply.id === limit) {
+            done();
+          }
+        });
+      });
 
       seq++;
     }, time);
 
   });
 
-  it('should send and recive allocate messages', function(done) {
+  it.skip('should send and recive allocate messages', function(done) {
 
     let time = 1000;
     let limit = 2;

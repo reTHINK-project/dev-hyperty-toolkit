@@ -23,6 +23,10 @@ src
 examples
 app
 
+coverage
+
+.vscode/
+
 resources/tmp
 resources/bundle.js
 resources/*.hy.js

@@ -29,23 +29,21 @@ var descriptorBase = function(type) {
   switch (type) {
     case 'hyperty':
       base.hypertyType = [];
-      base.constraints = {
-        node: false,
-        browser: true
-      };
       break;
 
     case 'runtime':
       base.type = '';
       base.runtimeType = 'browser';
-      base.hypertyCapabilities = {};
-      base.protocolCapabilities = {};
+      base.p2pHandlerStub = '';
+      base.p2pRequesterStub = '';
+      base.constraints = {};
       break;
 
     case 'protocolstub':
     case 'idp-proxy':
       base.type = '';
-      base.constraints = '';
+      base.constraints = {};
+      base.interworking = false;
       break;
 
     case 'dataschema':
@@ -60,16 +58,21 @@ var descriptorBase = function(type) {
   base.objectName = '';
   base.configuration = {};
   base.messageSchemas = '';
+  base.dataObjects = [];
 
   base.signature = '';
   base.accessControlPolicy = 'somePolicy';
+  base.constraints = {};
 
   return base;
 };
 
 var encode = function(opts) {
 
-  opts = _.extend({}, opts || {});
+  opts = _.extend({}, opts);
+
+  var descriptor = fs.readFileSync(path.resolve('./resources/descriptors/' + opts.descriptor + '.json'), 'utf8');
+  var json = JSON.parse(descriptor);
 
   return through.obj(function(file, enc, cb) {
 
@@ -84,13 +87,10 @@ var encode = function(opts) {
     gutil.log('Encode: ', file.path);
 
     var fileObject = path.parse(file.path);
-    var descriptor = fs.readFileSync(path.resolve('resources/descriptors/' + opts.descriptor + '.json'), 'utf8');
-    var json = JSON.parse(descriptor);
     var contents = fs.readFileSync(file.path, 'utf8');
     var type = '';
 
     var encoded = new Buffer(contents).toString('base64');
-    var value = 'default';
     var filename = fileObject.name;
 
     if (fileObject.name.indexOf('.hy') !== -1) {
@@ -99,12 +99,7 @@ var encode = function(opts) {
       filename = fileObject.name.replace('.ds', '');
     }
 
-    if (opts.isDefault) {
-      value = 'default';
-    } else {
-      value = opts.name || filename;
-    }
-
+    var value = filename;
     var cguid = 0;
     switch (opts.descriptor) {
       case 'Hyperties':
@@ -130,7 +125,7 @@ var encode = function(opts) {
     }
 
     if (!json.hasOwnProperty(value)) {
-      json[value] = descriptorBase();
+      json[value] = descriptorBase(type);
     }
 
     Object.keys(json).map(function(key, index) {
@@ -145,7 +140,15 @@ var encode = function(opts) {
     }
 
     json[value].description = checkValues('description', 'Description of ' + filename, json[value]);
-    json[value].objectName = checkValues('objectName', filename, json[value]);
+
+    var name = 'default';
+    if (opts.isDefault) {
+      name = 'default';
+    } else {
+      name = opts.name || filename;
+    }
+
+    json[value].objectName = checkValues('objectName', name, json[value]);
 
     if (opts.descriptor !== 'Hyperties') {
       if (opts.configuration) {
@@ -161,14 +164,15 @@ var encode = function(opts) {
 
     if (opts.descriptor === 'Runtimes') {
       json[value].runtimeType = 'browser';
-      json[value].hypertyCapabilities = {
+      json[value].p2pHandlerStub = checkValues('p2pHandlerStub', opts.p2pHandlerStub || '', json[value]);
+      json[value].p2pRequesterStub = checkValues('p2pRequesterStub', opts.p2pRequesterStub || '', json[value]);
+      json[value].constraints = {
+        browser: true,
         mic: true,
         camera: true,
         sensor: false,
         webrtc: true,
-        ortc: true
-      };
-      json[value].protocolCapabilities = {
+        ortc: true,
         http: true,
         https: true,
         ws: true,
@@ -184,7 +188,8 @@ var encode = function(opts) {
     }
 
     if (opts.descriptor === 'ProtoStubs' || opts.descriptor === 'IDPProxys') {
-      json[value].constraints = '';
+      json[value].constraints = checkValues('constraints', opts.constraints, json[value]);
+      json[value].interworking = checkValues('interworking', opts.interworking, json[value]);
     }
 
     if (!json[value].sourcePackageURL) {
@@ -214,7 +219,15 @@ var encode = function(opts) {
 };
 
 function checkValues(property, value, object) {
-  return _.isEmpty(object[property]) ? value : object[property];
+
+  if (_.isEmpty(value) && typeof(value) !== 'boolean') {
+    return object[property] || value;
+  } else if (_.isEqual(object[property], value)) {
+    return value;
+  } else {
+    return value;
+  }
+
 }
 
 module.exports = {

@@ -45,7 +45,7 @@
 			}
 		},
 		"children": {
-			"constant": ["chatmessages"]
+			"constant": ["resources"]
 		}
 	},
 	"ChatMessages": {

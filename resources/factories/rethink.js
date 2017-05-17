@@ -1,9 +1,10 @@
 // jshint
 // Runtime
-
 import runtimeFactory from './runtimeFactory';
 
 import MiniBus from 'runtime-core/dist/minibus';
+
+import IdentitiesGUI from './IdentitiesGUI';
 
 window.components = {};
 let minibus = new MiniBus();
@@ -94,8 +95,10 @@ const rethink = {
       console.log('Install configuration: ', development, domain, runtimeURL);
 
       let catalogue = runtimeFactory.createRuntimeCatalogue(development);
+      let runtimeDescriptor;
 
       catalogue.getRuntimeDescriptor(runtimeURL).then((descriptor) => {
+        runtimeDescriptor = descriptor;
 
         if (descriptor.sourcePackageURL === '/sourcePackage') {
           return descriptor.sourcePackage;
@@ -108,50 +111,60 @@ const rethink = {
 
         window.eval(sourcePackage.sourceCode);
 
-        let runtime = new Runtime(runtimeFactory, domain);
+        let runtime = new Runtime(runtimeDescriptor, runtimeFactory, domain);
+
         window.runtime = runtime;
 
-        minibus.addListener('core:loadHyperty', function(msg) {
-          console.log('Load Hyperty: ', msg);
+        runtime.init().then((result) => {
 
-          let resultMsg = {};
-          resultMsg.from = msg.to;
-          resultMsg.to = msg.from;
-          resultMsg.body = {};
+          let idmGuiURL = runtime.identityModule._runtimeURL + '/identity-gui';
+          let idmURL = runtime.identityModule._runtimeURL + '/idm';
+          let messageBus = runtime.messageBus;
+          let identitiesGUI = new IdentitiesGUI(idmGuiURL, idmURL, messageBus);
+          console.log('identitiesGUI: ', identitiesGUI);
 
-          //TODO: Work the message errors, probably use message factory
-          runtime.loadHyperty(msg.body.value.descriptor).then(function(result) {
-            resultMsg.body.value = result;
-            minibus._onMessage(resultMsg);
-          }).catch(function(reason) {
-            resultMsg.body.value = reason;
-            resultMsg.body.code = 404;
-            minibus._onMessage(resultMsg);
+          minibus.addListener('core:loadHyperty', function(msg) {
+            console.log('Load Hyperty: ', msg);
+
+            let resultMsg = {};
+            resultMsg.from = msg.to;
+            resultMsg.to = msg.from;
+            resultMsg.body = {};
+
+            //TODO: Work the message errors, probably use message factory
+            runtime.loadHyperty(msg.body.value.descriptor, true).then(function(result) {
+              resultMsg.body.value = result;
+              minibus._onMessage(resultMsg);
+            }).catch(function(reason) {
+              resultMsg.body.value = reason;
+              resultMsg.body.code = 404;
+              minibus._onMessage(resultMsg);
+            });
+
           });
 
-        });
+          minibus.addListener('core:loadStub', function(msg) {
+            console.log('Load Stub:', msg);
 
-        minibus.addListener('core:loadStub', function(msg) {
-          console.log('Load Stub:', msg);
+            let resultMsg = {};
+            resultMsg.from = msg.to;
+            resultMsg.to = msg.from;
+            resultMsg.body = {};
 
-          let resultMsg = {};
-          resultMsg.from = msg.to;
-          resultMsg.to = msg.from;
-          resultMsg.body = {};
+            //TODO: Work the message errors, probably use message factory
+            runtime.loadStub(msg.body.value.domain).then(function(result) {
+              resultMsg.body.value = result;
+              minibus._onMessage(resultMsg);
+            }).catch(function(reason) {
+              resultMsg.body.value = reason;
+              resultMsg.body.code = 400;
+              minibus._onMessage(resultMsg);
+            });
 
-          //TODO: Work the message errors, probably use message factory
-          runtime.loadStub(msg.body.value.domain).then(function(result) {
-            resultMsg.body.value = result;
-            minibus._onMessage(resultMsg);
-          }).catch(function(reason) {
-            resultMsg.body.value = reason;
-            resultMsg.body.code = 400;
-            minibus._onMessage(resultMsg);
           });
 
+          resolve(runtimeProxy);
         });
-
-        resolve(runtimeProxy);
 
       })
       .catch(function(reason) {
