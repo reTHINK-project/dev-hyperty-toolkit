@@ -145,7 +145,7 @@ let idp = {
 
             let assertion = btoa(JSON.stringify({tokenID: value.access_token, email: profile.email, id: info.user.id}));
 
-            let toResolve = {assertion: assertion, idp: {domain: 'slack.com', protocol: 'OAuth 2.0'}, infoToken: infoToken, interworking: {access_token: value.access_token, domain: 'slack.com' }};
+            let toResolve = {assertion: assertion, idp: {domain: 'slack.com', protocol: 'OAuth 2.0'}, infoToken: infoToken, interworking: {access_token: value.access_token, domain: 'slack.com' }, info : {expires: 3153600000}};
             console.log('RESOLVING THIS OBJECT', toResolve);
             resolve(toResolve);
           }, function(error) {
