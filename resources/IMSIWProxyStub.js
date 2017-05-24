@@ -28,7 +28,7 @@ var IMSIWProxyStub = function () {
   * @param  {ProtoStubDescriptor.ConfigurationDataList} configuration      configuration
   */
 	function IMSIWProxyStub(runtimeProtoStubURL, bus, config) {
-		var _this2 = this;
+		var _this = this;
 
 		_classCallCheck(this, IMSIWProxyStub);
 
@@ -39,57 +39,31 @@ var IMSIWProxyStub = function () {
 		this.messageBus.addListener('*', function (msg) {
 			//TODO add the respective listener
 			if (msg.to === 'domain-idp://' + domain) {
-				_this2.requestToIdp(msg);
+				_this.requestToIdp(msg);
 			}
 		});
-
-		this._sendStatus('created');
 	}
 
+	/**
+  * Function that see the intended method in the message received and call the respective function
+  *
+  * @param {message}  message received in the messageBus
+  */
+
+
 	_createClass(IMSIWProxyStub, [{
-		key: '_sendStatus',
-		value: function _sendStatus(value, reason) {
-			var _this = this;
-
-			console.log('[Slack Idp Proxy status changed] to ', value);
-
-			_this._state = value;
-
-			var msg = {
-				type: 'update',
-				from: _this.runtimeProtoStubURL,
-				to: _this.runtimeProtoStubURL + '/status',
-				body: {
-					value: value
-				}
-			};
-
-			if (reason) {
-				msg.body.desc = reason;
-			}
-
-			_this.messageBus.postMessage(msg);
-		}
-
-		/**
-   * Function that see the intended method in the message received and call the respective function
-   *
-   * @param {message}  message received in the messageBus
-   */
-
-	}, {
 		key: 'requestToIdp',
 		value: function requestToIdp(msg) {
-			var _this3 = this;
+			var _this2 = this;
 
 			var params = msg.body.params;
 
 			switch (msg.body.method) {
 				case 'generateAssertion':
 					this.generateAssertion(params.contents, params.origin, params.usernameHint).then(function (value) {
-						return _this3.replyMessage(msg, value);
+						return _this2.replyMessage(msg, value);
 					}).catch(function (error) {
-						return _this3.replyMessage(msg, error);
+						return _this2.replyMessage(msg, error);
 					});
 					break;
 				case 'validateAssertion':
@@ -102,7 +76,7 @@ var IMSIWProxyStub = function () {
 	}, {
 		key: 'generateAssertion',
 		value: function generateAssertion(contents, origin, hint) {
-			var _this4 = this;
+			var _this3 = this;
 
 			console.log('contents->', contents);
 			console.log('origin->', origin);
@@ -117,7 +91,7 @@ var IMSIWProxyStub = function () {
 					console.log('first url ', requestUrl, 'done');
 					reject({ name: 'IdPLoginError', loginUrl: requestUrl });
 				} else {
-					var accessToken = _this4._urlParser(hint, 'access_token');
+					var accessToken = _this3._urlParser(hint, 'access_token');
 					fetch('https://www.googleapis.com/oauth2/v1/userinfo?access_token=' + accessToken).then(function (res_user) {
 						return res_user.json();
 					}).then(function (body) {
