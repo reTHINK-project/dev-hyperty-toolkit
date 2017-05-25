@@ -30,9 +30,9 @@
     "babel-preset-env": "1.2.2",
     "cross-env": "3.2.4",
     "deep-equal": "1.0.1",
-    "runtime-browser": "rethink-project/dev-runtime-browser#v0.5.0",
-    "runtime-core": "rethink-project/dev-runtime-core#v0.8.1",
-    "service-framework": "rethink-project/dev-service-framework#v0.6.1",
+    "runtime-browser": "github:rethink-project/dev-runtime-browser#develop",
+    "runtime-core": "github:rethink-project/dev-runtime-core#develop",
+    "service-framework": "github:rethink-project/dev-service-framework#develop",
     "searchjs": "0.8.0"
   },
   "devDependencies": {
