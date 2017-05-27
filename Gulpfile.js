@@ -390,15 +390,12 @@ function createDescriptor() {
     var preconfig = chunk.contents.toString('utf8');
     preconfig = JSON.parse(replacePattern(preconfig, process.env.DOMAIN || 'localhost'));
 
-    console.log('PRE:', preconfig);
-
     gutil.log('---------------------- ' + nameOfHyperty + ' ------------------------');
 
     if (!data.hasOwnProperty(nameOfHyperty)) {
       data[nameOfHyperty] = descriptorBase('hyperty');
     }
 
-    console.log('Before:', data[nameOfHyperty])
     var updated = _.extend(data[nameOfHyperty], preconfig);
     data[nameOfHyperty] = updated;
 

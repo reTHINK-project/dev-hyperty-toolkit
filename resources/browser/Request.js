@@ -66,14 +66,13 @@ class Request {
         return;
       }
 
-      let xhr;
-      if (!this.xhr) {
-        xhr = new XMLHttpRequest();
+
+      let xhr = new XMLHttpRequest();
+      if (this._withCredentials) {
         xhr.withCredentials = this._withCredentials;
-        this.xhr = xhr;
-      } else {
-        xhr = this.xhr;
       }
+
+      this.xhr = xhr;
 
       xhr.addEventListener('readystatechange', function(event) {
         let xhr = event.currentTarget;
@@ -82,7 +81,7 @@ class Request {
           if (xhr.status >= 200 || xhr.status <= 299) {
             resolve(xhr.responseText);
           } else {
-            // console.log("rejecting promise because of response code: 200 != ", xhr.status);
+            console.log('rejecting promise because of response code: 200 != ', xhr.status, xhr.responseText);
             reject(xhr.responseText);
           }
         }
