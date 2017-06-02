@@ -371,7 +371,7 @@ class SlackProtoStub {
     let _this = this;
 
     return new Promise(function(resolve) {
-      debugger;
+
       let toCreate = { token: _this._token, name: channelName };
       _this._slack.channels.create(toCreate, (err, data) => {
         if (err) {
