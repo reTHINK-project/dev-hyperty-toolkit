@@ -293,6 +293,8 @@ function processPost(req, res) {
       data = {};
     }
 
+    gutil.log('constraints: ', gutil.colors.yellow(JSON.stringify(data)));
+
     if (data.hasOwnProperty('constraints')) {
       var constraints = data.constraints;
       filtered = Object.keys(raw).filter((resource) => {
