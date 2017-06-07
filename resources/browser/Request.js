@@ -42,7 +42,7 @@ class Request {
 
     if (!options) { options = null; }
 
-    console.log('method:', method, '| url: ', url, options ? ' | payload:' + options : '');
+    console.log('method:', method, '| url: ', url, options ? ' | payload:' + JSON.stringify(options) : '');
 
     return new Promise((resolve, reject) => {
       let protocolmap = {
@@ -94,7 +94,7 @@ class Request {
         xhr.setRequestHeader('content-type', 'application/json');
         xhr.setRequestHeader('cache-control', 'no-cache');
         */
-        xhr.send(options);
+        xhr.send(options.body);
       } else {
         xhr.send();
       }
