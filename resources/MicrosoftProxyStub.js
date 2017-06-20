@@ -1,4 +1,3 @@
-
 let microsoftInfo = {
   clientID:              '7e2f3589-4b38-4b1c-a321-c9251de00ef2',
   redirectURI:           location.origin,
@@ -54,6 +53,16 @@ let idp = {
 
       resolve({identity: idToken.email, contents: idToken.nonce});
 
+    });
+  },
+
+  /**
+  * Function to send a refresh token request 
+  */
+ 
+  refreshAssertion: (identity) => {
+    return new Promise(function(resolve, reject) {
+      resolve({error: "No refresh"});
     });
   },
 
@@ -148,6 +157,13 @@ class MicrosoftProxyStub {
         break;
       case 'validateAssertion':
         idp.validateAssertion(params.assertion, params.origin).then(
+          function(value) { _this.replyMessage(msg, value);},
+
+          function(error) { _this.replyMessage(msg, error);}
+        );
+        break;
+      case 'refreshAssertion':
+        idp.refreshAssertion(params.identity).then(
           function(value) { _this.replyMessage(msg, value);},
 
           function(error) { _this.replyMessage(msg, error);}
