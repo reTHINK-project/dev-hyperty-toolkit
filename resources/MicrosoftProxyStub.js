@@ -57,16 +57,6 @@ let idp = {
   },
 
   /**
-  * Function to send a refresh token request 
-  */
- 
-  refreshAssertion: (identity) => {
-    return new Promise(function(resolve, reject) {
-      resolve({error: "No refresh"});
-    });
-  },
-
-  /**
   * Function to generate an identity Assertion
   * TODO add details of the implementation, and improve implementation
   *
@@ -102,7 +92,6 @@ let idp = {
 
         let idpBundle = {domain: 'microsoft.com', protocol: 'OIDC'};
         let identityBundle = {assertion: hintSplited[1], idp: idpBundle, infoToken: idToken};
-
         resolve(identityBundle);
 
       }
@@ -157,13 +146,6 @@ class MicrosoftProxyStub {
         break;
       case 'validateAssertion':
         idp.validateAssertion(params.assertion, params.origin).then(
-          function(value) { _this.replyMessage(msg, value);},
-
-          function(error) { _this.replyMessage(msg, error);}
-        );
-        break;
-      case 'refreshAssertion':
-        idp.refreshAssertion(params.identity).then(
           function(value) { _this.replyMessage(msg, value);},
 
           function(error) { _this.replyMessage(msg, error);}
