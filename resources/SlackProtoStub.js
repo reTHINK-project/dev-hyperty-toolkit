@@ -148,7 +148,7 @@ class SlackProtoStub {
 
   _channelStatusInfo(msg, userID, channelObjUrl) {
     let _this = this;
-    let channelName = msg.body.value.name.split(' ').join('-');
+    let channelName = msg.body.value.name.split(' ').join('-').replace(/\//gi, '-');
     let channelExists = _this._channelsList.filter(function(value) { return value.name === channelName; })[0];
 
     // if channel exist, invite user, else channel need to be created and then invite user
