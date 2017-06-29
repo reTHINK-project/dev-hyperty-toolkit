@@ -43,16 +43,13 @@
 		},
 		"tag": {
 			"type": "string"
-		},
-		"children": {
-			"constant": ["actions","contexts"]
 		}
 	}, 
 	"ContextUnit": {
 		"type": "object",
 		"properties": {
 		}
-	}, 
+	},
 	"ContextValue": {
 		"type": "object",
 		"required": ["name", "unit", "value", "sum"],
@@ -90,7 +87,7 @@
 				"type": "string"
 			}
 		}
-	}, 
+	},
 	"Contexts": {
 		"type": "object",
 		"stereotype": "children",
@@ -106,7 +103,7 @@
 				"constant": "Context"
 			}
 		}
-	}, 
+	},
 	"Actions": {
 		"type": "object",
 		"stereotype": "children",
@@ -122,7 +119,7 @@
 				"constant": "Action"
 			}
 		}
-	}, 
+	},
 	"Action": {
 		"type": "object",
 		"stereotype": "syncobjectchild",
@@ -165,12 +162,12 @@
 				"type": "string"
 			}
 		}
-	}, 
+	},
 	"RawContextValue": {
 		"type": "object",
 		"properties": {
 		}
-	}, 
+	},
 	"ProcessedContextValue": {
 		"type": "object",
 		"properties": {
