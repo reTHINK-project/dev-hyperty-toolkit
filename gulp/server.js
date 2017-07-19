@@ -198,11 +198,13 @@ function devMiddleware(req, res, next) {
 
               console.log('Response: ', result.objectName.toString() + ' - ' + info.resource + ' - ' + result.sourcePackage.sourceCodeClassname);
               if (req.originalUrl.includes('cguid')) {
+                gutil.log('Response: ', gutil.colors.green(result.cguid.toString()));
                 res.writeHeader(200, {'Content-Type': 'text/plain'});
                 res.end(result.cguid.toString());
               } else if (req.originalUrl.includes('version')) {
-                res.writeHeader(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify(Number(result.version), '', 2));
+                gutil.log('Response: ', gutil.colors.green(Number(result.version).toString()));
+                res.writeHeader(200, {'Content-Type': 'text/plain'});
+                res.end(Number(result.version).toString());
               } else {
                 res.writeHeader(200, {'Content-Type': 'application/json'});
                 res.end(JSON.stringify(result, '', 2));
@@ -290,6 +292,8 @@ function processPost(req, res) {
     } catch (error) {
       data = {};
     }
+
+    gutil.log('constraints: ', gutil.colors.yellow(JSON.stringify(data)));
 
     if (data.hasOwnProperty('constraints')) {
       var constraints = data.constraints;

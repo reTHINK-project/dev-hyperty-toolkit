@@ -42,7 +42,7 @@ class Request {
 
     if (!options) { options = null; }
 
-    console.log('method:', method, '| url: ', url, options ? ' | payload:' + options : '');
+    console.log('method:', method, '| url: ', url, options ? ' | payload:' + JSON.stringify(options) : '');
 
     return new Promise((resolve, reject) => {
       let protocolmap = {
@@ -66,14 +66,13 @@ class Request {
         return;
       }
 
-      let xhr;
-      if (!this.xhr) {
-        xhr = new XMLHttpRequest();
+
+      let xhr = new XMLHttpRequest();
+      if (this._withCredentials) {
         xhr.withCredentials = this._withCredentials;
-        this.xhr = xhr;
-      } else {
-        xhr = this.xhr;
       }
+
+      this.xhr = xhr;
 
       xhr.addEventListener('readystatechange', function(event) {
         let xhr = event.currentTarget;
@@ -82,7 +81,7 @@ class Request {
           if (xhr.status >= 200 || xhr.status <= 299) {
             resolve(xhr.responseText);
           } else {
-            // console.log("rejecting promise because of response code: 200 != ", xhr.status);
+            console.log('rejecting promise because of response code: 200 != ', xhr.status, xhr.responseText);
             reject(xhr.responseText);
           }
         }
@@ -95,7 +94,7 @@ class Request {
         xhr.setRequestHeader('content-type', 'application/json');
         xhr.setRequestHeader('cache-control', 'no-cache');
         */
-        xhr.send(options);
+        xhr.send(options.body);
       } else {
         xhr.send();
       }

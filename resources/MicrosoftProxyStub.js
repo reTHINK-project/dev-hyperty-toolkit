@@ -1,4 +1,3 @@
-
 let microsoftInfo = {
   clientID:              '7e2f3589-4b38-4b1c-a321-c9251de00ef2',
   redirectURI:           location.origin,
@@ -93,7 +92,6 @@ let idp = {
 
         let idpBundle = {domain: 'microsoft.com', protocol: 'OIDC'};
         let identityBundle = {assertion: hintSplited[1], idp: idpBundle, infoToken: idToken};
-
         resolve(identityBundle);
 
       }
