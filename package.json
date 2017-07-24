@@ -1,6 +1,6 @@
 {
   "name": "dev-hyperty-toolkit",
-  "version": "0.5.0",
+  "version": "0.6.1",
   "description": "Hyperty Developer Setup, contains all the initial configuration to develop hyperties",
   "main": "index.js",
   "scripts": {
@@ -27,9 +27,9 @@
   },
   "homepage": "https://github.com/reTHINK-project/dev-hyperty-toolkit#readme",
   "dependencies": {
-    "runtime-browser": "github:rethink-project/dev-runtime-browser#develop",
-    "runtime-core": "github:rethink-project/dev-runtime-core#develop",
-    "service-framework": "github:rethink-project/dev-service-framework#develop"
+    "runtime-browser": "github:rethink-project/dev-runtime-browser#v0.6.0",
+    "runtime-core": "github:rethink-project/dev-runtime-core#v0.9.1",
+    "service-framework": "github:rethink-project/dev-service-framework#v0.7.1"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
