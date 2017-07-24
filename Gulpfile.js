@@ -36,10 +36,12 @@ gulp.task('serve', function(done) {
   var stage = getStage();
 
   var sequence = ['clean', 'stage', 'src-hyperties', 'checkHyperties', 'descriptor', 'checkDataSchemas', 'schemas', 'js', 'hyperties', 'server'];
+
+  env(path.join(process.cwd(), 'env'));
+
   if (stage !== 'production') {
 
     env(path.join(process.cwd(), '.env.server'));
-    env(path.join(process.cwd(), 'env'));
 
     sequence.push('watch');
   }
@@ -95,6 +97,8 @@ gulp.task('checkDataSchemas', function() {
 gulp.task('src-hyperties', function(done) {
 
   var srcPath;
+
+  console.log('PROCESS:', process.env.HYPERTY_REPO);
 
   if (process.env.HYPERTY_REPO) {
 
@@ -568,7 +572,7 @@ function copyHyperties(from, done) {
     if (stage !== 'production') {
       runSequence('copy-src', 'copy-examples', 'copy-assets', done);
     } else {
-      runSequence('copy-examples', 'copy-assets', done);
+      runSequence('copy-src', 'copy-examples', 'copy-assets', done);
     }
   }
 }

@@ -143,7 +143,7 @@ function encodeStub(file) {
       return prev;
     }, {});
 
-    console.log(resourceOpts, transpileOpts);
+    // console.log(resourceOpts, transpileOpts);
     encode(file, resourceOpts, transpileOpts);
 
   });

@@ -1,6 +1,8 @@
 FROM node:boron
 MAINTAINER vitor-t-silva@telecom.pt
 
+RUN apt-get update && apt-get install -y vim
+
 RUN mkdir -p /toolkit
 
 # Change the work directory

@@ -67,8 +67,8 @@ function server(done) {
     injectChanges: injectChanges,
     ghostMode: false,
     https: {
-      key: 'rethink-certificate.key',
-      cert: 'rethink-certificate.cert'
+      key: './gulp/ssl/local-server.key',
+      cert: './gulp/ssl/loca-server.crt'
     },
     logConnections: logConnections,
     codeSync: codeSync,
