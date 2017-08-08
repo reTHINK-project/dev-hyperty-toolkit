@@ -84,7 +84,7 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
   var fileObject = path.parse(chunk.path);
   var stage = getStage();
 
-  // console.log(opts, stage);
+  console.log(opts, stage);
 
   return gulp.src(chunk.path)
     .pipe(webpackStream({

@@ -3,6 +3,7 @@ var fs = require('fs');
 var path = require('path');
 
 var generateGUID = require('./guid');
+var replacePattern = require('./utils').replacePattern;
 
 var through = require('through2');
 var gutil = require('gulp-util');
@@ -218,6 +219,41 @@ var encode = function(opts) {
   });
 };
 
+function createDescriptor() {
+
+  var descriptor = fs.readFileSync(process.cwd() + '/resources/descriptors/Hyperties.json', 'utf8');
+  var data;
+  try {
+    data = JSON.parse(descriptor);
+  } catch (error) {
+    data = {};
+  }
+
+  return through.obj(function(chunk, enc, done) {
+
+    var fileObject = path.parse(chunk.path);
+    var nameOfHyperty = fileObject.name.replace('.hy', '');
+    var preconfig = chunk.contents.toString('utf8');
+    preconfig = JSON.parse(replacePattern(preconfig, process.env.DOMAIN || 'localhost'));
+
+    gutil.log('---------------------- ' + nameOfHyperty + ' ------------------------');
+
+    if (!data.hasOwnProperty(nameOfHyperty)) {
+      data[nameOfHyperty] = descriptorBase('hyperty');
+    }
+
+    var updated = _.extend(data[nameOfHyperty], preconfig);
+    data[nameOfHyperty] = updated;
+
+    var newChunk = _.clone(chunk);
+    newChunk.path = './resources/descriptors/Hyperties.json';
+    newChunk.contents = new Buffer(JSON.stringify(data, null, 2));
+    gutil.log(JSON.stringify(preconfig));
+
+    done(null, newChunk);
+  });
+}
+
 function checkValues(property, value, object) {
 
   if (_.isEmpty(value) && typeof(value) !== 'boolean') {
@@ -231,6 +267,7 @@ function checkValues(property, value, object) {
 }
 
 module.exports = {
+  createDescriptor: createDescriptor,
   descriptorBase: descriptorBase,
   encode: encode
 };

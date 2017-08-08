@@ -48,15 +48,15 @@ module.exports = function resource(opts) {
     gutil.log('Encoding: ', defaultPath, filename, JSON.stringify(opts));
 
     return gulp.src([file.path])
-    .pipe(encode(opts))
-    .pipe(source(opts.descriptor + '.json'))
-    .pipe(gulp.dest('resources/descriptors/'))
-    .on('end', function() {
-      var path = 'resources/descriptors/' + opts.descriptor + '.json';
-      file.contents = fs.readFileSync(path);
-      file.path = path;
-      done(null, file);
-    });
+      .pipe(encode(opts))
+      .pipe(source(opts.descriptor + '.json'))
+      .pipe(gulp.dest('resources/descriptors/'))
+      .on('end', function() {
+        var path = 'resources/descriptors/' + opts.descriptor + '.json';
+        file.contents = fs.readFileSync(path);
+        file.path = path;
+        done(null, file);
+      });
 
   });
 

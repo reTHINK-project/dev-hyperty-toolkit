@@ -7,7 +7,7 @@ import rethinkBrowser from 'runtime-browser/bin/rethink';
 
 import browserConfig from '../config.json';
 
-import { hypertyDeployed, hypertyFail } from '../app/main';
+import { hypertyDeployed, hypertyFail } from 'app';
 
 window.KJUR = {};
 
@@ -38,6 +38,8 @@ rethink.install(config).then(function(result) {
   return getListOfHyperties(domain);
 
 }).then(function(hyperties) {
+
+  console.log('AQUI:', hyperties);
 
   let $dropDown = $('#hyperties-dropdown');
 
