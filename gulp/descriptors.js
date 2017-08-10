@@ -98,6 +98,8 @@ var encode = function(opts) {
       filename = fileObject.name.replace('.hy', '');
     } else if (fileObject.name.indexOf('.ds') !== -1) {
       filename = fileObject.name.replace('.ds', '');
+    } else if (fileObject.name.indexOf('.ps') !== -1) {
+      filename = fileObject.name.replace('.ps', '');
     }
 
     var value = filename;
@@ -146,7 +148,8 @@ var encode = function(opts) {
     if (opts.isDefault) {
       name = 'default';
     } else {
-      name = opts.name || filename;
+      if (opts.name) name = opts.name;
+      else name = json[value].objectName;
     }
 
     json[value].objectName = checkValues('objectName', name, json[value]);
@@ -219,9 +222,10 @@ var encode = function(opts) {
   });
 };
 
-function createDescriptor() {
+function createDescriptor(resource) {
 
-  var descriptor = fs.readFileSync(process.cwd() + '/resources/descriptors/Hyperties.json', 'utf8');
+  var typeOfDescriptor = getTypeOfDescriptor(resource);
+  var descriptor = fs.readFileSync(process.cwd() + '/resources/descriptors/' + typeOfDescriptor.name + '.json', 'utf8');
   var data;
   try {
     data = JSON.parse(descriptor);
@@ -232,25 +236,33 @@ function createDescriptor() {
   return through.obj(function(chunk, enc, done) {
 
     var fileObject = path.parse(chunk.path);
-    var nameOfHyperty = fileObject.name.replace('.hy', '');
+    var nameOfResource = fileObject.name.replace(typeOfDescriptor.extension, '');
     var preconfig = chunk.contents.toString('utf8');
-    preconfig = JSON.parse(replacePattern(preconfig, process.env.DOMAIN || 'localhost'));
 
-    gutil.log('---------------------- ' + nameOfHyperty + ' ------------------------');
+    try {
+      preconfig = JSON.parse(replacePattern(preconfig, process.env.DOMAIN || 'localhost'));
 
-    if (!data.hasOwnProperty(nameOfHyperty)) {
-      data[nameOfHyperty] = descriptorBase('hyperty');
+      gutil.log('---------------------- ' + nameOfResource + ' ------------------------');
+
+      if (!data.hasOwnProperty(nameOfResource)) {
+        data[nameOfResource] = descriptorBase(typeOfDescriptor.type);
+      }
+
+      var updated = _.extend(data[nameOfResource], preconfig);
+      data[nameOfResource] = updated;
+
+
+      // console.log('PRE CONFIG:', data[nameOfResource].objectName);
+
+      var newChunk = _.clone(chunk);
+      newChunk.path = './resources/descriptors/' + typeOfDescriptor.name + '.json';
+      newChunk.contents = Buffer.from(JSON.stringify(data, null, 2), 'utf-8');
+      gutil.log(JSON.stringify(preconfig));
+      done(null, newChunk);
+    } catch (error) {
+      gutil.log(gutil.colors.red('ERROR: ', fileObject.name  + ': ' + error));
+      done();
     }
-
-    var updated = _.extend(data[nameOfHyperty], preconfig);
-    data[nameOfHyperty] = updated;
-
-    var newChunk = _.clone(chunk);
-    newChunk.path = './resources/descriptors/Hyperties.json';
-    newChunk.contents = new Buffer(JSON.stringify(data, null, 2));
-    gutil.log(JSON.stringify(preconfig));
-
-    done(null, newChunk);
   });
 }
 
@@ -264,6 +276,24 @@ function checkValues(property, value, object) {
     return value;
   }
 
+}
+
+function getTypeOfDescriptor(resource) {
+  var d = {
+    name: '',
+    type: '',
+    extension: ''
+  };
+
+  switch (resource) {
+    case 'runtime': d.name = 'Runtimes'; d.type = 'runtime'; d.extension = ''; break;
+    case 'hyperty': d.name = 'Hyperties'; d.type = 'hyperty'; d.extension = '.hy'; break;
+    case 'idpproxy': d.name = 'IDPProxys'; d.type = 'idp-proxy'; d.extension = ''; break;
+    case 'protostub': d.name = 'ProtoStubs'; d.type = 'protocolstub'; d.extension = '.ps'; break;
+    case 'dataschema': d.name = 'DataSchemas'; d.type = 'dataschema'; d.extension = '.ds'; break;
+  }
+
+  return d;
 }
 
 module.exports = {

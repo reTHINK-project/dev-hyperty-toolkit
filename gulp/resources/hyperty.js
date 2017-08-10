@@ -1,9 +1,13 @@
+var fs = require('fs');
 var gulp = require('gulp');
 var path = require('path');
 var through = require('through2');
 
 var gutil = require('gulp-util');
 
+var walk = require('../walk');
+
+var config = require('../toolkit.config');
 var transpile = require('../transpile');
 var resource = require('../resources');
 
@@ -19,7 +23,7 @@ function convertHyperty() {
         gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
       })
       .pipe(transpile({
-        destination: path.join(__dirname, '..', '..', '..', 'resources'),
+        destination: path.join(process.cwd(), 'resources'),
         standalone: 'activate',
         debug: false
       }))
@@ -35,6 +39,53 @@ function convertHyperty() {
 
 }
 
+function readFiles(dirname, file) {
+  var files = fs.readdirSync(dirname);
+  return files.filter(function(filename) {
+    return filename.includes(file);
+  }).map(function(filename) {
+    var content = fs.readFileSync(dirname + filename, 'utf-8');
+    return { filename: filename, folder: dirname, content: content };
+  });
+}
+
+function filterHyperties(environment) {
+
+  var filePath = path.join(config.hyperties.repository, config.hyperties.sourceCode);
+  var hyperties = [];
+
+  walk(filePath, function(filepath, rootdir, subdir, filename) {
+    if (filename.includes('.hy.json')) {
+      readFiles(path.join(rootdir, '/', subdir, '/'), filename).forEach(function(fileObject) {
+        hyperties.push(fileObject);
+      });
+    }
+  });
+
+  return hyperties.filter(function(file) {
+    var temp;
+    try {
+      temp = JSON.parse(file.content);
+    } catch (e) {
+      temp = file.content;
+    }
+
+    if (environment !== 'all') {
+      var typeOfEnvironment = environment === 'core' ? 'browser' : environment;
+      return temp.hasOwnProperty('constraints') && temp.constraints.hasOwnProperty(typeOfEnvironment) && temp.constraints[typeOfEnvironment];
+    } else {
+      return true;
+    }
+
+  }).map(function(file) {
+    var dir = path.parse(file.folder + file.filename).dir;
+    var folder = dir.replace(filePath, '');
+    return { dir: folder, filename: file.filename };
+  });
+}
+
 module.exports = {
+  filterHyperties: filterHyperties,
+
   convertHyperty: convertHyperty
 };

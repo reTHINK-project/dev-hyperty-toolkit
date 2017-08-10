@@ -26,7 +26,7 @@ module.exports = function resource(opts) {
     var descriptorName;
     if (filename.indexOf('hy') !== -1) {
       descriptorName = 'Hyperties';
-    } else if (filename.indexOf('ProtoStub') !== -1) {
+    } else if (filename.indexOf('ProtoStub') !== -1 || filename.indexOf('ps') !== -1) {
       descriptorName = 'ProtoStubs';
     } else if (filename.indexOf('ds') !== -1) {
       descriptorName = 'DataSchemas';

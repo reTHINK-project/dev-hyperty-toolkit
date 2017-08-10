@@ -1,9 +1,0 @@
-{
-    "include_hyperties": [
-      "group-chat-manager",
-      "connector"
-    ],
-    "exclude_hyperties": "[]",
-    "include_protostubs": "[]",
-    "exclude_protostubs": "[]"
-}

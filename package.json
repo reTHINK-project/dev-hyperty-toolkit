@@ -28,8 +28,8 @@
   "homepage": "https://github.com/reTHINK-project/dev-hyperty-toolkit#readme",
   "dependencies": {
     "express": "^4.15.4",
-    "runtime-browser": "github:rethink-project/dev-runtime-browser#v0.6.0",
-    "runtime-core": "github:rethink-project/dev-runtime-core#v0.9.1",
+    "runtime-browser": "github:rethink-project/dev-runtime-browser#develop",
+    "runtime-core": "github:rethink-project/dev-runtime-core#develop",
     "service-framework": "github:rethink-project/dev-service-framework#develop"
   },
   "devDependencies": {
@@ -74,7 +74,6 @@
     "run-sequence": "^2.1.0",
     "searchjs": "0.8.0",
     "sinon": "^2.4.1",
-    "slack": "8.3.1",
     "through2": "^2.0.1",
     "tv4": "^1.3.0",
     "urijs": "^1.18.10",

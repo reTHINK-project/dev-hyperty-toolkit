@@ -15,11 +15,16 @@ var express = require('express');
 var app = express();
 var router = express.Router();
 
+var config = require('../gulp/toolkit.config.js');
+
 app.use(bodyParser.raw()); // for parsing raw
 app.use(bodyParser.text()); // for parsing text
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(express.static(process.cwd() + '/app/'));
+app.use(express.static(process.env.HYPERTY_REPO + '/' + config.templates + '/'));
+
+app.use('/.well-known/runtime/index.html', express.static(process.cwd() + '/node_modules/runtime-browser/bin/'));
 
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -27,21 +32,18 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.get('/', function(req, res) {
-  console.log(req.originalUrl)
-  res.sendFile(process.cwd() + '/app/index.html');
-});
+// app.get('/:resource', function(req, res, next) {
+
+//   console.log('get resource:', req.params);
+//   next();
+// });
 
 app.get('/.well-known/:type', getResource);
 app.get('/.well-known/:type/:resource', getResource);
 app.get('/.well-known/:type/:resource/:attribute', getResource);
 
-
-app.post('/.well-known/:type', upload.any(), filterResource);
-app.post('/.well-known/:type/:resource', upload.any(), filterResource);
-app.post('/.well-known/:type/:resource/:attribute', upload.any(), filterResource);
-
 function getResource(req, res) {
+  var code = 200;
   var type = req.params.type;
   var resource = req.params.resource;
   var attribute = req.params.attribute;
@@ -50,24 +52,40 @@ function getResource(req, res) {
   var filtered = Object.keys(raw);
   var result;
 
+  gutil.log('-------------------------------- GET --------------------------------');
+
   if (type) {
     result = JSON.stringify(filtered, '', 2);
   }
 
   if (resource) {
-    result = getDescriptorByObjectName(raw, filtered, resource);
+    try {
+      result = getDescriptorByObjectName(raw, filtered, resource);
+      gutil.log(gutil.colors.green('GET ' + result.objectName) + ': cguid = ' + result.cguid);
+    } catch (error) {
+      code = 404;
+      result = {
+        code: code,
+        resource: resource,
+        description: error
+      };
+    }
   }
 
   if (attribute) {
+    gutil.log(gutil.colors.green('GET ' + result.objectName + ' with ' + attribute) + ': ' + result[attribute]);
     result = result[attribute].toString();
-    console.log(attribute + ' -> ' + result);
   }
 
   res.type('application/json');
-  res.status(200).send(result);
+  res.status(code).send(result);
 }
 
-function filterResource(req, res, next) {
+app.post('/.well-known/:type', upload.any(), filterResource);
+app.post('/.well-known/:type/:resource', upload.any(), filterResource);
+app.post('/.well-known/:type/:resource/:attribute', upload.any(), filterResource);
+
+function filterResource(req, res) {
 
   var code = 200;
   var type = req.params.type;
@@ -83,7 +101,7 @@ function filterResource(req, res, next) {
     data = {};
   }
 
-  gutil.log('constraints = ', gutil.colors.yellow(JSON.stringify(data, '', 2)));
+  gutil.log('-------------------------------- POST --------------------------------');
 
   if (data.hasOwnProperty('constraints')) {
 
@@ -102,7 +120,7 @@ function filterResource(req, res, next) {
         }
       });
 
-      gutil.log('Num of constraint matched for ' + gutil.colors.green(resource) + ': ', a.length, numOfResourceConstraints);
+      // gutil.log('Num of constraint matched for ' + gutil.colors.green(resource) + ': ', a.length, numOfResourceConstraints);
       return a.length === numOfResourceConstraints;
     });
 
@@ -118,6 +136,7 @@ function filterResource(req, res, next) {
 
   if (resource) {
     result = getDescriptorByObjectName(raw, matchedInstances, resource);
+    gutil.log(gutil.colors.green('POST ' + result.objectName) + ': cguid = ' + result.cguid);
 
     if (!result) {
       code = 404;
@@ -129,14 +148,15 @@ function filterResource(req, res, next) {
         constraints: data
       };
 
+      gutil.log(gutil.colors.red('POST: ') + result);
+
     }
 
   }
 
-
   if (attribute) {
-    result = result[attribute].toString();
-    console.log(attribute + ' -> ' + result);
+    gutil.log(gutil.colors.green('POST ' + result.objectName + ' with ' + attribute) + ': ' + result[attribute]);
+    result = JSON.stringify(result[attribute]);
   }
 
   res.type('application/json');

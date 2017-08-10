@@ -4,23 +4,23 @@ var path = require('path');
 var gutil = require('gulp-util');
 
 var webpack = require('webpack');
-var source = require('vinyl-source-stream');
 var webpackStream = require('webpack-stream');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 var browserSync = require('./server').browserSync;
 
-var config = require('../toolkit.config.json');
+var config = require('./toolkit.config.js');
 
 var convertSchema = require('./resources/dataschema').convertSchema;
-var convertHyperty = require('./resources/hyperty').convertHyperty;
+var { filterHyperties, convertHyperty } = require('./resources/hyperty');
+var { filterProtostubs, convertProtoStub } = require('./resources/protostub');
 var createDescriptor = require('./descriptors').createDescriptor;
 
 function watchHTML() {
 
   gulp.watch(['./../server/*.*', process.env.HYPERTY_REPO + '/examples/main.js'], bundleHTML);
 
-  bundleHTML();
+  return bundleHTML();
 }
 
 function bundleHTML() {
@@ -37,14 +37,14 @@ function bundleHTML() {
     resolve: {
       modules: [
         'node_modules',
-        path.resolve(process.env.HYPERTY_REPO + '/examples')
+        path.resolve(process.env.HYPERTY_REPO + '/' + process.env.HYPERTY_TEMPLATES_PATH)
       ],
       alias: {
-        app: path.resolve(process.env.HYPERTY_REPO + '/examples/main.js')
+        app: path.resolve(process.env.HYPERTY_REPO + '/' + process.env.HYPERTY_TEMPLATES_PATH + '/main.js')
       }
     },
     plugins: [new HtmlWebpackPlugin({
-      title: 'My App',
+      title: 'Hyperty Toolkit',
       template: 'server/index.ejs',
       files: {
         css: [],
@@ -60,27 +60,43 @@ function bundleHTML() {
 
 function watchHyperties(done) {
 
-  console.log('Watching hyperties:', process.env.HYPERTY_REPO);
-  var hypertyPath = process.env.HYPERTY_REPO;
+  var hypertyPath = config.hyperties.repository;
+  var hypertySrc = config.hyperties.sourceCode;
+  var hyperties = config.hyperties.include_hyperties || ['**'];
+  var filtered = filterHyperties(process.env.ENVIRONMENT);
 
-  gulp.watch([hypertyPath + '/src/**/*.js'], function(event) {
+  if (hyperties.length === 0) {
+    hyperties = filtered.map(resource => resource.dir.replace('/', ''));
+  }
 
-    console.log('Hyperty:', event);
+  var sourceCode = hyperties.map((hyperty) => {
+    hyperty = hyperty.trim();
+    return hypertyPath + '/' + hypertySrc + '/' + hyperty + '/*.js';
+  }).filter((hyperty) => {
+    return !!filtered.filter(resource => hyperty.includes(resource.dir)).length;
+  });
 
-    if (event.type === 'changed') {
+  gulp.watch(sourceCode, function(event) {
 
+    if ((event.type === 'changed' || event.type === 'added') && !event.path.includes('node_modules')) {
       var fileObject = path.parse(event.path);
       var filePath = fileObject.dir + '/*.hy.js';
       watchHyperty(filePath);
-
     }
 
   });
 
-  gulp.watch([hypertyPath + '/src/**/*.hy.json'], function(event) {
+  var descriptor = hyperties.map((hyperty) => {
+    hyperty = hyperty.trim();
+    return hypertyPath + '/' + hypertySrc + '/' + hyperty + '/*.hy.json';
+  }).filter((hyperty) => {
+    return !!filtered.filter(resource => hyperty.includes(resource.dir)).length;
+  });
+
+  gulp.watch(descriptor, function(event) {
 
     return gulp.src(event.path)
-      .pipe(createDescriptor())
+      .pipe(createDescriptor('hyperty'))
       .pipe(gulp.dest('./resources/descriptors/'))
       .on('end', function() {
         gutil.log('the preconfiguration hyperty was changed, and the Hyperties.json was updated');
@@ -92,7 +108,6 @@ function watchHyperties(done) {
 }
 
 function watchHyperty(filePath) {
-  console.log('Watch:', filePath);
   return gulp.src(filePath)
     .pipe(convertHyperty())
     .resume()
@@ -103,32 +118,82 @@ function watchHyperty(filePath) {
 
 function watchProtostubs() {
 
+  var stubPath = config.protostubs.repository;
+  var stubSrc = config.protostubs.sourceCode;
+  var stubs = config.protostubs.include_stubs || ['**'];
+  var filtered = filterProtostubs(process.env.ENVIRONMENT);
+
+  if (stubs.length === 0) {
+    stubs = filtered.map(resource => resource.dir.replace('/', ''));
+  }
+
+  var sourceCode = stubs.map((stub) => {
+    stub = stub.trim();
+    return stubPath + '/' + stubSrc + '/' + stub + '/*.js';
+  }).filter((stub) => {
+    return !!filtered.filter(resource => stub.includes(resource.dir)).length;
+  });
+
+  gulp.watch(sourceCode, function(event) {
+
+    if ((event.type === 'changed' || event.type === 'added') && !event.path.includes('node_modules')) {
+      var fileObject = path.parse(event.path);
+      var filePath = fileObject.dir + '/*.ps.js';
+      watchStub(filePath);
+    }
+
+  });
+
+
+  var descriptor = stubs.map((stub) => {
+    stub = stub.trim();
+    return stubPath + '/' + stubSrc + '/' + stub + '/*.ps.json';
+  }).filter((stub) => {
+    return !!filtered.filter(resource => stub.includes(resource.dir)).length;
+  });
+
+  gulp.watch(descriptor, function(event) {
+
+    return gulp.src(event.path)
+      .pipe(createDescriptor('protostub'))
+      .pipe(gulp.dest('./resources/descriptors/ProtoStubs.json'))
+      .on('end', function() {
+        gutil.log('the preconfiguration protostubs was changed, and the ProtoStubs.json was updated');
+        browserSync.reload();
+      });
+
+  });
+
+}
+
+function watchStub(filePath) {
+  return gulp.src(filePath)
+    .pipe(convertProtoStub())
+    .resume()
+    .on('end', function() {
+      browserSync.reload();
+    });
 }
 
 function watchIdpProxies() {
     
 }
 
-function createHyperties(done) {
+function createHypertiesSourceCode(done) {
 
-  var hyperties = config.include_hyperties || [];
+  var hyperties = config.hyperties.include_hyperties;
+  var filtered = filterHyperties(process.env.ENVIRONMENT);
 
-  var sourceCode = hyperties.map(function(hyperty) {
-    return process.env.HYPERTY_REPO + '/src/' + hyperty + '/*.hy.js';
+  if (hyperties.length === 0) {
+    hyperties = filtered.map(resource => resource.dir.replace('/', ''));
+  }
+
+  var sourceCode = hyperties.map((hyperty) => {
+    hyperty = hyperty.trim();
+    return config.hyperties.repository + '/' + config.hyperties.sourceCode + '/' + hyperty + '/*.hy.js';
+  }).filter((hyperty) => {
+    return !!filtered.filter(resource => hyperty.includes(resource.dir)).length;
   });
-
-  var descriptor = hyperties.map(function(hyperty) {
-    return process.env.HYPERTY_REPO + '/src/' + hyperty + '/*.hy.json';
-  });
-
-
-  gulp.src(descriptor)
-    .pipe(createDescriptor())
-    .pipe(gulp.dest('./resources/descriptors/'))
-    .on('end', function() {
-      gutil.log('the preconfiguration hyperty was changed, and the Hyperties.json was updated');
-      browserSync.reload();
-    });
 
   return gulp.src(sourceCode)
     .pipe(convertHyperty())
@@ -136,6 +201,82 @@ function createHyperties(done) {
       browserSync.reload();
     });
 }
+
+function createHypertiesDescriptors() {
+
+  var hyperties = config.hyperties.include_hyperties;
+  var filtered = filterHyperties(process.env.ENVIRONMENT);
+
+  if (hyperties.length === 0) {
+    hyperties = filtered.map(resource => resource.dir.replace('/', ''));
+  }
+
+  var descriptor = hyperties.map((hyperty) => {
+    hyperty = hyperty.trim();
+    return config.hyperties.repository + '/' + config.hyperties.sourceCode + '/' + hyperty + '/*.hy.json';
+  }).filter((hyperty) => {
+    return !!filtered.filter(resource => hyperty.includes(resource.dir)).length;
+  });
+
+
+  return gulp.src(descriptor)
+    .pipe(createDescriptor('hyperty'))
+    .pipe(gulp.dest('./resources/descriptors/'))
+    .on('end', function() {
+      gutil.log('the preconfiguration hyperty was changed, and the Hyperties.json was updated');
+      browserSync.reload();
+    });
+
+}
+
+function createProtoStubsSourceCode() {
+  var stubs = config.protostubs.include_stubs;
+  var filtered = filterProtostubs(process.env.ENVIRONMENT);
+
+  if (stubs.length === 0) {
+    stubs = filtered.map(resource => resource.dir.replace('/', ''));
+  }
+
+  var sourceCode = stubs.map((stub) => {
+    stub = stub.trim();
+    return config.protostubs.repository + '/' + config.protostubs.sourceCode + '/' + stub + '/*.ps.js';
+  }).filter((stub) => {
+    return !!filtered.filter(resource => stub.includes(resource.dir)).length;
+  });
+
+  return gulp.src(sourceCode)
+    .pipe(convertProtoStub())
+    .on('end', function() {
+      browserSync.reload();
+    });
+}
+
+function createProtoStubsDescriptors() {
+
+  var stubs = config.protostubs.include_stubs;
+  var filtered = filterProtostubs(process.env.ENVIRONMENT);
+
+  if (stubs.length === 0) {
+    stubs = filtered.map(resource => resource.dir.replace('/', ''));
+  }
+
+  var descriptor = stubs.map((stub) => {
+    stub = stub.trim();
+    return config.protostubs.repository + '/' + config.protostubs.sourceCode + '/' + stub + '/*.ps.json';
+  }).filter((stub) => {
+    return !!filtered.filter(resource => stub.includes(resource.dir)).length;
+  });
+
+  return gulp.src(descriptor)
+    .pipe(createDescriptor('protostub'))
+    .pipe(gulp.dest('./resources/descriptors/ProtoStubs.json'))
+    .on('end', function() {
+      gutil.log('the preconfiguration protostub was changed, and the Prostostubs.json was updated');
+      browserSync.reload();
+    });
+
+}
+
 
 function createDataSchemas() {
 
@@ -147,9 +288,15 @@ function createDataSchemas() {
 }
 
 module.exports = {
-  createHyperties: createHyperties,
+  createHypertiesSourceCode: createHypertiesSourceCode,
+  createHypertiesDescriptors: createHypertiesDescriptors,
+
+  createProtoStubsSourceCode: createProtoStubsSourceCode,
+  createProtoStubsDescriptors: createProtoStubsDescriptors,
+
   createDataSchemas: createDataSchemas,
 
   watchHTML: watchHTML,
-  watchHyperties: watchHyperties
+  watchHyperties: watchHyperties,
+  watchProtostubs: watchProtostubs
 };

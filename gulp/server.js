@@ -144,7 +144,6 @@ function devMiddleware(req, res, next) {
     if (req.originalUrl.includes('.well-known')) {
       var info = getResourceInfo(req.originalUrl);
 
-      console.log('Info:', info);
 
       if (req.originalUrl.includes('.html') || req.originalUrl.includes('.js')) {
 

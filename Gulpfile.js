@@ -4,10 +4,14 @@ var gulp = require('gulp');
 var fs = require('fs');
 var path = require('path');
 
+var env = require('node-env-file');
+env(path.join(process.cwd(), 'env'));
+
 var _ = require('lodash');
 var through = require('through2');
 var inquirer = require('inquirer');
 var gutil = require('gulp-util');
+var nodemon = require('gulp-nodemon');
 var runSequence = require('run-sequence');
 var vinylPaths = require('vinyl-paths');
 var del = require('del');
@@ -27,42 +31,59 @@ var resource = require('./gulp/resources');
 var walk = require('./gulp/walk');
 var unixifyPath = require('./gulp/utils').unixifyPath;
 
-var watchHyperties = require('./gulp/handleResources').watchHyperties;
-var watchHTML = require('./gulp/handleResources').watchHTML;
+var {
+  watchHTML,
+  watchHyperties,
+  watchProtostubs,
+  createHypertiesSourceCode,
+  createHypertiesDescriptors,
+  createProtoStubsSourceCode,
+  createProtoStubsDescriptors } = require('./gulp/handleResources');
 
-var createHyperties = require('./gulp/handleResources').createHyperties;
 var createDataSchemas = require('./gulp/handleResources').createDataSchemas;
-
 
 var dirname = __dirname;
 
-var env = require('node-env-file');
-
 gulp.task('serve', function(done) {
 
-  env(path.join(process.cwd(), 'env'));
-
-  var sequence = ['clean', 'stage', 'watch:html', 'checkHyperties', 'checkDataSchemas', 'hyperties', 'schemas', 'nodemon', 'watch:hyperties'];
+  var sequence = [
+    'clean',
+    'stage',
+    'watch:html',
+    'checkHyperties',
+    'checkProtostubs',
+    'checkDataSchemas',
+    'hyperties:sourceCode',
+    'protostubs:sourceCode',
+    'schemas',
+    'server',
+    ['watch:protostubs', 'watch:hyperties']
+  ];
 
   runSequence.apply(runSequence, sequence, done);
 
 });
 
-var nodemon = require('gulp-nodemon');
 
-gulp.task('nodemon', function(cb) {
+gulp.task('server', function(cb) {
 
   return nodemon({
-    script: './gulp/express.js',
+    script: './server/express.js',
     stdout: true
   }).once('start', cb);
 
 });
 
-gulp.task('hyperties', createHyperties);
+gulp.task('hyperties:sourceCode', ['hyperties:descriptor'], createHypertiesSourceCode);
+gulp.task('hyperties:descriptor', createHypertiesDescriptors);
+
+gulp.task('protostubs:sourceCode', ['protostubs:descriptor'], createProtoStubsSourceCode)
+gulp.task('protostubs:descriptor', createProtoStubsDescriptors);
+
 gulp.task('schemas', createDataSchemas);
 gulp.task('watch:html', watchHTML);
 gulp.task('watch:hyperties', watchHyperties);
+gulp.task('watch:protostubs', watchProtostubs);
 
 
 // gulp.task('serve', function(done) {
@@ -108,6 +129,20 @@ gulp.task('checkHyperties', function() {
     console.log(stats.isFile());
   } catch (e) {
     fs.writeFile(__dirname + '/resources/descriptors/Hyperties.json', '{}', (err) => {
+      if (err) throw new Error(err);
+      return true;
+    });
+  }
+
+});
+
+gulp.task('checkProtostubs', function() {
+
+  try {
+    var stats = fs.lstatSync(process.cwd() + '/resources/descriptors/ProtoStubs.json');
+    console.log(stats.isFile());
+  } catch (e) {
+    fs.writeFile(process.cwd() + '/resources/descriptors/ProtoStubs.json', '{}', (err) => {
       if (err) throw new Error(err);
       return true;
     });
@@ -169,7 +204,7 @@ gulp.task('clean', function() {
   return gulp.src([
     'src',
     'app',
-    // 'config.json',
+    'config.json',
     'resources/descriptors/Hyperties.json',
     'resources/descriptors/DataSchemas.json'], {read: false}).pipe(vinylPaths(del));
 });
@@ -179,7 +214,7 @@ gulp.task('copy-assets', copyAssets);
 gulp.task('copy-examples', copyExamples);
 
 // use default task to launch Browsersync and watch JS files
-gulp.task('server', server);
+// gulp.task('server', server);
 
 gulp.task('stage', function() {
 
