@@ -23,7 +23,7 @@ var descriptorBase = function(type) {
   base.sourcePackageURL = '/sourcePackage';
 
   base.cguid = '';
-  base.version = '0.1';
+  base.version = '0.0';
   base.description = '';
   base.language = 'Javascript';
 
@@ -139,10 +139,10 @@ var encode = function(opts) {
 
     // json[value].version = 0.1;
     if (json[value].version) {
-      json[value].version = Number(json[value].version) + 0.1;
+      json[value].version = (Number(json[value].version) + 0.1).toFixed(2);
     }
 
-    json[value].description = checkValues('description', 'Description of ' + filename, json[value]);
+    json[value].description = checkValues('description', json[value].description, json[value]);
 
     var name = 'default';
     if (opts.isDefault) {
@@ -202,7 +202,7 @@ var encode = function(opts) {
 
     if (json[value].sourcePackage) {
       json[value].sourcePackage.sourceCode = encoded;
-      json[value].sourcePackage.sourceCodeClassname = filename;
+      json[value].sourcePackage.sourceCodeClassname = name;
       json[value].sourcePackage.encoding = 'base64';
       json[value].sourcePackage.signature = '';
     }
