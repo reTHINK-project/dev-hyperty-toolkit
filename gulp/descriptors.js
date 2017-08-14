@@ -152,6 +152,8 @@ var encode = function(opts) {
       else name = json[value].objectName;
     }
 
+    if (name.length === 0) name = filename;
+
     json[value].objectName = checkValues('objectName', name, json[value]);
 
     if (opts.descriptor !== 'Hyperties') {

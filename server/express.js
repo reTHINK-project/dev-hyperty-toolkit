@@ -73,8 +73,18 @@ function getResource(req, res) {
   }
 
   if (attribute) {
-    gutil.log(gutil.colors.green('GET ' + result.objectName + ' with ' + attribute) + ': ' + result[attribute]);
-    result = result[attribute].toString();
+    if (result) {
+      result = JSON.stringify(result[attribute]);
+    } else {
+      code = 404;
+
+      result = {
+        code: code,
+        resource: resource,
+        description: 'Nothing found with that attribute'
+      };
+    }
+
   }
 
   res.type('application/json');
@@ -120,11 +130,16 @@ function filterResource(req, res) {
         }
       });
 
-      // gutil.log('Num of constraint matched for ' + gutil.colors.green(resource) + ': ', a.length, numOfResourceConstraints);
-      return a.length === numOfResourceConstraints;
+      gutil.log('------------------------------------------------------');
+      gutil.log(gutil.colors.green('Runtime (payload)') + ' constraints: ', constraints);
+      gutil.log(gutil.colors.green(resource) + ' constraints: ', resourceConstraints);
+
+      return numOfResourceConstraints >= a.length;
     });
 
   }
+
+  gutil.log(gutil.colors.yellow('constraints ', matchedInstances));
 
   if (matchedInstances.length === 0) {
     result = matchedInstances;
@@ -136,7 +151,6 @@ function filterResource(req, res) {
 
   if (resource) {
     result = getDescriptorByObjectName(raw, matchedInstances, resource);
-    gutil.log(gutil.colors.green('POST ' + result.objectName) + ': cguid = ' + result.cguid);
 
     if (!result) {
       code = 404;
@@ -144,12 +158,14 @@ function filterResource(req, res) {
       result = {
         code: code,
         resource: resource,
-        description: 'notingh found with the constraints',
+        description: 'Nothing found with that constraints',
         constraints: data
       };
 
-      gutil.log(gutil.colors.red('POST: ') + result);
+      gutil.log(gutil.colors.red('POST: ') + JSON.stringify(result));
 
+    } else {
+      gutil.log(gutil.colors.green('POST ' + result.objectName) + ': cguid = ' + result.cguid);
     }
 
   }
