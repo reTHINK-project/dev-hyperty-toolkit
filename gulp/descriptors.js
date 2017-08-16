@@ -100,6 +100,8 @@ var encode = function(opts) {
       filename = fileObject.name.replace('.ds', '');
     } else if (fileObject.name.indexOf('.ps') !== -1) {
       filename = fileObject.name.replace('.ps', '');
+    } else if (fileObject.name.indexOf('.idp') !== -1) {
+      filename = fileObject.name.replace('.idp', '');
     }
 
     var value = filename;
@@ -118,7 +120,7 @@ var encode = function(opts) {
         cguid = generateGUID(3);
         break;
       case 'ProtoStubs':
-        type = 'protostub';
+        type = 'protocolstub';
         cguid = generateGUID(4);
         break;
       case 'IDPProxys':
@@ -253,13 +255,10 @@ function createDescriptor(resource) {
       var updated = _.extend(data[nameOfResource], preconfig);
       data[nameOfResource] = updated;
 
-
-      // console.log('PRE CONFIG:', data[nameOfResource].objectName);
-
       var newChunk = _.clone(chunk);
-      newChunk.path = './resources/descriptors/' + typeOfDescriptor.name + '.json';
+      newChunk.path = process.cwd() + '/resources/descriptors/' + typeOfDescriptor.name + '.json';
       newChunk.contents = Buffer.from(JSON.stringify(data, null, 2), 'utf-8');
-      gutil.log(JSON.stringify(preconfig));
+      gutil.log(JSON.stringify(preconfig), newChunk.path);
       done(null, newChunk);
     } catch (error) {
       gutil.log(gutil.colors.red('ERROR: ', fileObject.name  + ': ' + error));
@@ -290,8 +289,8 @@ function getTypeOfDescriptor(resource) {
   switch (resource) {
     case 'runtime': d.name = 'Runtimes'; d.type = 'runtime'; d.extension = ''; break;
     case 'hyperty': d.name = 'Hyperties'; d.type = 'hyperty'; d.extension = '.hy'; break;
-    case 'idpproxy': d.name = 'IDPProxys'; d.type = 'idp-proxy'; d.extension = ''; break;
-    case 'protostub': d.name = 'ProtoStubs'; d.type = 'protocolstub'; d.extension = '.ps'; break;
+    case 'idp-proxy': d.name = 'IDPProxys'; d.type = 'idp-proxy'; d.extension = '.idp'; break;
+    case 'protocolstub': d.name = 'ProtoStubs'; d.type = 'protocolstub'; d.extension = '.ps'; break;
     case 'dataschema': d.name = 'DataSchemas'; d.type = 'dataschema'; d.extension = '.ds'; break;
   }
 
@@ -299,6 +298,7 @@ function getTypeOfDescriptor(resource) {
 }
 
 module.exports = {
+  getTypeOfDescriptor: getTypeOfDescriptor,
   createDescriptor: createDescriptor,
   descriptorBase: descriptorBase,
   encode: encode

@@ -19,7 +19,7 @@ var del = require('del');
 var replacePattern = require('./gulp/utils').replacePattern;
 var getEnvironment = require('./gulp/environment');
 var getStage = require('./gulp/stage');
-var server = require('./gulp/server').server;
+
 var browserSync = require('./gulp/server').browserSync;
 var descriptorBase = require('./gulp/descriptors').descriptorBase;
 var encodeTask = require('./gulp/encodeTask').encodeTask;
@@ -31,16 +31,24 @@ var resource = require('./gulp/resources');
 var walk = require('./gulp/walk');
 var unixifyPath = require('./gulp/utils').unixifyPath;
 
+var checkHypertiesFile = require('./gulp/resources/hyperty').checkHypertiesFile;
+var checkProtostubsFile = require('./gulp/resources/protostub').checkProtostubsFile;
+var checkDataSchemasFile = require('./gulp/resources/dataschema').checkDataSchemasFile;
+
 var {
   watchHTML,
   watchHyperties,
   watchProtostubs,
+  watchIdpProxies,
+  watchDataSchemas,
+  createIDPProxySourceCode,
+  createIDPProxyDescriptors,
   createHypertiesSourceCode,
   createHypertiesDescriptors,
   createProtoStubsSourceCode,
-  createProtoStubsDescriptors } = require('./gulp/handleResources');
-
-var createDataSchemas = require('./gulp/handleResources').createDataSchemas;
+  createProtoStubsDescriptors,
+  createDataSchemasSourceCode,
+  createDataSchemasDescriptors } = require('./gulp/handleResources');
 
 var dirname = __dirname;
 
@@ -53,11 +61,12 @@ gulp.task('serve', function(done) {
     'checkHyperties',
     'checkProtostubs',
     'checkDataSchemas',
-    'hyperties:sourceCode',
+    'dataschema:sourceCode',
+    'idpproxy:sourceCode',
     'protostubs:sourceCode',
-    'schemas',
+    'hyperties:sourceCode',
     'server',
-    ['watch:protostubs', 'watch:hyperties']
+    ['watch:protostubs', 'watch:hyperties', 'watch:idpproxies', 'watch:dataschemas']
   ];
 
   runSequence.apply(runSequence, sequence, done);
@@ -80,30 +89,25 @@ gulp.task('hyperties:descriptor', createHypertiesDescriptors);
 gulp.task('protostubs:sourceCode', ['protostubs:descriptor'], createProtoStubsSourceCode)
 gulp.task('protostubs:descriptor', createProtoStubsDescriptors);
 
-gulp.task('schemas', createDataSchemas);
+gulp.task('idpproxy:sourceCode', ['idpproxy:descriptor'], createIDPProxySourceCode);
+gulp.task('idpproxy:descriptor', createIDPProxyDescriptors);
+
+gulp.task('dataschema:sourceCode', ['dataschema:descriptor'], createDataSchemasSourceCode);
+gulp.task('dataschema:descriptor', createDataSchemasDescriptors);
+
+
+// gulp.task('schemas', createDataSchemas);
+
 gulp.task('watch:html', watchHTML);
 gulp.task('watch:hyperties', watchHyperties);
 gulp.task('watch:protostubs', watchProtostubs);
+gulp.task('watch:idpproxies', watchIdpProxies);
+gulp.task('watch:dataschemas', watchDataSchemas);
 
 
-// gulp.task('serve', function(done) {
-
-//   var stage = getStage();
-
-//   var sequence = ['clean', 'stage', 'src-hyperties', 'checkHyperties', 'descriptor', 'checkDataSchemas', 'schemas', 'js', 'hyperties', 'server'];
-
-//   env(path.join(process.cwd(), 'env'));
-
-//   if (stage !== 'production') {
-
-//     env(path.join(process.cwd(), '.env.server'));
-
-//     sequence.push('watch');
-//   }
-
-//   runSequence.apply(runSequence, sequence, done);
-
-// });
+gulp.task('checkHyperties', checkHypertiesFile);
+gulp.task('checkProtostubs', checkProtostubsFile);
+gulp.task('checkDataSchemas', checkDataSchemasFile);
 
 
 gulp.task('build:hyperties', function(done) {
@@ -119,48 +123,6 @@ gulp.task('build:hyperties', function(done) {
       .on('end', done);
 
   });
-
-});
-
-gulp.task('checkHyperties', function() {
-
-  try {
-    var stats = fs.lstatSync(__dirname + '/resources/descriptors/Hyperties.json');
-    console.log(stats.isFile());
-  } catch (e) {
-    fs.writeFile(__dirname + '/resources/descriptors/Hyperties.json', '{}', (err) => {
-      if (err) throw new Error(err);
-      return true;
-    });
-  }
-
-});
-
-gulp.task('checkProtostubs', function() {
-
-  try {
-    var stats = fs.lstatSync(process.cwd() + '/resources/descriptors/ProtoStubs.json');
-    console.log(stats.isFile());
-  } catch (e) {
-    fs.writeFile(process.cwd() + '/resources/descriptors/ProtoStubs.json', '{}', (err) => {
-      if (err) throw new Error(err);
-      return true;
-    });
-  }
-
-});
-
-gulp.task('checkDataSchemas', function() {
-
-  try {
-    var stats = fs.lstatSync(path.resolve(__dirname + '/resources/descriptors/DataSchemas.json'));
-    console.log(stats.isFile());
-  } catch (e) {
-    fs.writeFile(path.resolve(__dirname + '/resources/descriptors/DataSchemas.json'), '{}', (err) => {
-      if (err) throw new Error(err);
-      return true;
-    });
-  }
 
 });
 

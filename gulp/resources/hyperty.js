@@ -6,6 +6,7 @@ var through = require('through2');
 var gutil = require('gulp-util');
 
 var walk = require('../walk');
+var readFiles = require('../utils').readFiles;
 
 var config = require('../toolkit.config');
 var transpile = require('../transpile');
@@ -37,16 +38,6 @@ function convertHyperty() {
 
   });
 
-}
-
-function readFiles(dirname, file) {
-  var files = fs.readdirSync(dirname);
-  return files.filter(function(filename) {
-    return filename.includes(file);
-  }).map(function(filename) {
-    var content = fs.readFileSync(dirname + filename, 'utf-8');
-    return { filename: filename, folder: dirname, content: content };
-  });
 }
 
 function filterHyperties(environment) {
@@ -84,8 +75,26 @@ function filterHyperties(environment) {
   });
 }
 
-module.exports = {
-  filterHyperties: filterHyperties,
+function checkHypertiesFile() {
 
+  var name = 'Hyperties';
+  var resourcePath = '/resources/descriptors/' + name + '.json';
+
+  try {
+    var stats = fs.lstatSync(path.resolve(process.cwd() + resourcePath));
+    console.log(stats);
+    return true;
+  } catch (e) {
+    fs.writeFile(path.resolve(process.cwd() + resourcePath), '{}', (err) => {
+      if (err) throw new Error(err);
+      return true;
+    });
+  }
+
+}
+
+module.exports = {
+  checkHypertiesFile: checkHypertiesFile,
+  filterHyperties: filterHyperties,
   convertHyperty: convertHyperty
 };

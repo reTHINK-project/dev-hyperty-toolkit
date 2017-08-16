@@ -32,6 +32,7 @@ resources/bundle.js
 resources/*.hy.js
 resources/*.ps.js
 resources/*.ds.js
+resources/*.idp.js
 
 resources/descriptors/Hyperties.json
 resources/descriptors/DataSchemas.json

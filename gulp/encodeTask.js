@@ -99,7 +99,7 @@ function encodeStub(file) {
     {
       type: 'input',
       name: 'name',
-      message: 'Name of hyperty, protostub, dataschema (not specify use the file name):'
+      message: 'Name of hyperty, protocolstub, dataschema (not specify use the file name):'
     },
     {
       type: 'list',

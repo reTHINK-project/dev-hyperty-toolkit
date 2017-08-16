@@ -6,6 +6,7 @@ var through = require('through2');
 var gutil = require('gulp-util');
 
 var walk = require('../walk');
+var readFiles = require('../utils').readFiles;
 
 var config = require('../toolkit.config');
 var transpile = require('../transpile');
@@ -39,23 +40,13 @@ function convertProtoStub() {
 
 }
 
-function readFiles(dirname, file) {
-  var files = fs.readdirSync(dirname);
-  return files.filter(function(filename) {
-    return filename.includes(file);
-  }).map(function(filename) {
-    var content = fs.readFileSync(dirname + filename, 'utf-8');
-    return { filename: filename, folder: dirname, content: content };
-  });
-}
-
 function filterProtostubs(environment) {
 
   var filePath = path.join(config.protostubs.repository, config.protostubs.sourceCode);
   var stubs = [];
 
   walk(filePath, function(filepath, rootdir, subdir, filename) {
-    if (filename.includes('.ps.json')) {
+    if (filename.includes('.ps.json') || filename.includes('.idp.json')) {
       readFiles(path.join(rootdir, '/', subdir, '/'), filename).forEach(function(fileObject) {
         stubs.push(fileObject);
       });
@@ -84,7 +75,26 @@ function filterProtostubs(environment) {
   });
 }
 
+function checkProtostubsFile() {
+
+  var name = 'ProtoStubs';
+  var resourcePath = '/resources/descriptors/' + name + '.json';
+
+  try {
+    var stats = fs.lstatSync(path.resolve(process.cwd() + resourcePath));
+    console.log(stats);
+    return true;
+  } catch (e) {
+    fs.writeFile(path.resolve(process.cwd() + resourcePath), '{}', (err) => {
+      if (err) throw new Error(err);
+      return true;
+    });
+  }
+
+}
+
 module.exports = {
+  checkProtostubsFile: checkProtostubsFile,
   filterProtostubs: filterProtostubs,
   convertProtoStub: convertProtoStub
 };
