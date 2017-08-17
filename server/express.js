@@ -36,25 +36,22 @@ app.use(function(req, res, next) {
   next();
 });
 
-// app.get('/:resource', function(req, res, next) {
 
-//   console.log('get resource:', req.params);
-//   next();
-// });
-
-app.get('/.well-known/:type', getResource);
+app.get('/.well-known/:type', getTypeOfResources);
 app.get('/.well-known/:type/:resource', getResource);
-app.get('/.well-known/:type/:resource/:attribute', getResource);
+app.get('/.well-known/:type/:resource/:attribute', getResourceAttribute);
 
-function getResource(req, res) {
+
+function getTypeOfResources(req, res) {
+  duration.start();
   var code = 200;
   var type = req.params.type;
-  var resource = req.params.resource;
-  var attribute = req.params.attribute;
 
   getResources(type, (err, raw) => {
 
-    if (err) { throw err; }
+    if (err) {
+      return processError(err.code, type, err.description, {}, res);
+    }
 
     var filtered = Object.keys(raw);
     var result;
@@ -63,49 +60,141 @@ function getResource(req, res) {
 
     if (type) {
       result = JSON.stringify(filtered, '', 2);
+      gutil.log(gutil.colors.green('GET ' + type + ' | ' + result));
     }
+
+    if (!result) {
+      gutil.log(gutil.colors.red('ERROR GET ' + type + ' | ' + result));
+      return processError(404, type, 'The type of resource you are looking for doesn\'t exits', {}, res);
+    }
+
+    res.type('application/json');
+    res.status(code).send(result);
+    duration.end();
+  });
+
+}
+
+function getResource(req, res) {
+  duration.start();
+
+  var code = 200;
+  var type = req.params.type;
+  var resource = req.params.resource;
+
+  getResources(type, (err, raw) => {
+
+    if (err) {
+      return processError(err.code, type, err.description, {}, res);
+    }
+
+    var filtered = Object.keys(raw);
+    var result;
+
+    gutil.log('-------------------------------- GET --------------------------------');
 
     if (resource) {
       try {
         result = getDescriptorByObjectName(raw, filtered, resource);
-        gutil.log(gutil.colors.green('GET ' + result.objectName) + ': cguid = ' + result.cguid);
+        gutil.log(gutil.colors.green('GET ' + type + ' | ' + resource + ': ') + 'version: ' + result.version + ' | cguid: ' + result.cguid);
       } catch (error) {
-        code = 404;
-        result = {
-          code: code,
-          resource: resource,
-          description: error
-        };
+        return processError(404, resource, error, {}, res);
       }
     }
+
+    res.type('application/json');
+    res.status(code).send(result);
+    duration.end();
+
+  });
+
+}
+
+function getResourceAttribute(req, res) {
+
+  duration.start();
+
+  var code = 200;
+  var type = req.params.type;
+  var resource = req.params.resource;
+  var attribute = req.params.attribute;
+
+  getResources(type, (err, raw) => {
+
+    if (err) {
+      return processError(err.code, type, err.description, {}, res);
+    }
+
+    var filtered = Object.keys(raw);
+    var result;
+
+    result = getDescriptorByObjectName(raw, filtered, resource);
 
     if (attribute) {
       if (result) {
         result = JSON.stringify(result[attribute]);
+        gutil.log(gutil.colors.green('GET ' + type + ' | ' + attribute + ': '), result);
       } else {
-        code = 404;
-
-        result = {
-          code: code,
-          resource: resource,
-          description: 'Nothing found with that attribute'
-        };
+        return processError(404, resource, 'Nothing found with that attribute', {}, res);
       }
 
     }
 
     res.type('application/json');
     res.status(code).send(result);
-
-  })
+    duration.end();
+  });
 
 }
 
-app.post('/.well-known/:type', upload.any(), filterResource);
+app.post('/.well-known/:type', upload.any(), filterResourceType);
 app.post('/.well-known/:type/:resource', upload.any(), filterResource);
 app.post('/.well-known/:type/:resource/:attribute', upload.any(), filterResource);
 
+function filterResourceType(req, res) {
+  duration.start();
+
+  var code = 200;
+  var type = req.params.type;
+  var matchedInstances = [];
+  var result;
+
+  var data = req.body;
+  try {
+    data = JSON.parse(data);
+  } catch (error) {
+    data = {};
+  }
+
+  gutil.log('-------------------------------- POST --------------------------------');
+
+  getResources(type, (err, raw) => {
+
+    if (err) {
+      return processError(err.code, type, err.description, {}, res);
+    }
+
+    matchedInstances = findMatches(raw, data);
+
+    if (matchedInstances.length === 0) {
+      result = matchedInstances;
+    }
+
+    if (type) {
+      result = matchedInstances.map(item => raw[item].objectName);
+      gutil.log(gutil.colors.green('POST ' + type + ' | ') + result);
+    }
+
+    res.type('application/json');
+    res.status(code).send(result);
+    duration.end();
+  });
+
+}
+
 function filterResource(req, res) {
+
+  duration.start();
 
   var code = 200;
   var type = req.params.type;
@@ -125,76 +214,71 @@ function filterResource(req, res) {
 
   getResources(type, (err, raw) => {
 
-    if (data.hasOwnProperty('constraints')) {
-
-      var constraints = data.constraints;
-
-      matchedInstances = Object.keys(raw).filter((resource) => {
-        var resourceConstraints = raw[resource].constraints;
-        var numOfResourceConstraints = Object.keys(resourceConstraints).length;
-
-        // If the constraint is false should be ignored
-        var payloadConstraints = Object.keys(constraints).filter(constraint => constraints[constraint]);
-        var a = payloadConstraints.filter((constraint) => {
-          if (resourceConstraints.hasOwnProperty(constraint) || resourceConstraints[constraint]) {
-            return true;
-          }
-        });
-
-        gutil.log('------------------------------------------------------');
-        gutil.log(gutil.colors.green('Runtime (payload)') + ' constraints: ', constraints);
-        gutil.log(gutil.colors.green(resource) + ' constraints: ', resourceConstraints);
-
-        return numOfResourceConstraints >= a.length;
-      });
-
+    if (err) {
+      return processError(err.code, type, err.description, {}, res);
     }
 
-    gutil.log(gutil.colors.yellow('constraints ', matchedInstances));
+    matchedInstances = findMatches(raw, data);
+
+    gutil.log(gutil.colors.yellow('matched to constraints | ') + matchedInstances);
 
     if (matchedInstances.length === 0) {
       result = matchedInstances;
-    }
-
-    if (type) {
-      result = JSON.stringify(matchedInstances, '', 2);
     }
 
     if (resource) {
       result = getDescriptorByObjectName(raw, matchedInstances, resource);
 
       if (!result) {
-        code = 404;
-
-        result = {
-          code: code,
-          resource: resource,
-          description: 'Nothing found with that constraints',
-          constraints: data
-        };
-
-        gutil.log(gutil.colors.red('POST: ') + JSON.stringify(result));
-
-      } else {
-        gutil.log(gutil.colors.green('POST ' + result.objectName) + ': cguid = ' + result.cguid);
+        return processError(404, resource, 'Nothing found with that constraints', data, res);
       }
+
+      gutil.log(gutil.colors.green('POST ' + type + ' | ' + resource + ': '), result.cguid);
 
     }
 
     if (attribute) {
-      gutil.log(gutil.colors.green('POST ' + result.objectName + ' with ' + attribute) + ': ' + result[attribute]);
       result = JSON.stringify(result[attribute]);
+      gutil.log(gutil.colors.green('POST ' + type + ' | ' + attribute + ': '), result);
     }
 
     res.type('application/json');
     res.status(code).send(result);
+
+    duration.end();
   });
 
 }
 
-var httpsServer = https.createServer(credentials, app);
-httpsServer.listen(process.env.PORT || 443);
+function findMatches(raw, data) {
 
+  if (data.hasOwnProperty('constraints')) {
+    var constraints = data.constraints;
+
+    return Object.keys(raw).filter((resource) => {
+      var resourceConstraints = raw[resource].constraints;
+      var numOfResourceConstraints = Object.keys(resourceConstraints).length;
+
+      // If the constraint is false should be ignored
+      var payloadConstraints = Object.keys(constraints).filter(constraint => constraints[constraint]);
+      var numOfPayloadConstraints = Object.keys(payloadConstraints).length;
+      var a = payloadConstraints.filter((constraint) => {
+        if (resourceConstraints.hasOwnProperty(constraint) || resourceConstraints[constraint]) {
+          return true;
+        }
+      });
+
+      // gutil.log('------------------------------------------------------');
+      // gutil.log(gutil.colors.green('Runtime (payload)') + ' constraints: ', constraints);
+      // gutil.log(gutil.colors.green(resource) + ' constraints: ', resourceConstraints);
+
+      return numOfResourceConstraints >= numOfPayloadConstraints;
+    });
+  } else {
+    return [];
+  }
+
+}
 
 function getResources(type, cb) {
 
@@ -217,12 +301,40 @@ function getResources(type, cb) {
       break;
   }
 
-  raw
-    .pipe(JSONStream.parse())
-    .on('data', (d) => {
-      cb(null, d);
+  if (raw) {
+    raw
+      .pipe(JSONStream.parse())
+      .on('error', (e) => {
+        console.log(e);
+      })
+      .on('data', (d) => {
+        cb(null, d);
+      });
+  } else {
+    cb({
+      code: 500,
+      description: 'Unknown object type ' + type + ', please use one of: [hyperty, idp-proxy, runtime, protocolstub, sourcepackage, dataschema]'
     });
+  }
 
+}
+
+function processError(code, resource, desc, data, res) {
+
+  var result = {
+    code: code,
+    resource: resource,
+    description: desc
+  };
+
+  if (data) {
+    result.data = data;
+  }
+
+  gutil.log(gutil.colors.green('ERROR ' + code + ' | ' + resource + ': '), result);
+  res.type('application/json');
+  res.status(code).send(result);
+  return false;
 }
 
 function filterResources(resource, key) {
@@ -241,3 +353,21 @@ function getDescriptorByObjectName(raw, filtered, name) {
 
 }
 
+var duration = {
+  begin: '',
+  finish: '',
+  duration: '',
+  start: () => {
+    this.begin = new Date();
+  },
+  end: () => {
+    this.finish = new Date();
+    this.duration = this.finish - this.begin;
+    gutil.log('Duration:', this.duration, 'ms');
+  }
+
+};
+
+
+var httpsServer = https.createServer(credentials, app);
+httpsServer.listen(process.env.PORT || 443);
