@@ -255,10 +255,8 @@ function createDescriptor(resource) {
       var updated = _.extend(data[nameOfResource], preconfig);
       data[nameOfResource] = updated;
 
-      var newChunk = _.clone(chunk);
-      newChunk.path = process.cwd() + '/resources/descriptors/' + typeOfDescriptor.name + '.json';
-      newChunk.contents = Buffer.from(JSON.stringify(data, null, 2), 'utf-8');
-      gutil.log(JSON.stringify(preconfig), newChunk.path);
+      var newChunk = fs.writeFileSync(process.cwd() + '/resources/descriptors/' + typeOfDescriptor.name + '.json', Buffer.from(JSON.stringify(data, null, 2), 'utf-8'), 'utf8');
+
       done(null, newChunk);
     } catch (error) {
       gutil.log(gutil.colors.red('ERROR: ', fileObject.name  + ': ' + error));
