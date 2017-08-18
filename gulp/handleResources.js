@@ -80,7 +80,7 @@ function watchProtostubs(done) {
   var sourceCode = getListOfResources('protocolstub');
   sourceCode = sourceCode.map(item => item + '/*.ps.js');
 
-  console.log('Watch SourceCode:', sourceCode);
+  // console.log('Watch SourceCode:', sourceCode);
 
   gulp.watch(sourceCode, function(event) {
     return watchResource(event, 'protocolstub');
@@ -100,7 +100,7 @@ function watchIdpProxies(done) {
   var sourceCode = getListOfResources('idp-proxy');
   sourceCode = sourceCode.map(item => item + '/*.idp.js');
 
-  console.log('Watch SourceCode:', sourceCode);
+  // console.log('Watch SourceCode:', sourceCode);
 
   gulp.watch(sourceCode, function(event) {
     return watchResource(event, 'idp-proxy');
@@ -133,7 +133,7 @@ function watchDataSchemas(done) {
 
   // Watch the local resources for DataSchemas
   descriptor = descriptor.concat([process.cwd() + '/resources/schemas/**/*.ds.json']);
-  console.log('Watch dataSchema: ', descriptor);
+  // console.log('Watch dataSchema: ', descriptor);
   gulp.watch(descriptor, function(event) {
     return generateDescriptor('dataschema', event.path);
   });
@@ -277,7 +277,7 @@ function generateSourceCode(type) {
   var filtered;
   var repository;
   var convertFunction;
-  console.log('resource:', resource);
+  // console.log('resource:', resource);
 
   switch (resource.type) {
     case 'idp-proxy':
@@ -328,7 +328,6 @@ function generateDescriptor(type, filePath) {
   var list;
   var filtered;
   var repository;
-  console.log('resource:', resource);
 
   switch (resource.type) {
     case 'idp-proxy':
@@ -363,8 +362,6 @@ function generateDescriptor(type, filePath) {
   });
 
   if (filePath) { descriptor = filePath; }
-
-  console.log('DESCRIPTOR:', descriptor);
 
   if (resource.type === 'dataschema') {
     descriptor = descriptor.concat('./resources/schemas/**/*.ds.json');

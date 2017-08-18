@@ -252,6 +252,8 @@ function filterResource(req, res) {
 
 function findMatches(raw, data) {
 
+  // gutil.log(gutil.colors.green('Runtime (payload)') + ' constraints: ', data);
+
   if (data.hasOwnProperty('constraints')) {
     var constraints = data.constraints;
 
@@ -272,7 +274,7 @@ function findMatches(raw, data) {
       // gutil.log(gutil.colors.green('Runtime (payload)') + ' constraints: ', constraints);
       // gutil.log(gutil.colors.green(resource) + ' constraints: ', resourceConstraints);
 
-      return numOfResourceConstraints >= numOfPayloadConstraints;
+      return numOfResourceConstraints >= a.length;
     });
   } else {
     return [];

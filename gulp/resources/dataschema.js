@@ -60,7 +60,6 @@ function checkDataSchemasFile() {
 
   try {
     var stats = fs.lstatSync(path.resolve(process.cwd() + resourcePath));
-    console.log(stats);
     return true;
   } catch (e) {
     fs.writeFile(path.resolve(process.cwd() + resourcePath), '{}', (err) => {
