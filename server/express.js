@@ -158,12 +158,13 @@ function filterResourceType(req, res) {
   var type = req.params.type;
   var matchedInstances = [];
   var result;
-
   var data = req.body;
+
   try {
     data = JSON.parse(data);
   } catch (error) {
-    data = {};
+    // console.log(error);
+    data = req.body;
   }
 
   gutil.log('-------------------------------- POST --------------------------------');
@@ -204,10 +205,12 @@ function filterResource(req, res) {
   var result;
 
   var data = req.body;
+
   try {
     data = JSON.parse(data);
   } catch (error) {
-    data = {};
+    // console.log(error);
+    data = req.body;
   }
 
   gutil.log('-------------------------------- POST --------------------------------');
@@ -252,7 +255,7 @@ function filterResource(req, res) {
 
 function findMatches(raw, data) {
 
-  // gutil.log(gutil.colors.green('Runtime (payload)') + ' constraints: ', data);
+  gutil.log(gutil.colors.green('Runtime (payload)') + ' constraints: ', data);
 
   if (data.hasOwnProperty('constraints')) {
     var constraints = data.constraints;
@@ -270,11 +273,11 @@ function findMatches(raw, data) {
         }
       });
 
-      // gutil.log('------------------------------------------------------');
-      // gutil.log(gutil.colors.green('Runtime (payload)') + ' constraints: ', constraints);
-      // gutil.log(gutil.colors.green(resource) + ' constraints: ', resourceConstraints);
+      gutil.log('------------------------------------------------------');
+      gutil.log(gutil.colors.green('Runtime (payload)') + ' constraints: ', constraints, numOfPayloadConstraints);
+      gutil.log(gutil.colors.green(resource) + ' constraints: ', resourceConstraints, a.length);
 
-      return numOfResourceConstraints >= a.length;
+      return numOfPayloadConstraints >= a.length && a.length !== 0;
     });
   } else {
     return [];

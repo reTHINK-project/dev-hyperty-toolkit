@@ -11,6 +11,8 @@ var browserSync = require('./server').browserSync;
 
 var config = require('./toolkit.config.js');
 
+var { getTypeOfFile, encode } = require('./encodeTask');
+
 var { convertDataSchema, filterDataSchema } = require('./resources/dataschema');
 var { filterHyperties, convertHyperty } = require('./resources/hyperty');
 var { filterProtostubs, convertProtoStub } = require('./resources/protostub');
@@ -57,6 +59,24 @@ function bundleHTML() {
   return gulp.src(['./../server/*.*', process.env.HYPERTY_REPO + '/examples/main.js'])
     .pipe(webpackStream(webpackConfig, webpack))
     .pipe(gulp.dest('app/'));
+}
+
+function watchResources(done) {
+
+  gulp.watch(['./resources/*.js'], function(event) {
+
+    var type = getTypeOfFile(event.path);
+
+    switch (type) {
+      case 'Runtime':
+        var transpileOpts = {};
+        transpileOpts.isES6 = false;
+        encode(event.path, {}, transpileOpts);
+        break;
+    }
+
+  });
+
 }
 
 function watchHyperties(done) {
@@ -133,6 +153,7 @@ function watchDataSchemas(done) {
 
   // Watch the local resources for DataSchemas
   descriptor = descriptor.concat([process.cwd() + '/resources/schemas/**/*.ds.json']);
+
   // console.log('Watch dataSchema: ', descriptor);
   gulp.watch(descriptor, function(event) {
     return generateDescriptor('dataschema', event.path);
@@ -209,7 +230,7 @@ function getListOfResources(type) {
       resourcePath = config.hyperties.repository;
       resourceSrc = config.hyperties.sourceCode;
       break;
-    
+
     case 'dataschema':
       list = config.hyperties.include_hyperties || ['**'];
       filtered = filterDataSchema(process.env.ENVIRONMENT);
@@ -277,6 +298,7 @@ function generateSourceCode(type) {
   var filtered;
   var repository;
   var convertFunction;
+
   // console.log('resource:', resource);
 
   switch (resource.type) {
@@ -410,5 +432,6 @@ module.exports = {
   watchIdpProxies: watchIdpProxies,
   watchProtostubs: watchProtostubs,
   watchHyperties: watchHyperties,
+  watchResources: watchResources,
   watchHTML: watchHTML
 };

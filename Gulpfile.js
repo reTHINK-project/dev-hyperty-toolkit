@@ -41,6 +41,7 @@ var {
   watchProtostubs,
   watchIdpProxies,
   watchDataSchemas,
+  watchResources,
   createIDPProxySourceCode,
   createIDPProxyDescriptors,
   createHypertiesSourceCode,
@@ -66,7 +67,7 @@ gulp.task('serve', function(done) {
     'protostubs:sourceCode',
     'hyperties:sourceCode',
     'server',
-    ['watch:protostubs', 'watch:hyperties', 'watch:idpproxies', 'watch:dataschemas']
+    ['watch:resources', 'watch:protostubs', 'watch:hyperties', 'watch:idpproxies', 'watch:dataschemas']
   ];
 
   runSequence.apply(runSequence, sequence, done);
@@ -104,6 +105,7 @@ gulp.task('watch:protostubs', watchProtostubs);
 gulp.task('watch:idpproxies', watchIdpProxies);
 gulp.task('watch:dataschemas', watchDataSchemas);
 
+gulp.task('watch:resources', watchResources);
 
 gulp.task('checkHyperties', checkHypertiesFile);
 gulp.task('checkProtostubs', checkProtostubsFile);
