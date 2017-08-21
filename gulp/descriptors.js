@@ -2,14 +2,14 @@
 var fs = require('fs');
 var path = require('path');
 
-var generateGUID = require('./guid');
+var { MD5Hash } = require('./guid');
 var replacePattern = require('./utils').replacePattern;
 
 var through = require('through2');
 var gutil = require('gulp-util');
 var _ = require('lodash');
 
-var descriptorBase = function(type) {
+var descriptorBase = function(type, name) {
 
   var base = {};
 
@@ -22,17 +22,23 @@ var descriptorBase = function(type) {
   // Source Package configuration
   base.sourcePackageURL = '/sourcePackage';
 
-  base.cguid = '';
   base.version = '0.0';
   base.description = '';
   base.language = 'Javascript';
 
   switch (type) {
     case 'hyperty':
+      base.cguid = MD5Hash(1, name);
       base.hypertyType = [];
       break;
 
+    case 'dataschema':
+      base.cguid = MD5Hash(2, name);
+      base.language = 'JSON-Schema';
+      break;
+
     case 'runtime':
+      base.cguid = MD5Hash(3, name);
       base.type = '';
       base.runtimeType = 'browser';
       base.p2pHandlerStub = '';
@@ -41,15 +47,19 @@ var descriptorBase = function(type) {
       break;
 
     case 'protocolstub':
-    case 'idp-proxy':
+      base.cguid = MD5Hash(4, name);
       base.type = '';
       base.constraints = {};
       base.interworking = false;
       break;
 
-    case 'dataschema':
-      base.language = 'JSON-Schema';
+    case 'idp-proxy':
+      base.type = '';
+      base.cguid = MD5Hash(5, name);
+      base.constraints = {};
+      base.interworking = false;
       break;
+
 
     default:
       base.type = '';
@@ -106,36 +116,35 @@ var encode = function(opts) {
 
     var value = filename;
     var cguid = 0;
+
     switch (opts.descriptor) {
       case 'Hyperties':
         type = 'hyperty';
-        cguid = generateGUID(1);
+        cguid = MD5Hash(1, filename);
         break;
       case 'DataSchemas':
         type = 'dataschema';
-        cguid = generateGUID(2);
+        cguid = MD5Hash(2, filename);
         break;
       case 'Runtimes':
         type = 'runtime';
-        cguid = generateGUID(3);
+        cguid = MD5Hash(3, filename);
         break;
       case 'ProtoStubs':
         type = 'protocolstub';
-        cguid = generateGUID(4);
+        cguid = MD5Hash(4, filename);
         break;
       case 'IDPProxys':
         type = 'idp-proxy';
-        cguid = generateGUID(5);
+        cguid = MD5Hash(5, filename);
         break;
     }
 
     if (!json.hasOwnProperty(value)) {
-      json[value] = descriptorBase(type);
+      json[value] = descriptorBase(type, filename);
     }
 
-    Object.keys(json).map(function(key, index) {
-      json[key].cguid = cguid + index;
-    });
+    json[value].cguid = cguid;
 
     json[value].type = opts.descriptor;
 
@@ -249,7 +258,7 @@ function createDescriptor(resource) {
       gutil.log('---------------------- ' + nameOfResource + ' ------------------------');
 
       if (!data.hasOwnProperty(nameOfResource)) {
-        data[nameOfResource] = descriptorBase(typeOfDescriptor.type);
+        data[nameOfResource] = descriptorBase(typeOfDescriptor.type, fileObject.name);
       }
 
       var updated = _.extend(data[nameOfResource], preconfig);

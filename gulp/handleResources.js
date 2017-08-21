@@ -405,16 +405,6 @@ function generateDescriptor(type, filePath) {
 
 }
 
-
-function createDataSchemas() {
-
-  return gulp.src([process.env.HYPERTY_REPO + '/src/**/*.ds.json', './resources/schemas/**/*.ds.json'])
-    .pipe(convertDataSchema())
-    .on('end', function() {
-      browserSync.reload();
-    });
-}
-
 module.exports = {
   createHypertiesSourceCode: createHypertiesSourceCode,
   createHypertiesDescriptors: createHypertiesDescriptors,

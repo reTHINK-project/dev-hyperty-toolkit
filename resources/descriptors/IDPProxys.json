@@ -7,7 +7,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "cguid": "5-1ccca40f-0181-3787-a4dd-cd8e0ec4d4870",
+    "cguid": "5-a23b7159-3d89-f5a6-a8d9-3aab90077d430",
     "version": 0.8999999999999999,
     "description": "Description of IMSIWProxyStub",
     "language": "Javascript",
@@ -31,7 +31,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "cguid": "5-1ccca40f-0181-3787-a4dd-cd8e0ec4d4871",
+    "cguid": "5-a23b7159-3d89-f5a6-a8d9-3aab90077d431",
     "version": 2.1000000000000005,
     "description": "Description of IdpProxyStub",
     "language": "Javascript",
@@ -55,8 +55,8 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "cguid": "5-1ccca40f-0181-3787-a4dd-cd8e0ec4d4872",
-    "version": "7.00",
+    "cguid": "5-4c3d276bb3c7038dad08fd45a4b3b706",
+    "version": "7.80",
     "description": "IDPProxy slack description",
     "language": "javascript",
     "type": "IDPProxys",
@@ -79,7 +79,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "cguid": "5-1ccca40f-0181-3787-a4dd-cd8e0ec4d4873",
+    "cguid": "5-a23b7159-3d89-f5a6-a8d9-3aab90077d433",
     "version": 1.3,
     "description": "Description of MicrosoftProxyStub",
     "language": "Javascript",
@@ -103,7 +103,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "cguid": "5-1ccca40f-0181-3787-a4dd-cd8e0ec4d4874",
+    "cguid": "5-a23b7159-3d89-f5a6-a8d9-3aab90077d434",
     "version": 0.2,
     "description": "Description of OrangeProxyStub",
     "language": "Javascript",
@@ -127,7 +127,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "cguid": "5-1ccca40f-0181-3787-a4dd-cd8e0ec4d4875",
+    "cguid": "5-a23b7159-3d89-f5a6-a8d9-3aab90077d435",
     "version": 0.2,
     "description": "Description of NodejsProxyStub",
     "language": "Javascript",

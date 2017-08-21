@@ -93,7 +93,6 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
         path: path.join(opts.destination),
         library: opts.standalone,
         libraryTarget: 'umd',
-        libraryExport: 'default',
         umdNamedDefine: true,
         filename: fileObject.base
       },
