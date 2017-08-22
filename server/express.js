@@ -286,8 +286,9 @@ function findMatches(raw, data) {
 }
 
 function getResources(type, cb) {
-
   var raw;
+  var before = process.memoryUsage().rss
+
   switch (type) {
     case 'runtime':
       raw = fs.createReadStream('./resources/descriptors/Runtimes.json');
@@ -309,12 +310,18 @@ function getResources(type, cb) {
   if (raw) {
     raw
       .pipe(JSONStream.parse())
-      .on('error', (e) => {
+      .once('error', (e) => {
         console.log(e);
       })
-      .on('data', (d) => {
+      .once('data', (d) => {
         cb(null, d);
-      });
+      })
+      .once('end', function() {
+        raw.destroy();
+        gutil.log(gutil.colors.yellow('Memory Usage: '), Math.round(before / 1024 / 1024), 'MB');
+        gutil.log(gutil.colors.yellow('memory increased by: '), Math.round((process.memoryUsage().rss - before) / 1024 / 1024), 'MB');
+      })
+      .resume();
   } else {
     cb({
       code: 500,
