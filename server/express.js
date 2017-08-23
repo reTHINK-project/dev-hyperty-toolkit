@@ -287,7 +287,8 @@ function findMatches(raw, data) {
 
 function getResources(type, cb) {
   var raw;
-  var before = process.memoryUsage().rss
+  var parser = JSONStream.parse();
+  var before = process.memoryUsage().rss;
 
   switch (type) {
     case 'runtime':
@@ -307,21 +308,26 @@ function getResources(type, cb) {
       break;
   }
 
+  let data;
+
   if (raw) {
     raw
-      .pipe(JSONStream.parse())
-      .once('error', (e) => {
+      .pipe(parser)
+      .resume()
+      .on('error', (e) => {
         console.log(e);
+        cb(e);
       })
-      .once('data', (d) => {
-        cb(null, d);
+      .on('data', (d) => {
+        data = d;
       })
-      .once('end', function() {
-        raw.destroy();
+      .on('end', () => {
         gutil.log(gutil.colors.yellow('Memory Usage: '), Math.round(before / 1024 / 1024), 'MB');
         gutil.log(gutil.colors.yellow('memory increased by: '), Math.round((process.memoryUsage().rss - before) / 1024 / 1024), 'MB');
+        raw.destroy();
+        cb(null, data);
       })
-      .resume();
+
   } else {
     cb({
       code: 500,
