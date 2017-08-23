@@ -66,6 +66,7 @@ gulp.task('serve', function(done) {
     'idpproxy:sourceCode',
     'protostubs:sourceCode',
     'hyperties:sourceCode',
+    'service',
     'server',
     ['watch:resources', 'watch:protostubs', 'watch:hyperties', 'watch:idpproxies', 'watch:dataschemas']
   ];
@@ -78,6 +79,8 @@ gulp.task('serve', function(done) {
 gulp.task('server', function(cb) {
 
   return nodemon({
+    verbose: true,
+    ignore: ['resources/*'],
     script: './server/express.js',
     stdout: true
   }).once('start', cb);
@@ -87,7 +90,7 @@ gulp.task('server', function(cb) {
 gulp.task('hyperties:sourceCode', ['hyperties:descriptor'], createHypertiesSourceCode);
 gulp.task('hyperties:descriptor', createHypertiesDescriptors);
 
-gulp.task('protostubs:sourceCode', ['protostubs:descriptor'], createProtoStubsSourceCode)
+gulp.task('protostubs:sourceCode', ['protostubs:descriptor'], createProtoStubsSourceCode);
 gulp.task('protostubs:descriptor', createProtoStubsDescriptors);
 
 gulp.task('idpproxy:sourceCode', ['idpproxy:descriptor'], createIDPProxySourceCode);
@@ -95,9 +98,6 @@ gulp.task('idpproxy:descriptor', createIDPProxyDescriptors);
 
 gulp.task('dataschema:sourceCode', ['dataschema:descriptor'], createDataSchemasSourceCode);
 gulp.task('dataschema:descriptor', createDataSchemasDescriptors);
-
-
-// gulp.task('schemas', createDataSchemas);
 
 gulp.task('watch:html', watchHTML);
 gulp.task('watch:hyperties', watchHyperties);
@@ -124,6 +124,38 @@ gulp.task('build:hyperties', function(done) {
       .pipe(watchHyperties('./src/**/*.js'))
       .on('end', done);
 
+  });
+
+});
+
+gulp.task('service', function() {
+
+  var sequence = [
+    'watch:html',
+    'dataschema:sourceCode',
+    'idpproxy:sourceCode',
+    'protostubs:sourceCode',
+    'hyperties:sourceCode'
+  ];
+  var isRunning = false;
+
+  function executeOnce() {
+
+    console.log('Execute Once: ', isRunning);
+
+    if (isRunning) return false;
+
+    isRunning = true;
+
+    runSequence(sequence, () => {
+      isRunning = false;
+      console.log('Executed Once: ', isRunning);
+    });
+
+  }
+
+  gulp.watch(process.cwd() + '/node_modules/service-framework/**/*.*', () => {
+    executeOnce();
   });
 
 });
@@ -443,34 +475,6 @@ function createDescriptor() {
 
     done(null, newChunk);
   });
-}
-
-function convertHyperty() {
-
-  return through.obj(function(chunk, enc, done) {
-
-    var fileObject = path.parse(chunk.path);
-
-    return gulp.src([chunk.path])
-      .on('end', function() {
-        gutil.log('-----------------------------------------------------------');
-        gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
-      })
-      .pipe(transpile({
-        destination: __dirname + '/resources',
-        standalone: 'activate',
-        debug: false
-      }))
-      .pipe(resource())
-      .resume()
-      .on('end', function() {
-        gutil.log('Hyperty', fileObject.name, ' was converted and encoded');
-        gutil.log('-----------------------------------------------------------');
-        done();
-      });
-
-  });
-
 }
 
 function readFiles(dirname, file) {
