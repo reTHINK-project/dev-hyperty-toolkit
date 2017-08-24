@@ -42,4 +42,4 @@ module.exports = {
   replacePattern: replacePattern,
   unixifyPath: unixifyPath,
   readFiles: readFiles
-}
+};

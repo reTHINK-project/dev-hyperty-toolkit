@@ -11,6 +11,7 @@ var browserSync = require('./server').browserSync;
 
 var config = require('./toolkit.config.js');
 
+var { unixifyPath } = require('./utils');
 var { getTypeOfFile, encode } = require('./encodeTask');
 
 var { convertDataSchema, filterDataSchema } = require('./resources/dataschema');
@@ -241,12 +242,12 @@ function getListOfResources(type) {
 
 
   if (list.length === 0) {
-    list = filtered.map(resource => resource.dir.replace('/', ''));
+    list = filtered.map(resource => unixifyPath(resource.dir).replace('/', ''));
   }
 
   var resources = list.map((item) => {
     item = item.trim();
-    return resourcePath + '/' + resourceSrc + '/' + item;
+    return path.join(resourcePath, resourceSrc, item);
   }).filter((item) => {
     return !!filtered.filter(resource => item.includes(resource.dir)).length;
   });
@@ -305,33 +306,33 @@ function generateSourceCode(type) {
     case 'idp-proxy':
     case 'protocolstub':
       list = config.protostubs.include_stubs;
-      repository = config.protostubs.repository + '/' + config.protostubs.sourceCode;
+      repository = path.join(config.protostubs.repository, config.protostubs.sourceCode);
       filtered = filterProtostubs(process.env.ENVIRONMENT);
       convertFunction = convertProtoStub;
       break;
 
     case 'hyperty':
       list = config.hyperties.include_hyperties;
-      repository = config.hyperties.repository + '/' + config.hyperties.sourceCode;
+      repository = path.join(config.hyperties.repository, config.hyperties.sourceCode);
       filtered = filterHyperties(process.env.ENVIRONMENT);
       convertFunction = convertHyperty;
       break;
 
     case 'dataschema':
       list = config.hyperties.include_hyperties;
-      repository = config.hyperties.repository + '/' + config.hyperties.sourceCode;
+      repository = path.join(config.hyperties.repository, config.hyperties.sourceCode);
       filtered = filterDataSchema(process.env.ENVIRONMENT);
       convertFunction = convertDataSchema;
       break;
   }
 
   if (list.length === 0) {
-    list = filtered.map(resource => resource.dir.replace('/', ''));
+    list = filtered.map(resource => unixifyPath(resource.dir).replace('/', ''));
   }
 
   var sourceCode = list.map((item) => {
     item = item.trim();
-    return repository + '/' + item + '/*' + resource.extension + '.js';
+    return path.join(repository, item, '*' + resource.extension + '.js');
   }).filter((item) => {
     return !!filtered.filter(resource => item.includes(resource.dir)).length;
   });
@@ -355,30 +356,30 @@ function generateDescriptor(type, filePath) {
     case 'idp-proxy':
     case 'protocolstub':
       list = config.protostubs.include_stubs;
-      repository = config.protostubs.repository + '/' + config.protostubs.sourceCode;
+      repository = path.join(config.protostubs.repository, config.protostubs.sourceCode);
       filtered = filterProtostubs(process.env.ENVIRONMENT);
       break;
 
     case 'hyperty':
       list = config.hyperties.include_hyperties;
-      repository = config.hyperties.repository + '/' + config.hyperties.sourceCode;
+      repository = path.join(config.hyperties.repository, config.hyperties.sourceCode);
       filtered = filterHyperties(process.env.ENVIRONMENT);
       break;
 
     case 'dataschema':
       list = config.hyperties.include_hyperties;
-      repository = config.hyperties.repository + '/' + config.hyperties.sourceCode;
+      repository = path.join(config.hyperties.repository, config.hyperties.sourceCode);
       filtered = filterDataSchema(process.env.ENVIRONMENT);
 
   }
 
   if (list.length === 0) {
-    list = filtered.map(resource => resource.dir.replace('/', ''));
+    list = filtered.map(resource => unixifyPath(resource.dir).replace('/', ''));
   }
 
   var descriptor = list.map((item) => {
     item = item.trim();
-    return repository + '/' + item + '/*' + resource.extension + '.json';
+    return path.join(repository, item, '*' + resource.extension + '.json');
   }).filter((item) => {
     return !!filtered.filter(resource => item.includes(resource.dir)).length;
   });
