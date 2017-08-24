@@ -81,8 +81,8 @@ module.exports = function(config) {
     protocol: 'https',
 
     httpsServerOptions: {
-      key: fs.readFileSync('./gulp/ssl/local-server.key', 'utf8'),
-      cert: fs.readFileSync('./gulp/ssl/loca-server.crt', 'utf8')
+      key: fs.readFileSync('./server/ssl/server.key', 'utf8'),
+      cert: fs.readFileSync('./server/ssl/server.crt', 'utf8')
     },
 
     proxyValidateSSL: false,
@@ -93,6 +93,7 @@ module.exports = function(config) {
     }],
 
     client: {
+      runInParent: true,
       captureConsole: false
     },
 

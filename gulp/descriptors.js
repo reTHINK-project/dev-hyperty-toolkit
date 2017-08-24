@@ -2,13 +2,14 @@
 var fs = require('fs');
 var path = require('path');
 
-var generateGUID = require('./guid');
+var { MD5Hash } = require('./guid');
+var replacePattern = require('./utils').replacePattern;
 
 var through = require('through2');
 var gutil = require('gulp-util');
 var _ = require('lodash');
 
-var descriptorBase = function(type) {
+var descriptorBase = function(type, name) {
 
   var base = {};
 
@@ -21,17 +22,23 @@ var descriptorBase = function(type) {
   // Source Package configuration
   base.sourcePackageURL = '/sourcePackage';
 
-  base.cguid = '';
-  base.version = '0.1';
+  base.version = '0.0';
   base.description = '';
   base.language = 'Javascript';
 
   switch (type) {
     case 'hyperty':
+      base.cguid = MD5Hash(1, name);
       base.hypertyType = [];
       break;
 
+    case 'dataschema':
+      base.cguid = MD5Hash(2, name);
+      base.language = 'JSON-Schema';
+      break;
+
     case 'runtime':
+      base.cguid = MD5Hash(3, name);
       base.type = '';
       base.runtimeType = 'browser';
       base.p2pHandlerStub = '';
@@ -40,15 +47,19 @@ var descriptorBase = function(type) {
       break;
 
     case 'protocolstub':
-    case 'idp-proxy':
+      base.cguid = MD5Hash(4, name);
       base.type = '';
       base.constraints = {};
       base.interworking = false;
       break;
 
-    case 'dataschema':
-      base.language = 'JSON-Schema';
+    case 'idp-proxy':
+      base.type = '';
+      base.cguid = MD5Hash(5, name);
+      base.constraints = {};
+      base.interworking = false;
       break;
+
 
     default:
       base.type = '';
@@ -97,56 +108,62 @@ var encode = function(opts) {
       filename = fileObject.name.replace('.hy', '');
     } else if (fileObject.name.indexOf('.ds') !== -1) {
       filename = fileObject.name.replace('.ds', '');
+    } else if (fileObject.name.indexOf('.ps') !== -1) {
+      filename = fileObject.name.replace('.ps', '');
+    } else if (fileObject.name.indexOf('.idp') !== -1) {
+      filename = fileObject.name.replace('.idp', '');
     }
 
     var value = filename;
     var cguid = 0;
+
     switch (opts.descriptor) {
       case 'Hyperties':
         type = 'hyperty';
-        cguid = generateGUID(1);
+        cguid = MD5Hash(1, filename);
         break;
       case 'DataSchemas':
         type = 'dataschema';
-        cguid = generateGUID(2);
+        cguid = MD5Hash(2, filename);
         break;
       case 'Runtimes':
         type = 'runtime';
-        cguid = generateGUID(3);
+        cguid = MD5Hash(3, filename);
         break;
       case 'ProtoStubs':
-        type = 'protostub';
-        cguid = generateGUID(4);
+        type = 'protocolstub';
+        cguid = MD5Hash(4, filename);
         break;
       case 'IDPProxys':
         type = 'idp-proxy';
-        cguid = generateGUID(5);
+        cguid = MD5Hash(5, filename);
         break;
     }
 
     if (!json.hasOwnProperty(value)) {
-      json[value] = descriptorBase(type);
+      json[value] = descriptorBase(type, filename);
     }
 
-    Object.keys(json).map(function(key, index) {
-      json[key].cguid = cguid + index;
-    });
+    json[value].cguid = cguid;
 
     json[value].type = opts.descriptor;
 
     // json[value].version = 0.1;
     if (json[value].version) {
-      json[value].version = Number(json[value].version) + 0.1;
+      json[value].version = (Number(json[value].version) + 0.1).toFixed(2);
     }
 
-    json[value].description = checkValues('description', 'Description of ' + filename, json[value]);
+    json[value].description = checkValues('description', json[value].description, json[value]);
 
     var name = 'default';
     if (opts.isDefault) {
       name = 'default';
     } else {
-      name = opts.name || filename;
+      if (opts.name) name = opts.name;
+      else name = json[value].objectName;
     }
+
+    if (name.length === 0) name = filename;
 
     json[value].objectName = checkValues('objectName', name, json[value]);
 
@@ -198,7 +215,7 @@ var encode = function(opts) {
 
     if (json[value].sourcePackage) {
       json[value].sourcePackage.sourceCode = encoded;
-      json[value].sourcePackage.sourceCodeClassname = filename;
+      json[value].sourcePackage.sourceCodeClassname = name;
       json[value].sourcePackage.encoding = 'base64';
       json[value].sourcePackage.signature = '';
     }
@@ -218,6 +235,45 @@ var encode = function(opts) {
   });
 };
 
+function createDescriptor(resource) {
+
+  var typeOfDescriptor = getTypeOfDescriptor(resource);
+  var descriptor = fs.readFileSync(process.cwd() + '/resources/descriptors/' + typeOfDescriptor.name + '.json', 'utf8');
+  var data;
+  try {
+    data = JSON.parse(descriptor);
+  } catch (error) {
+    data = {};
+  }
+
+  return through.obj(function(chunk, enc, done) {
+
+    var fileObject = path.parse(chunk.path);
+    var nameOfResource = fileObject.name.replace(typeOfDescriptor.extension, '');
+    var preconfig = chunk.contents.toString('utf8');
+
+    try {
+      preconfig = JSON.parse(replacePattern(preconfig, process.env.DOMAIN || 'localhost'));
+
+      gutil.log('---------------------- ' + nameOfResource + ' ------------------------');
+
+      if (!data.hasOwnProperty(nameOfResource)) {
+        data[nameOfResource] = descriptorBase(typeOfDescriptor.type, fileObject.name);
+      }
+
+      var updated = _.extend(data[nameOfResource], preconfig);
+      data[nameOfResource] = updated;
+
+      var newChunk = fs.writeFileSync(process.cwd() + '/resources/descriptors/' + typeOfDescriptor.name + '.json', Buffer.from(JSON.stringify(data, null, 2), 'utf-8'), 'utf8');
+
+      done(null, newChunk);
+    } catch (error) {
+      gutil.log(gutil.colors.red('ERROR: ', fileObject.name  + ': ' + error));
+      done();
+    }
+  });
+}
+
 function checkValues(property, value, object) {
 
   if (_.isEmpty(value) && typeof(value) !== 'boolean') {
@@ -230,7 +286,27 @@ function checkValues(property, value, object) {
 
 }
 
+function getTypeOfDescriptor(resource) {
+  var d = {
+    name: '',
+    type: '',
+    extension: ''
+  };
+
+  switch (resource) {
+    case 'runtime': d.name = 'Runtimes'; d.type = 'runtime'; d.extension = ''; break;
+    case 'hyperty': d.name = 'Hyperties'; d.type = 'hyperty'; d.extension = '.hy'; break;
+    case 'idp-proxy': d.name = 'IDPProxys'; d.type = 'idp-proxy'; d.extension = '.idp'; break;
+    case 'protocolstub': d.name = 'ProtoStubs'; d.type = 'protocolstub'; d.extension = '.ps'; break;
+    case 'dataschema': d.name = 'DataSchemas'; d.type = 'dataschema'; d.extension = '.ds'; break;
+  }
+
+  return d;
+}
+
 module.exports = {
+  getTypeOfDescriptor: getTypeOfDescriptor,
+  createDescriptor: createDescriptor,
   descriptorBase: descriptorBase,
   encode: encode
 };

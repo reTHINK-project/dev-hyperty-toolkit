@@ -1,105 +1,123 @@
 // jshint varstmt: false
 var fs = require('fs');
+var path = require('path');
 var gutil = require('gulp-util');
 var getStage = require('./stage');
+
+var handlebars = require('handlebars');
+
 var browserSync = require('browser-sync').create('Toolkit');
 
 var bsServer;
 var serverStatus;
 
 function server(done) {
-
-  var stage = getStage();
-
-  var timestamps = true;
-
-  var codeSync = true;
-  var minify = false;
-  var logLevel = 'info';
-  var notify = true;
-  var logConnections = true;
-  var injectChanges = true;
-  var ui = {};
-  var logFileChanges = true;
-
-  if (stage === 'production') {
-    codeSync = false;
-    minify = true;
-    logLevel = 'info';
-    notify = false;
-    injectChanges = false;
-    ui = false;
-  }
-
-  var server = {
-    baseDir: './app'
-  };
-
-  if (stage === 'develop') {
-    server.middleware = devMiddleware;
-  } else {
-    server.middleware = middleware;
-    server.routes = {
-      '/.well-known/runtime': 'node_modules/runtime-browser/bin'
-    };
-
-    gutil.log('|******************************************************************************|');
-    gutil.log('|                                                                              |');
-    gutil.log('|                     THE TOOLKIT IS IN PRODUCTION MODE                        |');
-    gutil.log('|       THE LOCAL CATALOGUE WAS NOT ACCESSIBLE, WILL BE USED THE REMOTE        |');
-    gutil.log('|                     BASED ON YOUR CONFIGURATION FILE                         |');
-    gutil.log('|                                                                              |');
-    gutil.log('|******************************************************************************|');
-  }
-
-  // Serve files from the root of this project
-  bsServer = browserSync.init({
-    open: false,
-    online: false,
-    timestamps: timestamps,
-    logLevel: logLevel,
-    cors: true,
-    logFileChanges: logFileChanges,
-    port: process.env.PORT || 443,
-    minify: minify,
-    notify: notify,
-    ui: ui,
-    injectChanges: injectChanges,
-    ghostMode: false,
-    https: {
-      key: './gulp/ssl/local-server.key',
-      cert: './gulp/ssl/loca-server.crt'
-    },
-    logConnections: logConnections,
-    codeSync: codeSync,
-    server: server
-  }, function(err) {
-    if (err) {
-      gutil.log('Check the documentation on Gulp Task.');
-      gutil.log('Or open an issue here https://github.com/reTHINK-project/dev-hyperty-toolkit/issues');
-      done(err);
-    }
-
-    if (serverStatus === 'open') {
-      browserSync.exit();
-
-      gutil.log('|******************************************************************************|');
-      gutil.log('|                                                                              |');
-      gutil.log('|                         THE TOOLKIT WILL STOP RUNNING.                       |');
-      gutil.log('|              CHECK IF YOU HAVE OTHER SEVICE RUNNING ON PORT 443.             |');
-      gutil.log('|                                                                              |');
-      gutil.log('|******************************************************************************|');
-
-      return false;
-    }
-
-    browserSync.reload();
-    done();
+  browserSync.init({
+    // open: false,
+    // online: false,
+    // https: {
+    //   key: './gulp/ssl/server.key',
+    //   cert: './gulp/ssl/server.crt'
+    // },
+    // proxy: 'http://localhost:5000',
+    // files: ['../app/**/*.*'],
+    // port: process.env.PORT || 443
   });
-
-  checkStatus();
-
 }
+
+// function server(done) {
+
+//   var stage = getStage();
+
+//   var timestamps = true;
+
+//   var codeSync = true;
+//   var minify = false;
+//   var logLevel = 'info';
+//   var notify = true;
+//   var logConnections = true;
+//   var injectChanges = true;
+//   var ui = {};
+//   var logFileChanges = true;
+
+//   if (stage === 'production') {
+//     codeSync = false;
+//     minify = true;
+//     logLevel = 'info';
+//     notify = false;
+//     injectChanges = false;
+//     ui = false;
+//   }
+
+//   var server = {
+//     baseDir: './app'
+//   };
+
+//   if (stage === 'develop') {
+//     server.middleware = devMiddleware;
+//   } else {
+//     server.middleware = middleware;
+//     server.routes = {
+//       '/.well-known/runtime': 'node_modules/runtime-browser/bin'
+//     };
+
+//     gutil.log('|******************************************************************************|');
+//     gutil.log('|                                                                              |');
+//     gutil.log('|                     THE TOOLKIT IS IN PRODUCTION MODE                        |');
+//     gutil.log('|       THE LOCAL CATALOGUE WAS NOT ACCESSIBLE, WILL BE USED THE REMOTE        |');
+//     gutil.log('|                     BASED ON YOUR CONFIGURATION FILE                         |');
+//     gutil.log('|                                                                              |');
+//     gutil.log('|******************************************************************************|');
+//   }
+
+//   // Serve files from the root of this project
+//   bsServer = browserSync.init({
+//     open: false,
+//     online: false,
+//     timestamps: timestamps,
+//     logLevel: logLevel,
+//     cors: true,
+//     logFileChanges: logFileChanges,
+//     port: process.env.PORT || 443,
+//     minify: minify,
+//     notify: notify,
+//     ui: ui,
+//     injectChanges: injectChanges,
+//     ghostMode: false,
+//     https: {
+//       key: './gulp/ssl/server.key',
+//       cert: './gulp/ssl/server.crt'
+//     },
+//     logConnections: logConnections,
+//     codeSync: codeSync,
+//     server: server
+//   }, function(err) {
+//     if (err) {
+//       gutil.log('Check the documentation on Gulp Task.');
+//       gutil.log('Or open an issue here https://github.com/reTHINK-project/dev-hyperty-toolkit/issues');
+//       done(err);
+//     }
+
+//     if (serverStatus === 'open') {
+//       browserSync.exit();
+
+//       gutil.log('|******************************************************************************|');
+//       gutil.log('|                                                                              |');
+//       gutil.log('|                         THE TOOLKIT WILL STOP RUNNING.                       |');
+//       gutil.log('|              CHECK IF YOU HAVE OTHER SEVICE RUNNING ON PORT 443.             |');
+//       gutil.log('|                                                                              |');
+//       gutil.log('|******************************************************************************|');
+
+//       return false;
+//     }
+
+//     browserSync.reload();
+//     done();
+//   });
+
+//   checkStatus();
+
+// }
 
 function checkStatus() {
   bsServer.utils.portscanner.checkPortStatus(443, {}, function(err, status) {
@@ -126,7 +144,6 @@ function devMiddleware(req, res, next) {
     if (req.originalUrl.includes('.well-known')) {
       var info = getResourceInfo(req.originalUrl);
 
-      console.log('Info:', info);
 
       if (req.originalUrl.includes('.html') || req.originalUrl.includes('.js')) {
 
@@ -238,9 +255,35 @@ function devMiddleware(req, res, next) {
         }
 
       }
-    }
+    } else if (req.originalUrl.includes('.hbs')) {
 
-    next();
+      var tpl = path.join(process.env.HYPERTY_REPO, 'examples', req.originalUrl);
+
+      fs.readFile(tpl, 'utf8', function(err, data) {
+
+        var template = handlebars.compile(data);
+        res.writeHeader(200, { 'Content-Type': 'text/html' });
+        var context = { title: 'My New Post', body: 'This is my first post!' };
+        var html = template(context);
+        res.end(html);
+
+      });
+
+    } else if (req.originalUrl.includes('.js?_=')) {
+
+      var cleanJSPath = req.originalUrl.substr(0, req.originalUrl.indexOf('?'));
+      var js = path.join(process.env.HYPERTY_REPO, 'examples', cleanJSPath);
+
+      fs.readFile(js, 'utf8', function(err, data) {
+
+        res.writeHeader(200, { 'Content-Type': 'application/javascript' });
+        res.end(data);
+
+      });
+
+    } else {
+      next();
+    }
 
   } else if (req.method === 'POST') {
     processPost(req, res);

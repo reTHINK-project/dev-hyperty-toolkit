@@ -21,7 +21,6 @@ parserOptions:
     classes: true
   sourceType: module
 
-
 rules:
   no-const-assign: warn
   no-this-before-super: warn

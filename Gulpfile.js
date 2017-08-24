@@ -4,10 +4,14 @@ var gulp = require('gulp');
 var fs = require('fs');
 var path = require('path');
 
+var env = require('node-env-file');
+env(path.join(process.cwd(), 'env'));
+
 var _ = require('lodash');
 var through = require('through2');
 var inquirer = require('inquirer');
 var gutil = require('gulp-util');
+var nodemon = require('gulp-nodemon');
 var runSequence = require('run-sequence');
 var vinylPaths = require('vinyl-paths');
 var del = require('del');
@@ -15,7 +19,7 @@ var del = require('del');
 var replacePattern = require('./gulp/utils').replacePattern;
 var getEnvironment = require('./gulp/environment');
 var getStage = require('./gulp/stage');
-var server = require('./gulp/server').server;
+
 var browserSync = require('./gulp/server').browserSync;
 var descriptorBase = require('./gulp/descriptors').descriptorBase;
 var encodeTask = require('./gulp/encodeTask').encodeTask;
@@ -27,28 +31,86 @@ var resource = require('./gulp/resources');
 var walk = require('./gulp/walk');
 var unixifyPath = require('./gulp/utils').unixifyPath;
 
-var dirname = __dirname;
+var checkHypertiesFile = require('./gulp/resources/hyperty').checkHypertiesFile;
+var checkProtostubsFile = require('./gulp/resources/protostub').checkProtostubsFile;
+var checkDataSchemasFile = require('./gulp/resources/dataschema').checkDataSchemasFile;
 
-var env = require('node-env-file');
+var {
+  watchHTML,
+  watchHyperties,
+  watchProtostubs,
+  watchIdpProxies,
+  watchDataSchemas,
+  watchResources,
+  createIDPProxySourceCode,
+  createIDPProxyDescriptors,
+  createHypertiesSourceCode,
+  createHypertiesDescriptors,
+  createProtoStubsSourceCode,
+  createProtoStubsDescriptors,
+  createDataSchemasSourceCode,
+  createDataSchemasDescriptors } = require('./gulp/handleResources');
+
+var dirname = __dirname;
 
 gulp.task('serve', function(done) {
 
-  var stage = getStage();
-
-  var sequence = ['clean', 'stage', 'src-hyperties', 'checkHyperties', 'descriptor', 'checkDataSchemas', 'schemas', 'js', 'hyperties', 'server'];
-
-  env(path.join(process.cwd(), 'env'));
-
-  if (stage !== 'production') {
-
-    env(path.join(process.cwd(), '.env.server'));
-
-    sequence.push('watch');
-  }
+  var sequence = [
+    'clean',
+    'stage',
+    'watch:html',
+    'checkHyperties',
+    'checkProtostubs',
+    'checkDataSchemas',
+    'dataschema:sourceCode',
+    'idpproxy:sourceCode',
+    'protostubs:sourceCode',
+    'hyperties:sourceCode',
+    'service',
+    'server',
+    ['watch:resources', 'watch:protostubs', 'watch:hyperties', 'watch:idpproxies', 'watch:dataschemas']
+  ];
 
   runSequence.apply(runSequence, sequence, done);
 
 });
+
+
+gulp.task('server', function(cb) {
+
+  return nodemon({
+    verbose: true,
+    ignore: ['resources/*'],
+    script: './server/express.js',
+    stdout: true
+  }).once('start', cb);
+
+});
+
+gulp.task('hyperties:sourceCode', ['hyperties:descriptor'], createHypertiesSourceCode);
+gulp.task('hyperties:descriptor', createHypertiesDescriptors);
+
+gulp.task('protostubs:sourceCode', ['protostubs:descriptor'], createProtoStubsSourceCode);
+gulp.task('protostubs:descriptor', createProtoStubsDescriptors);
+
+gulp.task('idpproxy:sourceCode', ['idpproxy:descriptor'], createIDPProxySourceCode);
+gulp.task('idpproxy:descriptor', createIDPProxyDescriptors);
+
+gulp.task('dataschema:sourceCode', ['dataschema:descriptor'], createDataSchemasSourceCode);
+gulp.task('dataschema:descriptor', createDataSchemasDescriptors);
+
+gulp.task('watch:html', watchHTML);
+gulp.task('watch:hyperties', watchHyperties);
+gulp.task('watch:protostubs', watchProtostubs);
+gulp.task('watch:idpproxies', watchIdpProxies);
+gulp.task('watch:dataschemas', watchDataSchemas);
+
+gulp.task('watch:resources', watchResources);
+
+gulp.task('checkHyperties', checkHypertiesFile);
+gulp.task('checkProtostubs', checkProtostubsFile);
+gulp.task('checkDataSchemas', checkDataSchemasFile);
+
 
 gulp.task('build:hyperties', function(done) {
 
@@ -59,38 +121,42 @@ gulp.task('build:hyperties', function(done) {
   runSequence.apply(runSequence, sequence, function() {
 
     return gulp.src('./src/**/*.js')
-    .pipe(watchHyperties('./src/**/*.js'))
-    .on('end', done);
+      .pipe(watchHyperties('./src/**/*.js'))
+      .on('end', done);
 
   });
 
 });
 
-gulp.task('checkHyperties', function() {
+gulp.task('service', function() {
 
-  try {
-    var stats = fs.lstatSync(__dirname + '/resources/descriptors/Hyperties.json');
-    console.log(stats.isFile());
-  } catch (e) {
-    fs.writeFile(__dirname + '/resources/descriptors/Hyperties.json', '{}', (err) => {
-      if (err) throw new Error(err);
-      return true;
+  var sequence = [
+    'watch:html',
+    'dataschema:sourceCode',
+    'idpproxy:sourceCode',
+    'protostubs:sourceCode',
+    'hyperties:sourceCode'
+  ];
+  var isRunning = false;
+
+  function executeOnce() {
+
+    console.log('Execute Once: ', isRunning);
+
+    if (isRunning) return false;
+
+    isRunning = true;
+
+    runSequence(sequence, () => {
+      isRunning = false;
+      console.log('Executed Once: ', isRunning);
     });
+
   }
 
-});
-
-gulp.task('checkDataSchemas', function() {
-
-  try {
-    var stats = fs.lstatSync(path.resolve(__dirname + '/resources/descriptors/DataSchemas.json'));
-    console.log(stats.isFile());
-  } catch (e) {
-    fs.writeFile(path.resolve(__dirname + '/resources/descriptors/DataSchemas.json'), '{}', (err) => {
-      if (err) throw new Error(err);
-      return true;
-    });
-  }
+  gulp.watch(process.cwd() + '/node_modules/service-framework/**/*.*', () => {
+    executeOnce();
+  });
 
 });
 
@@ -98,13 +164,11 @@ gulp.task('src-hyperties', function(done) {
 
   var srcPath;
 
-  console.log('PROCESS:', process.env.HYPERTY_REPO);
-
   if (process.env.HYPERTY_REPO) {
 
     srcPath = path.resolve(process.env.HYPERTY_REPO);
 
-    console.log('Hyperty:', srcPath)
+    console.log('Hyperties are in: ', srcPath);
 
     fs.stat(srcPath, function(error) {
       if (error) {
@@ -146,7 +210,7 @@ gulp.task('copy-assets', copyAssets);
 gulp.task('copy-examples', copyExamples);
 
 // use default task to launch Browsersync and watch JS files
-gulp.task('server', server);
+// gulp.task('server', server);
 
 gulp.task('stage', function() {
 
@@ -156,19 +220,20 @@ gulp.task('stage', function() {
     DEVELOPMENT: process.env.DEVELOPMENT || true,
     RUNTIME_URL: process.env.RUNTIME_URL,
     DOMAIN: process.env.DOMAIN || 'localhost',
-    HYPERTY_REPO: process.env.HYPERTY_REPO || '../dev-hyperty',
     ENVIRONMENT: process.env.ENVIRONMENT || 'core',
     INDEX_URL: process.env.INDEX_URL,
-    SANDBOX_URL: process.env.SANDBOX_URL
+    SANDBOX_URL: process.env.SANDBOX_URL,
+    HYPERTY_REPO: process.env.HYPERTY_REPO || '../dev-hyperty',
+    PROTOSTUB_REPO: process.env.PROTOSTUB_REPO || '../dev-protostubs'
   };
 
   return gulp.src('./')
-  .pipe(createFile('config.json', new Buffer(JSON.stringify(configuration, null, 2))))
-  .pipe(gulp.dest('./'))
-  .on('end', function() {
-    gutil.log('You are in the ' + stage + ' mode');
-    gutil.log('Your configuration \n', JSON.stringify(configuration, null, 2));
-  });
+    .pipe(createFile('config.json', new Buffer(JSON.stringify(configuration, null, 2))))
+    .pipe(gulp.dest('./'))
+    .on('end', function() {
+      gutil.log('You are in the ' + stage + ' mode');
+      gutil.log('Your configuration \n', JSON.stringify(configuration, null, 2));
+    });
 
 });
 
@@ -195,24 +260,24 @@ function copyFiles(opts) {
 
     gutil.log('Copy changes from ' + fileObject.base + ' to ' + dir);
     return gulp.src(chunk.path)
-    .pipe(gulp.dest(dir))
-    .on('end', function() {
-      done();
-    });
+      .pipe(gulp.dest(dir))
+      .on('end', function() {
+        done();
+      });
 
   });
 
 }
 
-function watchHyperties(filePath) {
-  console.log('Watch:', filePath);
-  return gulp.src(filePath)
-    .pipe(convertHyperty())
-    .resume()
-    .on('end', function() {
-      browserSync.reload();
-    });
-}
+// function watchHyperties(filePath) {
+//   console.log('Watch:', filePath);
+//   return gulp.src(filePath)
+//     .pipe(convertHyperty())
+//     .resume()
+//     .on('end', function() {
+//       browserSync.reload();
+//     });
+// }
 
 gulp.task('watch', function() {
 
@@ -223,9 +288,9 @@ gulp.task('watch', function() {
 
   gulp.watch(['./server/rethink.js', './resources/factories/*.js', './resources/browser/*.js', './resources/sandboxes/*.js', './app/main.js'], function() {
     return gulp.src('./server/rethink.js')
-    .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
-    .resume()
-    .on('end', browserSync.reload);
+      .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
+      .resume()
+      .on('end', browserSync.reload);
   });
 
   gulp.watch('env', ['stage']);
@@ -253,21 +318,21 @@ gulp.task('watch', function() {
   gulp.watch(['./src/**/*.ds.json'], function(event) {
     var fileObject = path.parse(event.path);
     return gulp.src([fileObject.dir + '/*.ds.js'])
-    .pipe(convertSchema())
-    .on('end', function() {
-      browserSync.reload();
-    });
+      .pipe(convertSchema())
+      .on('end', function() {
+        browserSync.reload();
+      });
   });
 
   gulp.watch(['./src/**/*.hy.json'], function(event) {
 
     return gulp.src(event.path)
-    .pipe(createDescriptor())
-    .pipe(gulp.dest('./resources/descriptors/'))
-    .on('end', function() {
-      gutil.log('the preconfiguration hyperty was changed, and the Hyperties.json was updated');
-      browserSync.reload();
-    });
+      .pipe(createDescriptor())
+      .pipe(gulp.dest('./resources/descriptors/'))
+      .on('end', function() {
+        gutil.log('the preconfiguration hyperty was changed, and the Hyperties.json was updated');
+        browserSync.reload();
+      });
 
   });
 
@@ -278,47 +343,47 @@ gulp.task('watch', function() {
   // Watch
   gulp.watch([dirname + '/src/**/*.js'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'src'}));
+      .pipe(copyFiles({dest: 'src'}));
   });
 
   gulp.watch([dirname + '/src/**/*.json'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'src'}));
+      .pipe(copyFiles({dest: 'src'}));
   });
 
   gulp.watch([dirname + '/examples/*.html', dirname + '/examples/**/*.hbs'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'app'}))
-    .resume()
-    .on('end', function() {
-      gutil.log('The html templates are copied with success');
-      gutil.log('-----------------------------------------------------------');
-      browserSync.reload();
-    });
+      .pipe(copyFiles({dest: 'app'}))
+      .resume()
+      .on('end', function() {
+        gutil.log('The html templates are copied with success');
+        gutil.log('-----------------------------------------------------------');
+        browserSync.reload();
+      });
   });
 
   gulp.watch([dirname + '/examples/main.js'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'app'}))
-    .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
-    .resume()
-    .on('end', function() {
-      gutil.log('The main file was created like a distribution file on /dist');
-      gutil.log('-----------------------------------------------------------');
-      browserSync.reload();
-    });
+      .pipe(copyFiles({dest: 'app'}))
+      .pipe(transpile({destination: __dirname + '/app/dist', debug: true}))
+      .resume()
+      .on('end', function() {
+        gutil.log('The main file was created like a distribution file on /dist');
+        gutil.log('-----------------------------------------------------------');
+        browserSync.reload();
+      });
   });
 
   gulp.watch([dirname + '/examples/**/*.js', '!' + dirname + '/examples/main.js'], function(event) {
     return gulp.src([event.path])
-    .pipe(copyFiles({dest: 'app'}))
-    .pipe(transpile({destination: __dirname + '/app', debug: true}))
-    .resume()
-    .on('end', function() {
-      gutil.log('The javascript was copied and converted to es5');
-      gutil.log('-----------------------------------------------------------');
-      browserSync.reload();
-    });
+      .pipe(copyFiles({dest: 'app'}))
+      .pipe(transpile({destination: __dirname + '/app', debug: true}))
+      .resume()
+      .on('end', function() {
+        gutil.log('The javascript was copied and converted to es5');
+        gutil.log('-----------------------------------------------------------');
+        browserSync.reload();
+      });
   });
 
 });
@@ -344,36 +409,36 @@ gulp.task('js', function() {
 });
 
 // process JS files and return the stream.
-gulp.task('hyperties', function() {
+// gulp.task('hyperties', function() {
 
-  return gulp.src('./src/**/*.hy.js')
-  .pipe(convertHyperty())
-  .on('end', function() {
-    browserSync.reload();
-  });
+//   return gulp.src('./src/**/*.hy.js')
+//     .pipe(convertHyperty())
+//     .on('end', function() {
+//       browserSync.reload();
+//     });
 
-});
+// });
 
-gulp.task('schemas', function() {
+// gulp.task('schemas', function() {
 
-  return gulp.src(['./src/**/*.ds.json', './resources/schemas/**/*.ds.json'])
-  .pipe(convertSchema())
-  .on('end', function() {
-    browserSync.reload();
-  });
+//   return gulp.src(['./src/**/*.ds.json', './resources/schemas/**/*.ds.json'])
+//     .pipe(convertSchema())
+//     .on('end', function() {
+//       browserSync.reload();
+//     });
 
-});
+// });
 
 gulp.task('encode', encodeTask);
 
 gulp.task('descriptor', function() {
 
   return gulp.src('./src/**/*.hy.json')
-  .pipe(createDescriptor())
-  .pipe(gulp.dest('./resources/'))
-  .on('end', function() {
-    browserSync.reload();
-  });
+    .pipe(createDescriptor())
+    .pipe(gulp.dest('./resources/'))
+    .on('end', function() {
+      browserSync.reload();
+    });
 
 });
 
@@ -410,34 +475,6 @@ function createDescriptor() {
 
     done(null, newChunk);
   });
-}
-
-function convertHyperty() {
-
-  return through.obj(function(chunk, enc, done) {
-
-    var fileObject = path.parse(chunk.path);
-
-    return gulp.src([chunk.path])
-    .on('end', function() {
-      gutil.log('-----------------------------------------------------------');
-      gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
-    })
-    .pipe(transpile({
-      destination: __dirname + '/resources',
-      standalone: 'activate',
-      debug: false
-    }))
-    .pipe(resource())
-    .resume()
-    .on('end', function() {
-      gutil.log('Hyperty', fileObject.name, ' was converted and encoded');
-      gutil.log('-----------------------------------------------------------');
-      done();
-    });
-
-  });
-
 }
 
 function readFiles(dirname, file) {
@@ -492,17 +529,17 @@ function convertSchema() {
     var fileObject = path.parse(chunk.path);
 
     return gulp.src([chunk.path])
-    .on('end', function() {
-      gutil.log('-----------------------------------------------------------');
-      gutil.log('Encoding ' + fileObject.base + ' to base64');
-    })
-    .pipe(resource())
-    .resume()
-    .on('end', function() {
-      gutil.log('DataSchema', fileObject.name, ' was encoded');
-      gutil.log('-----------------------------------------------------------');
-      done();
-    });
+      .on('end', function() {
+        gutil.log('-----------------------------------------------------------');
+        gutil.log('Encoding ' + fileObject.base + ' to base64');
+      })
+      .pipe(resource())
+      .resume()
+      .on('end', function() {
+        gutil.log('DataSchema', fileObject.name, ' was encoded');
+        gutil.log('-----------------------------------------------------------');
+        done();
+      });
 
   });
 
@@ -549,19 +586,18 @@ function copySrc() {
     var directory = fileObject.dir.substr(fileObject.dir.indexOf('/src/'));
     return gulp.src(file)
       .pipe(gulp.dest('.' + directory));
-
   });
 
 }
 
 function copyAssets() {
   return gulp.src(['./server/assets/*.png', './server/assets/*.ico'])
-  .pipe(gulp.dest('./app/assets'));
+    .pipe(gulp.dest('./app/assets'));
 }
 
 function copyExamples() {
   return gulp.src([dirname + '/examples/**/*'])
-  .pipe(gulp.dest('./app'));
+    .pipe(gulp.dest('./app'));
 }
 
 function copyHyperties(from, done) {
