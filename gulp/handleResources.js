@@ -30,10 +30,10 @@ function bundleHTML() {
 
   var webpackConfig = {
     entry: {
-      rethink: __dirname + '/../server/rethink.js'
+      rethink: process.cwd() + '/server/rethink.js'
     },
     output: {
-      path: __dirname + '/../app',
+      path: process.cwd() + '/app',
       filename: '[name].js'
     },
     devtool: 'source-map',
