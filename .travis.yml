@@ -16,7 +16,7 @@ before_install:
   - git clone --branch=develop https://github.com/reTHINK-project/dev-hyperty.git
   - export HYPERTY_REPO=./dev-hyperty
   - git clone https://github.com/reTHINK-project/dev-protostubs.git
-  - export HYPERTY_REPO=./dev-protostubs
+  - export PROTOSTUB_REPO=./dev-protostubs
 
 install:
   - npm install
