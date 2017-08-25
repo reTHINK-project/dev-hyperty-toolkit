@@ -101,7 +101,7 @@ function watchProtostubs(done) {
   var sourceCode = getListOfResources('protocolstub');
   sourceCode = sourceCode.map(item => item + '/**/*.js');
 
-  console.log('Watch SourceCode:', sourceCode);
+  // console.log('Watch SourceCode:', sourceCode);
 
   gulp.watch(sourceCode, function(event) {
     return watchResource(event, 'protocolstub');
@@ -251,8 +251,6 @@ function getListOfResources(type) {
   }).filter((item) => {
     return !!filtered.filter(resource => item.includes(resource.dir)).length;
   });
-
-  console.log('AQUI:', resources);
 
   return resources;
 }
