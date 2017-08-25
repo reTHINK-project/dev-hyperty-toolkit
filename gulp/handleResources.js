@@ -83,7 +83,7 @@ function watchResources(done) {
 function watchHyperties(done) {
 
   var sourceCode = getListOfResources('hyperty');
-  sourceCode = sourceCode.map(item => item + '/*.js');
+  sourceCode = sourceCode.map(item => item + '/**/*.js');
   gulp.watch(sourceCode, function(event) {
     return watchResource(event, 'hyperty');
   });
@@ -99,9 +99,9 @@ function watchHyperties(done) {
 function watchProtostubs(done) {
 
   var sourceCode = getListOfResources('protocolstub');
-  sourceCode = sourceCode.map(item => item + '/*.ps.js');
+  sourceCode = sourceCode.map(item => item + '/**/*.js');
 
-  // console.log('Watch SourceCode:', sourceCode);
+  console.log('Watch SourceCode:', sourceCode);
 
   gulp.watch(sourceCode, function(event) {
     return watchResource(event, 'protocolstub');
@@ -175,25 +175,25 @@ function watchResource(event, type) {
       case 'hyperty':
         resource = getTypeOfDescriptor('hyperty');
         convertFunction = convertHyperty;
-        filePath = fileObject.dir + '/*' + resource.extension + '.js';
+        filePath = path.join(fileObject.dir, '*' + resource.extension + '.js');
         break;
 
       case 'protocolstub':
         resource = getTypeOfDescriptor('protocolstub');
         convertFunction = convertProtoStub;
-        filePath = fileObject.dir + '/*' + resource.extension + '.js';
+        filePath = path.join(fileObject.dir, '*' + resource.extension + '.js');
         break;
 
       case 'idp-proxy':
         resource = getTypeOfDescriptor('idp-proxy');
         convertFunction = convertProtoStub;
-        filePath = fileObject.dir + '/*' + resource.extension + '.js';
+        filePath = path.join(fileObject.dir, '*' + resource.extension + '.js');
         break;
 
       case 'dataschema':
         resource = getTypeOfDescriptor('dataschema');
         convertFunction = convertDataSchema;
-        filePath = fileObject.dir + '/*' + resource.extension + '.js';
+        filePath = path.join(fileObject.dir, '*' + resource.extension + '.js');
         break;
     }
 
@@ -251,6 +251,8 @@ function getListOfResources(type) {
   }).filter((item) => {
     return !!filtered.filter(resource => item.includes(resource.dir)).length;
   });
+
+  console.log('AQUI:', resources);
 
   return resources;
 }
