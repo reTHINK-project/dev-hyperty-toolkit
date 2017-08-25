@@ -83,13 +83,16 @@ function watchResources(done) {
 function watchHyperties(done) {
 
   var sourceCode = getListOfResources('hyperty');
-  sourceCode = sourceCode.map(item => item + '/**/*.js');
+  sourceCode = sourceCode.map(item => item + '/*.js');
+
   gulp.watch(sourceCode, function(event) {
+    console.log('event:', event);
     return watchResource(event, 'hyperty');
   });
 
   var descriptor = getListOfResources('hyperty');
   descriptor = descriptor.map(item => item + '/*.hy.json');
+
   gulp.watch(descriptor, function(event) {
     return generateDescriptor('hyperty', event.path);
   });
@@ -99,9 +102,9 @@ function watchHyperties(done) {
 function watchProtostubs(done) {
 
   var sourceCode = getListOfResources('protocolstub');
-  sourceCode = sourceCode.map(item => item + '/**/*.js');
+  sourceCode = sourceCode.map(item => item + '/*.js');
 
-  // console.log('Watch SourceCode:', sourceCode);
+  console.log('Watch SourceCode:', sourceCode);
 
   gulp.watch(sourceCode, function(event) {
     return watchResource(event, 'protocolstub');
@@ -239,7 +242,6 @@ function getListOfResources(type) {
       resourceSrc = config.hyperties.sourceCode;
       break;
   }
-
 
   if (list.length === 0) {
     list = filtered.map(resource => unixifyPath(resource.dir).replace('/', ''));

@@ -99,11 +99,11 @@ gulp.task('idpproxy:descriptor', createIDPProxyDescriptors);
 gulp.task('dataschema:sourceCode', ['dataschema:descriptor'], createDataSchemasSourceCode);
 gulp.task('dataschema:descriptor', createDataSchemasDescriptors);
 
-gulp.task('watch:html', watchHTML);
-gulp.task('watch:hyperties', watchHyperties);
-gulp.task('watch:protostubs', watchProtostubs);
-gulp.task('watch:idpproxies', watchIdpProxies);
-gulp.task('watch:dataschemas', watchDataSchemas);
+gulp.task('watch:html', ['set:env'], watchHTML);
+gulp.task('watch:hyperties', ['set:env'], watchHyperties);
+gulp.task('watch:protostubs', ['set:env'], watchProtostubs);
+gulp.task('watch:idpproxies', ['set:env'], watchIdpProxies);
+gulp.task('watch:dataschemas', ['set:env'], watchDataSchemas);
 
 gulp.task('watch:resources', watchResources);
 
@@ -111,6 +111,10 @@ gulp.task('checkHyperties', checkHypertiesFile);
 gulp.task('checkProtostubs', checkProtostubsFile);
 gulp.task('checkDataSchemas', checkDataSchemasFile);
 
+gulp.task('set:env', function() {
+  env(path.join(process.cwd(), '.env.server'));
+  env(path.join(process.cwd(), 'env'));
+})
 
 gulp.task('build:hyperties', function(done) {
 
@@ -213,6 +217,9 @@ gulp.task('copy-examples', copyExamples);
 // gulp.task('server', server);
 
 gulp.task('stage', function() {
+
+  env(path.join(process.cwd(), '.env.server'));
+  env(path.join(process.cwd(), 'env'));
 
   var stage = getStage();
 
