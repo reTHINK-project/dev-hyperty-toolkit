@@ -285,48 +285,66 @@ function findMatches(raw, data) {
 
 }
 
+
+/**
+ * TODO: Check why the usage of readStream cause a large CPU Usage
+ * 
+ * @param {any} type 
+ * @param {any} cb 
+ */
 function getResources(type, cb) {
   var raw;
-  var parser = JSONStream.parse();
+  // var parser = JSONStream.parse();
   var before = process.memoryUsage().rss;
 
   switch (type) {
     case 'runtime':
-      raw = fs.createReadStream('./resources/descriptors/Runtimes.json');
+      // raw = fs.createReadStream('./resources/descriptors/Runtimes.json');
+      raw = fs.readFileSync('./resources/descriptors/Runtimes.json');
       break;
     case 'hyperty':
-      raw = fs.createReadStream('./resources/descriptors/Hyperties.json');
+      // raw = fs.createReadStream('./resources/descriptors/Hyperties.json');
+      raw = fs.readFileSync('./resources/descriptors/Hyperties.json');
       break;
     case 'idp-proxy':
-      raw = fs.createReadStream('./resources/descriptors/IDPProxys.json');
+      // raw = fs.createReadStream('./resources/descriptors/IDPProxys.json');
+      raw = fs.readFileSync('./resources/descriptors/IDPProxys.json');
       break;
     case 'protocolstub':
-      raw = fs.createReadStream('./resources/descriptors/ProtoStubs.json');
+      // raw = fs.createReadStream('./resources/descriptors/ProtoStubs.json');
+      raw = fs.readFileSync('./resources/descriptors/ProtoStubs.json');
       break;
     case 'dataschema':
-      raw = fs.createReadStream('./resources/descriptors/DataSchemas.json');
+      // raw = fs.createReadStream('./resources/descriptors/DataSchemas.json');
+      raw = fs.readFileSync('./resources/descriptors/DataSchemas.json');
       break;
   }
 
   let data;
 
   if (raw) {
-    raw
-      .pipe(parser)
-      .resume()
-      .on('error', (e) => {
-        console.log(e);
-        cb(e);
-      })
-      .on('data', (d) => {
-        data = d;
-      })
-      .on('end', () => {
-        gutil.log(gutil.colors.yellow('Memory Usage: '), Math.round(before / 1024 / 1024), 'MB');
-        gutil.log(gutil.colors.yellow('memory increased by: '), Math.round((process.memoryUsage().rss - before) / 1024 / 1024), 'MB');
-        raw.destroy();
-        cb(null, data);
-      })
+
+    gutil.log(gutil.colors.yellow('Memory Usage: '), Math.round(before / 1024 / 1024), 'MB');
+    gutil.log(gutil.colors.yellow('memory increased by: '), Math.round((process.memoryUsage().rss - before) / 1024 / 1024), 'MB');
+    cb(null, JSON.parse(raw));
+
+    // TODO: check why the streams cause a large CPU usage
+    // raw
+    //   .pipe(parser)
+    //   .resume()
+    //   .on('error', (e) => {
+    //     console.log(e);
+    //     cb(e);
+    //   })
+    //   .on('data', (d) => {
+    //     data = d;
+    //   })
+    //   .on('end', () => {
+    //     gutil.log(gutil.colors.yellow('Memory Usage: '), Math.round(before / 1024 / 1024), 'MB');
+    //     gutil.log(gutil.colors.yellow('memory increased by: '), Math.round((process.memoryUsage().rss - before) / 1024 / 1024), 'MB');
+    //     raw.destroy();
+    //     cb(null, data);
+    //   })
 
   } else {
     cb({
