@@ -83,7 +83,7 @@ function watchResources(done) {
 function watchHyperties(done) {
 
   var sourceCode = getListOfResources('hyperty');
-  sourceCode = sourceCode.map(item => item + '/*.js');
+  sourceCode = sourceCode.map(item => path.join(item, '*.js'));
 
   gulp.watch(sourceCode, function(event) {
     console.log('event:', event);
@@ -91,7 +91,7 @@ function watchHyperties(done) {
   });
 
   var descriptor = getListOfResources('hyperty');
-  descriptor = descriptor.map(item => item + '/*.hy.json');
+  descriptor = descriptor.map(item => path.join(item, '*.hy.json'));
 
   gulp.watch(descriptor, function(event) {
     return generateDescriptor('hyperty', event.path);
@@ -102,9 +102,9 @@ function watchHyperties(done) {
 function watchProtostubs(done) {
 
   var sourceCode = getListOfResources('protocolstub');
-  sourceCode = sourceCode.map(item => item + '/*.js');
+  sourceCode = sourceCode.map(item => path.join(item, '*.js'));
 
-  console.log('Watch SourceCode:', sourceCode);
+  // console.log('Watch SourceCode:', sourceCode);
 
   gulp.watch(sourceCode, function(event) {
     return watchResource(event, 'protocolstub');
@@ -112,7 +112,7 @@ function watchProtostubs(done) {
 
 
   var descriptor = getListOfResources('protocolstub');
-  descriptor = descriptor.map(item => item + '/*.ps.json');
+  descriptor = descriptor.map(item => path.join(item, '*.ps.json'));
   gulp.watch(descriptor, function(event) {
     return generateDescriptor('protocolstub', event.path);
   });
@@ -122,7 +122,7 @@ function watchProtostubs(done) {
 function watchIdpProxies(done) {
 
   var sourceCode = getListOfResources('idp-proxy');
-  sourceCode = sourceCode.map(item => item + '/*.idp.js');
+  sourceCode = sourceCode.map(item => path.join(item, '*.idp.js'));
 
   // console.log('Watch SourceCode:', sourceCode);
 
@@ -132,7 +132,7 @@ function watchIdpProxies(done) {
 
 
   var descriptor = getListOfResources('idp-proxy');
-  descriptor = descriptor.map(item => item + '/*.idp.json');
+  descriptor = descriptor.map(item => path.join(item, '*.idp.json'));
   gulp.watch(descriptor, function(event) {
     return generateDescriptor('idp-proxy', event.path);
   });
@@ -142,10 +142,10 @@ function watchIdpProxies(done) {
 
 function watchDataSchemas(done) {
   var sourceCode = getListOfResources('dataschema');
-  sourceCode = sourceCode.map(item => item + '/*.ds.js');
+  sourceCode = sourceCode.map(item => path.join(item, '*.ds.js'));
 
   // Watch the local resources for DataSchemas
-  sourceCode.concat([process.cwd() + '/resources/schemas/**/*.ds.json']);
+  sourceCode.concat([process.cwd() + path.join('resources', 'schemas', '**', '*.ds.json')]);
 
   gulp.watch(sourceCode, function(event) {
     return watchResource(event, 'dataschema');
@@ -153,10 +153,10 @@ function watchDataSchemas(done) {
 
 
   var descriptor = getListOfResources('dataschema');
-  descriptor = descriptor.map(item => item + '/*.ds.json');
+  descriptor = descriptor.map(item => path.join(item, '*.ds.json'));
 
   // Watch the local resources for DataSchemas
-  descriptor = descriptor.concat([process.cwd() + '/resources/schemas/**/*.ds.json']);
+  descriptor = descriptor.concat([process.cwd() + path.join('resources', 'schemas', '**', '*.ds.json')]);
 
   // console.log('Watch dataSchema: ', descriptor);
   gulp.watch(descriptor, function(event) {
