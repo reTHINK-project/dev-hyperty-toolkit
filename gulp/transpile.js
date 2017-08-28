@@ -84,7 +84,7 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
   var fileObject = path.parse(chunk.path);
   var stage = getStage();
 
-  console.log(opts);
+  // console.log(opts, stage);
 
   return gulp.src(chunk.path)
     .pipe(webpackStream({
@@ -93,6 +93,7 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
         path: path.join(opts.destination),
         library: opts.standalone,
         libraryTarget: 'umd',
+        libraryExport: 'default',
         umdNamedDefine: true,
         filename: fileObject.base
       },

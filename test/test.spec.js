@@ -32,11 +32,11 @@ describe('Install Runtime', function() {
     rethink.install(config).then(function(result) {
       runtimeLoader = result;
 
-      sinon.stub(window.runtime.identityModule, 'getIdentityAssertion', function() {
+      sinon.stub(window.runtime.identityModule, 'getIdentityAssertion').callsFake(function() {
         return new Promise((resolve) => {
           let identityBundle = {
             assertion: 'assertion',
-            idp:'karma.com',
+            idp: 'karma.com',
             userProfile: {
               avatar: 'https://lh3.googleusercontent.com/-WaCrjVMMV-Q/AAAAAAAAAAI/AAAAAAAAAAs/8OlVqCpSB9c/photo.jpg',
               cn: 'test karma',

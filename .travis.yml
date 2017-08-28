@@ -15,8 +15,10 @@ before_install:
   - sh -e /etc/init.d/xvfb start
   - git clone --branch=develop https://github.com/reTHINK-project/dev-hyperty.git
   - export HYPERTY_REPO=./dev-hyperty
+  - git clone https://github.com/reTHINK-project/dev-protostubs.git
+  - export PROTOSTUB_REPO=./dev-protostubs
 
 install:
   - npm install
-  - npm run start:dev &
+  - npm run start:all &
   - sleep 60

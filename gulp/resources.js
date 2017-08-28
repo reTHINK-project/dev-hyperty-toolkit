@@ -26,7 +26,7 @@ module.exports = function resource(opts) {
     var descriptorName;
     if (filename.indexOf('hy') !== -1) {
       descriptorName = 'Hyperties';
-    } else if (filename.indexOf('ProtoStub') !== -1) {
+    } else if (filename.indexOf('ProtoStub') !== -1 || filename.indexOf('ps') !== -1) {
       descriptorName = 'ProtoStubs';
     } else if (filename.indexOf('ds') !== -1) {
       descriptorName = 'DataSchemas';
@@ -48,15 +48,15 @@ module.exports = function resource(opts) {
     gutil.log('Encoding: ', defaultPath, filename, JSON.stringify(opts));
 
     return gulp.src([file.path])
-    .pipe(encode(opts))
-    .pipe(source(opts.descriptor + '.json'))
-    .pipe(gulp.dest('resources/descriptors/'))
-    .on('end', function() {
-      var path = 'resources/descriptors/' + opts.descriptor + '.json';
-      file.contents = fs.readFileSync(path);
-      file.path = path;
-      done(null, file);
-    });
+      .pipe(encode(opts))
+      .pipe(source(opts.descriptor + '.json'))
+      .pipe(gulp.dest('resources/descriptors/'))
+      .on('end', function() {
+        var path = 'resources/descriptors/' + opts.descriptor + '.json';
+        file.contents = fs.readFileSync(path);
+        file.path = path;
+        done(null, file);
+      });
 
   });
 
