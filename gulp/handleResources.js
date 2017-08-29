@@ -22,7 +22,13 @@ var getTypeOfDescriptor = require('./descriptors').getTypeOfDescriptor;
 
 function watchHTML() {
 
-  gulp.watch(['./../server/*.*', process.env.HYPERTY_REPO + '/examples/main.js'], bundleHTML);
+  gulp.watch([
+    process.cwd() + '/server/*.*',
+    process.env.HYPERTY_REPO + '/examples/main.js',
+    process.env.HYPERTY_REPO + '/exmaples/**/*.hbs',
+    process.env.HYPERTY_REPO + '/exmaples/**/*.js'], () => {
+    bundleHTML();
+  });
 
   return bundleHTML();
 }
@@ -49,7 +55,7 @@ function bundleHTML() {
     },
     plugins: [new HtmlWebpackPlugin({
       title: 'Hyperty Toolkit',
-      template: 'server/index.ejs',
+      template: process.cwd() + '/server/index.ejs',
       files: {
         css: [],
         js: []
@@ -57,7 +63,8 @@ function bundleHTML() {
     })]
   };
 
-  return gulp.src(['./../server/*.*', process.env.HYPERTY_REPO + '/examples/main.js'])
+
+  return gulp.src([process.cwd() +  '/server/*.*', process.env.HYPERTY_REPO + '/examples/main.js'])
     .pipe(webpackStream(webpackConfig, webpack))
     .pipe(gulp.dest('app/'));
 }
