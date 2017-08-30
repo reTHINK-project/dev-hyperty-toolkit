@@ -9,7 +9,7 @@
   <title><%= htmlWebpackPlugin.options.title || 'Webpack App'%></title>
 
   <!-- Compiled and minified CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
   <% if (htmlWebpackPlugin.files.favicon) { %>
@@ -25,7 +25,7 @@
 
   <!-- Compiled and minified JavaScript -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <script src="https://code.highcharts.com/modules/exporting.js"></script>
@@ -104,6 +104,25 @@
   <% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
     <!-- <script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script> -->
   <% } %>
+
+  <script>
+    $(document).ready(function(){
+      console.log('AQUI:', $('.modal'));
+      $('.modal').modal({
+        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+        opacity: .5, // Opacity of modal background
+        inDuration: 300, // Transition in duration
+        outDuration: 200, // Transition out duration
+        startingTop: '4%', // Starting top style attribute
+        endingTop: '10%', // Ending top style attribute
+        ready: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+          alert("Ready");
+          console.log(modal, trigger);
+        },
+        complete: function() { alert('Closed'); } // Callback for Modal close
+        });
+    });
+  </script>
 
   <% if (htmlWebpackPlugin.options.devServer) { %>
   <script src="<%= htmlWebpackPlugin.options.devServer%>/webpack-dev-server.js"></script>

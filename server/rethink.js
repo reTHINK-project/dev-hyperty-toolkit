@@ -39,8 +39,6 @@ rethink.install(config).then(function(result) {
 
 }).then(function(hyperties) {
 
-  console.log('AQUI:', hyperties);
-
   let $dropDown = $('#hyperties-dropdown');
 
   hyperties.forEach(function(key) {
