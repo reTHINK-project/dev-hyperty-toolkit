@@ -132,7 +132,7 @@ function getResourceAttribute(req, res) {
 
     if (attribute) {
       if (result) {
-        result = JSON.stringify(result[attribute]);
+        result = result[attribute].toString();
         gutil.log(gutil.colors.green('GET ' + type + ' | ' + attribute + ': '), result);
       } else {
         return processError(404, resource, 'Nothing found with that attribute', {}, res);
@@ -288,9 +288,9 @@ function findMatches(raw, data) {
 
 /**
  * TODO: Check why the usage of readStream cause a large CPU Usage
- * 
- * @param {any} type 
- * @param {any} cb 
+ *
+ * @param {any} type
+ * @param {any} cb
  */
 function getResources(type, cb) {
   var raw;
