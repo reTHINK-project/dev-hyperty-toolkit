@@ -8,6 +8,8 @@ var through = require('through2');
 var webpackStream = require('webpack-stream');
 var webpack = require('webpack');
 
+// var CompressionPlugin = require('compression-webpack-plugin');
+
 var getStage = require('./stage');
 var getEnvironment = require('./environment');
 
@@ -80,15 +82,44 @@ module.exports = function transpile(opts) {
 
 };
 
+const webPackPlugins = [
+  new webpack.DefinePlugin({
+    'process.env.NODE_ENV': '"production"'
+  }),
+  new webpack.optimize.UglifyJsPlugin({
+    mangle: true,
+    compress: {
+      pure_getters: true,
+      unsafe: true,
+      unsafe_comps: true,
+      screw_ie8: true
+    },
+    output: {
+      comments: false
+    },
+    exclude: [/\.min\.js$/gi] // skip pre-minified libs
+  }),
+  new webpack.IgnorePlugin(/^\.\/locale$/, [/moment$/]),
+  new webpack.NoErrorsPlugin()
+
+  // new CompressionPlugin({
+  //   asset: '[path].gz[query]',
+  //   algorithm: 'gzip',
+  //   test: /\.js$|\.css$|\.html$/,
+  //   threshold: 10240,
+  //   minRatio: 0
+  // })
+];
+
 function transpileBrowser(args, filename, opts, chunk, cb) {
   var fileObject = path.parse(chunk.path);
   var stage = getStage();
 
-  // console.log(opts, stage);
-
   return gulp.src(chunk.path)
     .pipe(webpackStream({
-      devtool: stage === 'develop' ? 'inline-source-map' : false,
+      plugins: stage === 'develop' ? [] : webPackPlugins,
+      cache: stage === 'develop' ? false : true,
+      devtool: stage === 'develop' ? 'inline-source-map' : 'cheap-module-source-map',
       output: {
         path: path.join(opts.destination),
         library: opts.standalone,
@@ -109,7 +140,9 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
             test: /\.js$/,
             exclude: /node_modules/,
             use: [
-              { loader: 'babel-loader' }
+              { loader: 'babel-loader', options: {
+                extends: path.join(__dirname, '..', '.babelrc')
+              }}
             ]
           }
         ]
@@ -136,7 +169,9 @@ function transpileNode(filename, opts, chunk, cb) {
   return gulp.src(chunk.path)
     .pipe(webpackStream({
       target: 'node',
-      devtool: stage === 'develop' ? 'inline-source-map' : false,
+      plugins: stage === 'develop' ? [] : webPackPlugins,
+      cache: stage === 'develop' ? false : true,
+      devtool: stage === 'develop' ? 'inline-source-map' : 'cheap-module-source-map',
       output: {
         path: path.join(opts.destination),
         library: opts.standalone,
@@ -145,9 +180,22 @@ function transpileNode(filename, opts, chunk, cb) {
         filename: fileObject.base
       },
       module: {
-        loaders: [
-          { test: /\.json$/, loader: 'json' },
-          { exclude: /node_modules/, test: /\.js$/, loader: 'babel-loader' }
+        rules: [
+          {
+            test: /\.json$/,
+            use: [
+              { loader: 'json-loader'}
+            ]
+          },
+          {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: [
+              { loader: 'babel-loader', options: {
+                extends: path.join(__dirname, '..', '.babelrc')
+              }}
+            ]
+          }
         ]
       }
     }, webpack))
