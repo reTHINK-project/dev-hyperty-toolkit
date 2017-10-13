@@ -111,9 +111,10 @@ function watchProtostubs(done) {
   var sourceCode = getListOfResources('protocolstub');
   sourceCode = sourceCode.map(item => path.join(item, '*.js'));
 
-  // console.log('Watch SourceCode:', sourceCode);
+  console.log('Watch Protostubs SourceCode:', sourceCode);
 
   gulp.watch(sourceCode, function(event) {
+    console.log('Change Portostubs code:', event);
     return watchResource(event, 'protocolstub');
   });
 
@@ -121,6 +122,7 @@ function watchProtostubs(done) {
   var descriptor = getListOfResources('protocolstub');
   descriptor = descriptor.map(item => path.join(item, '*.ps.json'));
   gulp.watch(descriptor, function(event) {
+    console.log('Change Portostubs descriptor:', event);
     return generateDescriptor('protocolstub', event.path);
   });
 

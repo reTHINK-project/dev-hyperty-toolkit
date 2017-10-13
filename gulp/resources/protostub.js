@@ -63,7 +63,13 @@ function filterProtostubs(environment) {
 
     if (environment !== 'all') {
       var typeOfEnvironment = environment === 'core' ? 'browser' : environment;
-      return temp.hasOwnProperty('constraints') && temp.constraints.hasOwnProperty(typeOfEnvironment) && temp.constraints[typeOfEnvironment];
+      var r = temp.hasOwnProperty('constraints') && temp.constraints.hasOwnProperty(typeOfEnvironment) && temp.constraints[typeOfEnvironment];
+
+      if (typeOfEnvironment === 'browser') {
+        r = temp.hasOwnProperty('constraints') && (temp.constraints.hasOwnProperty(typeOfEnvironment) && temp.constraints[typeOfEnvironment] || temp.constraints.hasOwnProperty('windowSandbox'));
+      }
+
+      return r;
     } else {
       return true;
     }

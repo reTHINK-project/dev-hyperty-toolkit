@@ -28,7 +28,10 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 app.use(express.static(process.cwd() + '/app/'));
 app.use(express.static(process.env.HYPERTY_REPO + '/' + config.templates + '/'));
 
-app.use('/.well-known/runtime/index.html', express.static(process.cwd() + '/node_modules/runtime-browser/bin/'));
+app.use('/.well-known/runtime/', express.static(process.cwd() + '/node_modules/runtime-browser/bin/'));
+
+// app.use('/.well-known/runtime/sandbox.html', express.static(process.cwd() + '/node_modules/runtime-browser/bin/sandbox.html'));
+// app.use('/.well-known/runtime/index.html', express.static(process.cwd() + '/node_modules/runtime-browser/bin/index.html'));
 
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
