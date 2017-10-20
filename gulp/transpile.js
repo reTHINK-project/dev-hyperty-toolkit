@@ -69,7 +69,7 @@ module.exports = function transpile(opts) {
         return transpileBrowser(args, filename, opts, chunk, cb);
       }
 
-    } else if (environment === 'browser' || environment === 'core' || environment === 'node' && !filename.includes('.hy.js')) {
+    } else if (environment === 'browser' || environment === 'core' && !filename.includes('.hy.js')) {
       gutil.log('Converting ' + filename + ' to be used on browser');
       return transpileBrowser(args, filename, opts, chunk, cb);
 
@@ -84,6 +84,7 @@ module.exports = function transpile(opts) {
 
 const webPackPlugins = [
   new webpack.DefinePlugin({
+    global: {},
     'process.env.NODE_ENV': '"production"'
   }),
   new webpack.optimize.UglifyJsPlugin({
