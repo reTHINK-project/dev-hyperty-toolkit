@@ -59,28 +59,28 @@ module.exports = function transpile(opts) {
     var environment = opts.environment || getEnvironment();
 
     if (environment === 'all') {
-      var configEnv = getHypertyConfiguration(chunk.path);
-
-      if (configEnv === 'node') {
-        gutil.log('Converting ' + filename + ' to be used on node');
-        return transpileNode(chunk.path, opts, chunk, cb);
-      } else {
-        gutil.log('Converting ' + filename + ' to be used on browser');
-        return transpileBrowser(args, filename, opts, chunk, cb);
-      }
-
-    } else if (environment === 'browser' || environment === 'core' && !filename.includes('.hy.js')) {
-      gutil.log('Converting ' + filename + ' to be used on browser');
-      return transpileBrowser(args, filename, opts, chunk, cb);
-
+      return chooseTranspileMode(args, filename, opts, chunk, cb);
+    } else if ((environment === 'browser' || environment === 'core') && !filename.includes('.hy.js')) {
+      return chooseTranspileMode(args, filename, opts, chunk, cb);
     } else {
-      gutil.log('Converting ' + filename + ' to be used on node');
-      return transpileNode(chunk.path, opts, chunk, cb);
+      return chooseTranspileMode(args, filename, opts, chunk, cb);
     }
 
   });
 
 };
+
+function chooseTranspileMode(args, filename, opts, chunk, cb) {
+  var configEnv = getHypertyConfiguration(chunk.path);
+  if (configEnv === 'node') {
+    gutil.log('Converting ' + filename + ' to be used on node');
+    return transpileNode(chunk.path, opts, chunk, cb);
+  } else {
+    gutil.log('Converting ' + filename + ' to be used on browser');
+    return transpileBrowser(args, filename, opts, chunk, cb);
+  }
+
+}
 
 const webPackPlugins = [
   new webpack.DefinePlugin({

@@ -93,7 +93,7 @@ function watchHyperties(done) {
   sourceCode = sourceCode.map(item => path.join(item, '*.js'));
 
   gulp.watch(sourceCode, function(event) {
-    console.log('event:', event);
+    // console.log('event:', event);
     return watchResource(event, 'hyperty');
   });
 
@@ -111,10 +111,10 @@ function watchProtostubs(done) {
   var sourceCode = getListOfResources('protocolstub');
   sourceCode = sourceCode.map(item => path.join(item, '*.js'));
 
-  console.log('Watch Protostubs SourceCode:', sourceCode);
+  // console.log('Watch Protostubs SourceCode:', sourceCode);
 
   gulp.watch(sourceCode, function(event) {
-    console.log('Change Portostubs code:', event);
+    // console.log('Change Portostubs code:', event);
     return watchResource(event, 'protocolstub');
   });
 
@@ -122,7 +122,7 @@ function watchProtostubs(done) {
   var descriptor = getListOfResources('protocolstub');
   descriptor = descriptor.map(item => path.join(item, '*.ps.json'));
   gulp.watch(descriptor, function(event) {
-    console.log('Change Portostubs descriptor:', event);
+    // console.log('Change Portostubs descriptor:', event);
     return generateDescriptor('protocolstub', event.path);
   });
 
