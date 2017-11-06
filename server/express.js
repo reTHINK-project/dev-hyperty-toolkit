@@ -244,7 +244,7 @@ function filterResource(req, res) {
     }
 
     if (attribute) {
-      result = JSON.stringify(result[attribute]);
+      result = result[attribute];
       gutil.log(gutil.colors.green('POST ' + type + ' | ' + attribute + ': '), result);
     }
 
