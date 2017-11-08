@@ -99,7 +99,7 @@ function encodeStub(file) {
     {
       type: 'input',
       name: 'name',
-      message: 'Name of hyperty, protostub, dataschema (not specify use the file name):'
+      message: 'Name of hyperty, protocolstub, dataschema (not specify use the file name):'
     },
     {
       type: 'list',
@@ -143,7 +143,7 @@ function encodeStub(file) {
       return prev;
     }, {});
 
-    console.log(resourceOpts, transpileOpts);
+    // console.log(resourceOpts, transpileOpts);
     encode(file, resourceOpts, transpileOpts);
 
   });
@@ -159,11 +159,11 @@ function encode(file, resourceOpts, transpileOpts) {
 
   if (file) {
     return gulp.src(file)
-    .pipe(gulpif(isES6, transpile(transpileOpts)))
-    .pipe(resource(resourceOpts))
-    .on('end', function() {
-      gutil.log('encoded');
-    });
+      .pipe(gulpif(isES6, transpile(transpileOpts)))
+      .pipe(resource(resourceOpts))
+      .on('end', function() {
+        gutil.log('encoded');
+      });
   }
 
 }
@@ -194,34 +194,32 @@ var encodeTask = function(done) {
       choices: files
     }]).then(function(res) {
 
-      fs.access(res.file, fs.R_OK | fs.W_OK, function(err) {
-        if (err) done(new Error('No such file or directory'));
-        return;
-      });
+    fs.access(res.file, fs.R_OK | fs.W_OK, function(err) {
+      if (err) done(new Error('No such file or directory'));
+      return;
+    });
 
-      var pathFile = path.resolve(res.file);
-      var type = getTypeOfFile(pathFile);
+    var pathFile = path.resolve(res.file);
+    var type = getTypeOfFile(pathFile);
 
-      switch (type) {
-        case 'Hyperty':
-          break;
+    switch (type) {
+      case 'Hyperty':
+        break;
 
-        case 'IDPProxy':
-        case 'ProtoStub':
-          encodeStub(pathFile);
-          break;
+      case 'IDPProxy':
+      case 'ProtoStub':
+        encodeStub(pathFile);
+        break;
 
-        case 'Runtime':
-          encodeRuntime(pathFile);
-          break;
+      case 'Runtime':
+        encodeRuntime(pathFile);
+        break;
 
-        case 'DataSchema':
-          break;
+      case 'DataSchema':
+        break;
 
-      }
     }
-  );
-
+  });
 };
 
 module.exports = {

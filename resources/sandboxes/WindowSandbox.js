@@ -26,7 +26,14 @@ class WindowSandbox extends Sandbox {
       console.log('SandboxRegistry._create ', url, config);
       window.eval(sourceCode);
 
-      let component = activate(url, this._bus, config);
+      let component;
+      if (typeof activate === 'function') {
+        component = activate(url, this._bus, config);
+      }
+
+      if (typeof activate.default === 'function') {
+        component = activate.default(url, this._bus, config);
+      }
 
       //for testing, this make components accessible from browser console
       window.components[url] = component;

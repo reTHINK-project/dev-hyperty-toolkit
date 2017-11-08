@@ -14,7 +14,7 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'browserify'],
+    frameworks: ['mocha', 'chai', 'sinon'],
 
     // list of files / patterns to load in the browser
     files: [
@@ -26,13 +26,6 @@ module.exports = function(config) {
       'test/**/*.spec.js'
     ],
 
-    plugins: [
-     'karma-mocha',
-     'karma-browserify',
-     'karma-mocha-reporter',
-     'karma-chrome-launcher'
-    ],
-
     // list of files to exclude
     exclude: [
     ],
@@ -40,25 +33,56 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'test/**/*.spec.js': ['browserify']
+      './test/**/*.spec.js': ['webpack', 'sourcemap']
     },
 
-    browserify: {
-      transform: [
-        ['babelify']
-      ]
+    // webpack configuration
+    webpack: {
+      devtool: 'inline-source-map'
     },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['mocha'],
+    reporters: ['spec', 'html'],
+
+    specReporter: {
+      maxLogLines: 5,             // limit number of lines logged per test
+      suppressErrorSummary: false, // do not print error summary
+      suppressFailed: false,      // do not print information about failed tests
+      suppressPassed: false,      // do not print information about passed tests
+      suppressSkipped: false,      // do not print information about skipped tests
+      showSpecTiming: true,      // print the time elapsed for each spec
+      failFast: false              // test would finish with error when a first fail occurs.
+    },
+
+    // the default configuration
+    htmlReporter: {
+      outputFile: 'test/units.html',
+
+      // Optional
+      pageTitle: 'Unit Tests',
+      subPageTitle: 'reThink Project performance tests',
+      groupSuites: true,
+      useCompactStyle: true,
+      useLegacyStyle: true
+    },
+
+    plugins: ['karma-spec-reporter',
+      'karma-webpack',
+      'karma-mocha',
+      'karma-chai',
+      'karma-sinon',
+      'karma-sourcemap-loader',
+      'karma-htmlfile-reporter',
+      'karma-mocha-reporter',
+      'karma-chrome-launcher'],
 
     protocol: 'https',
 
     httpsServerOptions: {
-      key: fs.readFileSync('rethink-certificate.key', 'utf8'),
-      cert: fs.readFileSync('rethink-certificate.cert', 'utf8')
+      key: fs.readFileSync('./server/ssl/server.key', 'utf8'),
+      cert: fs.readFileSync('./server/ssl/server.crt', 'utf8')
     },
 
     proxyValidateSSL: false,
@@ -69,6 +93,7 @@ module.exports = function(config) {
     }],
 
     client: {
+      runInParent: true,
       captureConsole: false
     },
 

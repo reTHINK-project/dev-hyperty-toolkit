@@ -7,7 +7,7 @@ import rethinkBrowser from 'runtime-browser/bin/rethink';
 
 import browserConfig from '../config.json';
 
-import { hypertyDeployed, hypertyFail } from '../app/main';
+import { hypertyDeployed, hypertyFail } from 'app';
 
 window.KJUR = {};
 

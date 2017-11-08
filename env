@@ -3,4 +3,11 @@ RUNTIME_URL=hyperty-catalogue://catalogue.localhost/.well-known/runtime/Runtime
 DOMAIN=localhost
 INDEX_URL=https://localhost/.well-known/runtime/index.html
 SANDBOX_URL=https://localhost/.well-known/runtime/sandbox.html
+
 HYPERTY_REPO=../dev-hyperty
+HYPERTY_TEMPLATES_PATH=examples
+HYPERTY_SOURCECODE_PATH=src
+HYPERTY_INCLUDES=connector, group-chat-manager, user-availability, hello-world, node-hyperty, node-hyperty-observer
+
+PROTOSTUB_REPO=../dev-protostubs
+PROTOSTUB_SOURCECODE_PATH=src

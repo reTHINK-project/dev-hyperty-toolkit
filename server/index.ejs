@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]> <html lang="en" class="ie6" <% if(htmlWebpackPlugin.files.manifest) { %> manifest="<%= htmlWebpackPlugin.files.manifest %>"<% } %>> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="ie7" <% if(htmlWebpackPlugin.files.manifest) { %> manifest="<%= htmlWebpackPlugin.files.manifest %>"<% } %>> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="ie8" <% if(htmlWebpackPlugin.files.manifest) { %> manifest="<%= htmlWebpackPlugin.files.manifest %>"<% } %>> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="ie9" <% if(htmlWebpackPlugin.files.manifest) { %> manifest="<%= htmlWebpackPlugin.files.manifest %>"<% } %>> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="" <% if(htmlWebpackPlugin.files.manifest) { %> manifest="<%= htmlWebpackPlugin.files.manifest %>"<% } %>> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title><%= htmlWebpackPlugin.options.title || 'Webpack App'%></title>
+
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <% if (htmlWebpackPlugin.files.favicon) { %>
+  <link rel="shortcut icon" href="<%= htmlWebpackPlugin.files.favicon%>">
+  <% } %>
+  <% if (htmlWebpackPlugin.options.mobile) { %>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <% } %>
+
+  <% for (var css in htmlWebpackPlugin.files.css) { %>
+  <link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet">
+  <% } %>
+
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+</head>
+<body>
+  <% if (htmlWebpackPlugin.options.unsupportedBrowser) { %>
+  <style>.unsupported-browser { display: none; }</style>
+  <div class="unsupported-browser">
+    Sorry, your browser is not supported.  Please upgrade to
+    the latest version or switch your browser to use this site.
+    See <a href="http://outdatedbrowser.com/">outdatedbrowser.com</a>
+    for options.
+  </div>
+  <% } %>
+
+  <div class="card blue-grey darken-1" style="margin:0;">
+    <div class="card-content white-text">
+      <span class="card-title">Hyperty Toolkit</span>
+      <p>This repository provides required tools to develop Hyperties and help you testing all your hyperties.</p>
+    </div>
+
+    <div class="card-action center">
+
+      <div class="preloader-wrapper small active">
+        <div class="spinner-layer spinner-blue-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div><div class="gap-patch">
+            <div class="circle"></div>
+          </div><div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hyperties-list-holder hide">
+        <!-- Dropdown Trigger -->
+        <a class="btn dropdown-button" data-beloworigin="true" data-activates="hyperties-dropdown">List of Hyperties &lt;choose one&gt;<i class="mdi-navigation-arrow-drop-down right"></i></a>
+
+        <!-- Dropdown Structure -->
+        <ul id="hyperties-dropdown" class="dropdown-content">
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content container">
+    <div class="row">
+
+      <div class="section notification"></div>
+
+    </div>
+  </div>
+
+  <% if (htmlWebpackPlugin.options.appMountId) { %>
+  <div id="<%= htmlWebpackPlugin.options.appMountId%>"></div>
+  <% } %>
+
+  <% if (htmlWebpackPlugin.options.appMountIds && htmlWebpackPlugin.options.appMountIds.length > 0) { %>
+  <% for (var index in htmlWebpackPlugin.options.appMountIds) { %>
+  <div id="<%= htmlWebpackPlugin.options.appMountIds[index]%>"></div>
+  <% } %>
+  <% } %>
+
+  <% if (htmlWebpackPlugin.options.window) { %>
+  <script>
+    <% for (var varName in htmlWebpackPlugin.options.window) { %>
+      window['<%=varName%>'] = <%= JSON.stringify(htmlWebpackPlugin.options.window[varName]) %>;
+    <% } %>
+  </script>
+  <% } %>
+
+  <% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
+    <!-- <script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script> -->
+  <% } %>
+
+  <script>
+    $(document).ready(function(){
+
+      $('.modal').modal({
+        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+        opacity: .5, // Opacity of modal background
+        inDuration: 300, // Transition in duration
+        outDuration: 200, // Transition out duration
+        startingTop: '4%', // Starting top style attribute
+        endingTop: '10%', // Ending top style attribute
+        ready: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+          alert("Ready");
+          console.log(modal, trigger);
+        },
+        complete: function() { alert('Closed'); } // Callback for Modal close
+        });
+    });
+  </script>
+
+  <% if (htmlWebpackPlugin.options.devServer) { %>
+  <script src="<%= htmlWebpackPlugin.options.devServer%>/webpack-dev-server.js"></script>
+  <% } %>
+
+</body>
+</html>

@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 function replacePattern(str, value) {
   const regex = /%domain%/gm;
   const subst = value;
@@ -26,7 +28,18 @@ function unixifyPath(filepath) {
   }
 }
 
+function readFiles(dirname, file) {
+  var files = fs.readdirSync(dirname);
+  return files.filter(function(filename) {
+    return filename.includes(file);
+  }).map(function(filename) {
+    var content = fs.readFileSync(dirname + filename, 'utf-8');
+    return { filename: filename, folder: dirname, content: content };
+  });
+}
+
 module.exports = {
   replacePattern: replacePattern,
-  unixifyPath: unixifyPath
-}
+  unixifyPath: unixifyPath,
+  readFiles: readFiles
+};
