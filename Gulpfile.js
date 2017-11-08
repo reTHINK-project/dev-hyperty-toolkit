@@ -131,8 +131,21 @@ gulp.task('set:env', function() {
   env(path.join(process.cwd(), 'env'));
 });
 
+gulp.task('build:hyperties', ['hyperties:sourceCode']);
+gulp.task('build:protostubs', ['protostubs:sourceCode']);
+gulp.task('build:idpproxy', ['idpproxy:sourceCode']);
+gulp.task('build:dataschema', ['dataschema:sourceCode']);
 
-gulp.task('build:hyperties', ['hyperties:descriptor'], createHypertiesSourceCode);
+gulp.task('build:prod', function(done) {
+  runSequence(
+    'checkHyperties',
+    'checkProtostubs',
+    'checkDataSchemas',
+    'hyperties:sourceCode',
+    'protostubs:sourceCode',
+    'idpproxy:sourceCode',
+    'dataschema:sourceCode', done);
+});
 
 gulp.task('clean', function() {
   return gulp.src([

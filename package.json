@@ -14,6 +14,7 @@
     "start:node": "cross-env ENVIRONMENT=node MODE=dev gulp serve",
     "start:all": "cross-env ENVIRONMENT=all MODE=dev gulp serve",
     "build": "cross-env ENVIRONMENT=browser gulp build:hyperties && cross-env ENVIRONMENT=node gulp build:hyperties",
+    "build:prod": "cross-env ENVIRONMENT=all MODE=prod gulp build:prod",
     "build:hyperties": "cross-env ENVIRONMENT=browser MODE=prod gulp build:hyperties",
     "build:hyperties:node": "cross-env ENVIRONMENT=node MODE=prod gulp build:hyperties"
   },
