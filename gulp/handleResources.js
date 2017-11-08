@@ -7,7 +7,7 @@ var webpack = require('webpack');
 var webpackStream = require('webpack-stream');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
-var browserSync = require('./server').browserSync;
+// var browserSync = require('./server').browserSync;
 
 var config = require('./toolkit.config.js');
 
@@ -213,7 +213,7 @@ function watchResource(event, type) {
       .pipe(convertFunction())
       .resume()
       .on('end', function() {
-        browserSync.reload();
+        // browserSync.reload();
       });
 
   }
@@ -351,7 +351,7 @@ function generateSourceCode(type) {
   return gulp.src(sourceCode)
     .pipe(convertFunction())
     .on('end', function() {
-      browserSync.reload();
+      // browserSync.reload();
     });
 
 }
@@ -403,7 +403,8 @@ function generateDescriptor(type, filePath) {
       .pipe(convertDataSchema())
       .on('end', function() {
         gutil.log('the pre configuration of ' + resource.type + '  was changed, and the ' + resource.name + '.json was updated');
-        browserSync.reload();
+
+        // browserSync.reload();
       });
   }
 
@@ -412,7 +413,8 @@ function generateDescriptor(type, filePath) {
     .pipe(gulp.dest('./resources/descriptors/' + resource.name + '.json'))
     .on('end', function() {
       gutil.log('the pre configuration of ' + resource.type + '  was changed, and the ' + resource.name + '.json was updated');
-      browserSync.reload();
+
+      // browserSync.reload();
     });
 
 }
