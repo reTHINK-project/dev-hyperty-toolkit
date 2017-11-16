@@ -68,7 +68,7 @@ var descriptorBase = function(type, name) {
 
   base.objectName = '';
   base.configuration = {};
-  base.messageSchemas = '';
+  base.messageSchemas = [];
   base.dataObjects = [];
 
   base.signature = '';
