@@ -7,7 +7,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.10",
+    "version": "1.90",
     "description": "IDPProxy for google idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -30,7 +30,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.10",
+    "version": "1.90",
     "description": "IDPProxy rethink-project.eu description",
     "language": "javascript",
     "type": "IDPProxys",
@@ -54,7 +54,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.10",
+    "version": "1.90",
     "description": "IDPProxy slack description",
     "language": "javascript",
     "type": "IDPProxys",
