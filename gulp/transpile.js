@@ -7,6 +7,7 @@ var gutil = require('gulp-util');
 var through = require('through2');
 var webpackStream = require('webpack-stream');
 var webpack = require('webpack');
+var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 // var CompressionPlugin = require('compression-webpack-plugin');
 
@@ -87,19 +88,21 @@ const webPackPlugins = [
     global: {},
     'process.env.NODE_ENV': '"production"'
   }),
-  new webpack.optimize.UglifyJsPlugin({
-    mangle: true,
-    compress: {
-      pure_getters: true,
-      unsafe: true,
-      unsafe_comps: true,
-      screw_ie8: true
-    },
-    output: {
-      comments: false
-    },
-    exclude: [/\.min\.js$/gi] // skip pre-minified libs
-  }),
+  new UglifyJsPlugin(),
+
+  // new webpack.optimize.UglifyJsPlugin({
+  //   mangle: true,
+  //   compress: {
+  //     pure_getters: true,
+  //     unsafe: true,
+  //     unsafe_comps: true,
+  //     screw_ie8: true
+  //   },
+  //   output: {
+  //     comments: false
+  //   },
+  //   exclude: [/\.min\.js$/gi, /node_modules/] // skip pre-minified libs
+  // }),
   new webpack.IgnorePlugin(/^\.\/locale$/, [/moment$/]),
   new webpack.NoErrorsPlugin()
 
@@ -120,7 +123,7 @@ function transpileBrowser(args, filename, opts, chunk, cb) {
     .pipe(webpackStream({
       plugins: stage === 'develop' ? [] : webPackPlugins,
       cache: stage === 'develop' ? false : true,
-      devtool: stage === 'develop' ? 'inline-source-map' : 'cheap-module-source-map',
+      devtool: stage === 'develop' ? 'eval-source-map' : 'none',
       output: {
         path: path.join(opts.destination),
         library: opts.standalone,
@@ -172,7 +175,7 @@ function transpileNode(filename, opts, chunk, cb) {
       target: 'node',
       plugins: stage === 'develop' ? [] : webPackPlugins,
       cache: stage === 'develop' ? false : true,
-      devtool: stage === 'develop' ? 'inline-source-map' : 'cheap-module-source-map',
+      devtool: stage === 'develop' ? 'eval-source-map' : 'none',
       output: {
         path: path.join(opts.destination),
         library: opts.standalone,
