@@ -1,5 +1,5 @@
-FROM node:boron
-MAINTAINER vitor-t-silva@telecom.pt
+FROM node:carbon
+LABEL maintainer=vitor-t-silva@telecom.pt
 
 RUN apt-get update && apt-get install -y vim
 
