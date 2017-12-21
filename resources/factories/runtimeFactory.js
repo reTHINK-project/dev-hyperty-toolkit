@@ -28,7 +28,7 @@ const runtimeFactory = Object.create({
       this.capabilitiesManager.isAvailable(isWindowSandbox).then((result) => {
         if (result) {
           // TODO: to be retrieved from capabilitiesManager
-          SandboxCapabilities = { "windowSandbox": true };
+          SandboxCapabilities = {windowSandbox: true};
 
           console.info('[createSandbox ] - windowSandbox');
           sandbox = new WindowSandbox(SandboxCapabilities);
@@ -64,17 +64,28 @@ const runtimeFactory = Object.create({
     return atob(b64);
   },
 
-  storageManager() {
+  storageManager(name, schemas) {
 
-    if (!this.storage) {
-      // Using the implementation of Service Framework
-      // Dexie is the IndexDB Wrapper
-      const db = new Dexie('cache');
-      const storeName = 'objects';
-      this.storage = new StorageManager(db, storeName);
+    if (!this.databases) { this.databases = {}; }
+    if (!this.storeManager) { this.storeManager = {}; }
+
+    if (navigator && navigator.storage && navigator.storage.persist) {
+      navigator.storage.persist().then(function(persistent) {
+        if (persistent) { console.log('Storage will not be cleared except by explicit user action'); } else { console.log('Storage may be cleared by the UA under storage pressure.'); }
+      });
     }
 
-    return this.storage;
+    // Using the implementation of Service Framework
+    // Dexie is the IndexDB Wrapper
+    if (!this.databases.hasOwnProperty(name)) {
+      this.databases[name] = new Dexie(name);
+    }
+
+    if (!this.storeManager.hasOwnProperty(name)) {
+      this.storeManager[name] = new StorageManager(this.databases[name], name, schemas);
+    }
+
+    return this.storeManager[name];
   },
 
   persistenceManager() {
@@ -96,8 +107,12 @@ const runtimeFactory = Object.create({
   },
 
   runtimeCapabilities() {
+
     if (!this.capabilitiesManager) {
-      this.capabilitiesManager = new RuntimeCapabilities(this.storage);
+
+      let storageManager = this.storageManager('capabilities');
+
+      this.capabilitiesManager = new RuntimeCapabilities(storageManager);
     }
 
     return this.capabilitiesManager;
