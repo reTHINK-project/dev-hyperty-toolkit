@@ -53,7 +53,7 @@ function getTypeOfResources(req, res) {
       return processError(err.code, type, err.description, {}, res);
     }
 
-    var filtered = Object.keys(raw);
+    var filtered = Object.keys(raw).map(key => raw[key].objectName);
     var result;
 
     gutil.log('-------------------------------- GET --------------------------------');

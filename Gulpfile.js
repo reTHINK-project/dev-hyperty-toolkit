@@ -95,7 +95,7 @@ gulp.task('server', function(cb) {
 
   return nodemon({
     verbose: true,
-    ignore: ['resources/*'],
+    ignore: ['resources/*.hy.js', 'resources/descriptors/*.*'],
     script: './server/express.js',
     stdout: true
   }).once('start', cb);
@@ -196,11 +196,11 @@ function createFile(path, contents) {
 gulp.task('service', function() {
 
   var sequence = [
-    'watch:html',
-    'dataschema:sourceCode',
-    'idpproxy:sourceCode',
-    'protostubs:sourceCode',
-    'hyperties:sourceCode'
+    'watch:html'
+    // 'dataschema:sourceCode',
+    // 'idpproxy:sourceCode',
+    // 'protostubs:sourceCode',
+    // 'hyperties:sourceCode'
   ];
   var isRunning = false;
 
@@ -219,7 +219,7 @@ gulp.task('service', function() {
 
   }
 
-  gulp.watch(process.cwd() + '/node_modules/service-framework/**/*.*', () => {
+  gulp.watch([process.cwd() + '/node_modules/service-framework/**/*.*', process.cwd() + '/node_modules/runtime-browser/**/*.*'], () => {
     executeOnce();
   });
 
