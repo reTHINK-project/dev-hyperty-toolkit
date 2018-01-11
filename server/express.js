@@ -53,7 +53,7 @@ function getTypeOfResources(req, res) {
       return processError(err.code, type, err.description, {}, res);
     }
 
-    var filtered = Object.keys(raw);
+    var filtered = Object.keys(raw).map(key => raw[key].objectName);
     var result;
 
     gutil.log('-------------------------------- GET --------------------------------');
@@ -127,6 +127,8 @@ function getResourceAttribute(req, res) {
 
     var filtered = Object.keys(raw);
     var result;
+
+
 
     result = getDescriptorByObjectName(raw, filtered, resource);
 
@@ -223,6 +225,7 @@ function filterResource(req, res) {
 
     matchedInstances = findMatches(raw, data);
 
+    gutil.log(gutil.colors.yellow('constraints | ') + data);
     gutil.log(gutil.colors.yellow('matched to constraints | ') + matchedInstances);
 
     if (matchedInstances.length === 0) {
@@ -265,19 +268,20 @@ function findMatches(raw, data) {
       var numOfResourceConstraints = Object.keys(resourceConstraints).length;
 
       // If the constraint is false should be ignored
-      var payloadConstraints = Object.keys(constraints).filter(constraint => constraints[constraint]);
-      var numOfPayloadConstraints = Object.keys(payloadConstraints).length;
-      var a = payloadConstraints.filter((constraint) => {
-        if (resourceConstraints.hasOwnProperty(constraint) || resourceConstraints[constraint]) {
+     /* var payloadConstraints = Object.keys(constraints).filter(constraint => constraints[constraint]);
+      var numOfPayloadConstraints = Object.keys(payloadConstraints).length;*/
+      var a = Object.keys(resourceConstraints).filter((constraint) => {
+        if (constraints.hasOwnProperty(constraint) && constraints[constraint]) {
           return true;
         }
       });
 
-      gutil.log('------------------------------------------------------');
+/*----');
       gutil.log(gutil.colors.green('Runtime (payload)') + ' constraints: ', constraints, numOfPayloadConstraints);
-      gutil.log(gutil.colors.green(resource) + ' constraints: ', resourceConstraints, a.length);
+      gutil.log(gutil.colors.green(resource) + ' constraints: ', resourceConstraints, a.length);*/
 
-      return numOfPayloadConstraints >= a.length && a.length !== 0;
+//      return numOfPayloadConstraints >= a.length && a.length !== 0;
+      return numOfResourceConstraints === a.length;
     });
   } else {
     return [];
