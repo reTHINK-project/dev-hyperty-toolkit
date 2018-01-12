@@ -1,5 +1,599 @@
+// version: 0.11.1
+// date: Fri Jan 12 2018 12:42:38 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.1
+// date: Fri Jan 12 2018 12:42:38 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.1
+// date: Fri Jan 12 2018 12:41:34 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.1
+// date: Fri Jan 12 2018 12:41:34 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Fri Jan 12 2018 12:21:50 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Fri Jan 12 2018 12:21:50 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Fri Jan 12 2018 12:17:17 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Fri Jan 12 2018 12:17:17 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Fri Jan 12 2018 12:14:42 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Fri Jan 12 2018 12:14:42 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
 // version: 0.11.0
 // date: Wed Jan 10 2018 16:54:02 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Wed Jan 10 2018 16:54:02 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Wed Jan 10 2018 16:48:46 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Wed Jan 10 2018 16:48:47 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Wed Jan 10 2018 16:31:02 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Wed Jan 10 2018 16:31:02 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Wed Jan 10 2018 15:19:01 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Wed Jan 10 2018 15:19:01 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Wed Jan 10 2018 15:13:30 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Wed Jan 10 2018 15:13:31 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Wed Jan 10 2018 09:10:09 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Wed Jan 10 2018 09:10:09 GMT+0000 (WET)
+// licence: 
+/**
+* Copyright 2016 PT Inovação e Sistemas SA
+* Copyright 2016 INESC-ID
+* Copyright 2016 QUOBIS NETWORKS SL
+* Copyright 2016 FRAUNHOFER-GESELLSCHAFT ZUR FOERDERUNG DER ANGEWANDTEN FORSCHUNG E.V
+* Copyright 2016 ORANGE SA
+* Copyright 2016 Deutsche Telekom AG
+* Copyright 2016 Apizee
+* Copyright 2016 TECHNISCHE UNIVERSITAT BERLIN
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+**/
+
+
+// version: 0.11.0
+// date: Tue Jan 09 2018 17:50:56 GMT+0000 (WET)
 // licence: 
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
@@ -2584,7 +3178,7 @@ var n=r(0),i=r(414)(/[\\^$*+?.()|[\]{}]/g,"\\$&");n(n.S,"RegExp",{escape:functio
 /***/
 function(e,t){e.exports=function(e,t){var r=t===Object(t)?function(e){return t[e]}:t;return function(t){return String(t).replace(e,r)}}},/* 415 */
 /***/
-function(e,t,r){"use strict";function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0});var n=r(9),i=_interopRequireDefault(n),o=r(96),s=_interopRequireDefault(o),a=r(1),u=_interopRequireDefault(a),c=r(2),f=_interopRequireDefault(c),l=r(201),d=r(7),p=function(e){if(e&&e.__esModule)return e;var t={};if(null!=e)for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r]);return t.default=e,t}(d),y=r(439),h=_interopRequireDefault(y),v=r(469),g=_interopRequireDefault(v),b=r(476),m=_interopRequireDefault(b),_=r(477),R=_interopRequireDefault(_),w=r(488),S=_interopRequireDefault(w),P=r(14),O=r(99),M=_interopRequireDefault(O),k=r(100),L=_interopRequireDefault(k),x=r(492),E=_interopRequireDefault(x),A=r(493),U=r(494),D=_interopRequireDefault(U),I=r(144),j=r(495),T=_interopRequireDefault(j),C=r(140),F=r(496),N=_interopRequireDefault(F),q=r(498),H=_interopRequireDefault(q),B=r(499),K=_interopRequireDefault(B),G=r(503),V=_interopRequireDefault(G),W=r(506),Y=_interopRequireDefault(W),z=r(517),J=_interopRequireDefault(z),$=r(519),Q=_interopRequireDefault($),X=p.getLogger("RuntimeUA"),Z=function(){/**
+function(e,t,r){"use strict";function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0});var n=r(9),i=_interopRequireDefault(n),o=r(96),s=_interopRequireDefault(o),a=r(1),u=_interopRequireDefault(a),c=r(2),f=_interopRequireDefault(c),l=r(201),d=r(7),p=function(e){if(e&&e.__esModule)return e;var t={};if(null!=e)for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r]);return t.default=e,t}(d),y=r(439),h=_interopRequireDefault(y),v=r(469),g=_interopRequireDefault(v),b=r(476),m=_interopRequireDefault(b),_=r(477),R=_interopRequireDefault(_),w=r(488),S=_interopRequireDefault(w),P=r(14),O=r(99),M=_interopRequireDefault(O),k=r(100),L=_interopRequireDefault(k),x=r(492),E=_interopRequireDefault(x),A=r(493),U=r(494),D=_interopRequireDefault(U),I=r(144),j=r(495),T=_interopRequireDefault(j),C=r(140),F=r(496),N=(_interopRequireDefault(F),r(498)),q=_interopRequireDefault(N),H=r(499),B=_interopRequireDefault(H),K=r(503),G=_interopRequireDefault(K),V=r(506),W=_interopRequireDefault(V),Y=r(517),z=_interopRequireDefault(Y),J=r(519),$=_interopRequireDefault(J),Q=p.getLogger("RuntimeUA"),X=function(){/**
    * Create a new instance of Runtime User Agent
    * @param {descriptor} runtimeDescriptor - pass all the hyperty runtime descriptor
    * @param {runtimeFactory} runtimeFactory - Specific implementation for the environment where the core runtime will run;
@@ -2592,7 +3186,7 @@ function(e,t,r){"use strict";function _interopRequireDefault(e){return e&&e.__es
    */
 function RuntimeUA(e,t,r){if((0,u.default)(this,RuntimeUA),!e)throw new Error("The runtime descriptor is a needed parameter");if(!t)throw new Error("The sandbox factory is a needed parameter");if(!r)throw new Error("You need the domain of runtime");if(
 // Configuration object with information related with servers
-this.runtimeConfiguration=(0,s.default)({domain:r},I.runtimeConfiguration),this.runtimeFactory=t,this.log=X,this.logLevels=l.log,e.p2pHandlerStub&&"string"==typeof e.p2pHandlerStub&&e.p2pHandlerStub.includes("://")?this.p2p=!0:this.p2p=!1,C.runtimeUtils.runtimeDescriptor=e,this.runtimeUtils=C.runtimeUtils,this.storages={},"function"!=typeof t.createRuntimeCatalogue)throw new Error("Check your Runtime Factory because it needs the Runtime Catalogue implementation");if(this.runtimeCatalogue=t.createRuntimeCatalogue(),"function"!=typeof t.persistenceManager)throw new Error("Check your Runtime Factory because it needs the Persistence Manager implementation");if(this.persistenceManager=t.persistenceManager(),"function"!=typeof t.storageManager)throw new Error("Check your Runtime Factory because it needs the Storage Manager implementation");this.storages=(0,A.storage)(t),"function"==typeof t.runtimeCapabilities?this.runtimeCapabilities=t.runtimeCapabilities(this.storages.capabilities):X.info("Check your RuntimeFactory because it needs the Runtime Capabilities implementation")}/**
+this.runtimeConfiguration=(0,s.default)({domain:r},I.runtimeConfiguration),this.runtimeFactory=t,this.log=Q,this.logLevels=l.log,e.p2pHandlerStub&&"string"==typeof e.p2pHandlerStub&&e.p2pHandlerStub.includes("://")?this.p2p=!0:this.p2p=!1,C.runtimeUtils.runtimeDescriptor=e,this.runtimeUtils=C.runtimeUtils,this.storages={},"function"!=typeof t.createRuntimeCatalogue)throw new Error("Check your Runtime Factory because it needs the Runtime Catalogue implementation");if(this.runtimeCatalogue=t.createRuntimeCatalogue(),"function"!=typeof t.persistenceManager)throw new Error("Check your Runtime Factory because it needs the Persistence Manager implementation");if(this.persistenceManager=t.persistenceManager(),"function"!=typeof t.storageManager)throw new Error("Check your Runtime Factory because it needs the Storage Manager implementation");this.storages=(0,A.storage)(t),"function"==typeof t.runtimeCapabilities?this.runtimeCapabilities=t.runtimeCapabilities(this.storages.capabilities):Q.info("Check your RuntimeFactory because it needs the Runtime Capabilities implementation")}/**
    * Intialize the installation of runtime
    *
    * @access public
@@ -2600,7 +3194,7 @@ this.runtimeConfiguration=(0,s.default)({domain:r},I.runtimeConfiguration),this.
    *
    * @memberOf RuntimeUA
    */
-return(0,f.default)(RuntimeUA,[{key:"init",value:function(){var e=this;return new i.default(function(t,r){e.domain=e.runtimeConfiguration.domain;try{var n=e.runtimeCapabilities.getRuntimeCapabilities(),o=e.storages.runtime.get("runtime:URL"),a=e.storages.syncherManager.get("syncherManager:ObjectURLs"),u=e.storages.hypertyResources.get(),c=e.storages.runtime.get("p2pHandler:URL");i.default.all([o,n,a,u,c]).then(function(t){return e.runtimeURL=t[0]?t[0].runtimeURL:t[0],e.runtimeURL||(e.runtimeURL="runtime://"+e.domain+"/"+(0,P.generateGUID)(),e.storages.runtime.set("runtime:URL",1,{runtimeURL:e.runtimeURL})),e.capabilities=t[1],(0,s.default)(C.runtimeUtils.runtimeCapabilities.constraints,t[1]),e._dataObjectsStorage=new K.default(e.storages.syncherManager,t[2]||{}),e._hypertyResources=t[3]||{},e.p2pHandlerURL=t[4]?t[4].p2pHandlerURL:t[4],e.p2pHandlerURL||(e.p2pHandlerURL=e.runtimeURL+"/p2phandler/"+(0,P.generateGUID)(),X.info("[RuntimeUA - init] P2PHandlerURL: ",e.p2pHandlerURL),e.storages.runtime.set("p2pHandler:URL",1,{p2pHandlerURL:e.p2pHandlerURL})),e._loadComponents()}).then(function(t){return e._hypertyResourcesStorage=new V.default(e.runtimeURL,e.messageBus,e.storages.hypertyResources,e._hypertyResources),e.p2p?(X.info("[RuntimeUA - init] load p2pHandler: ",t),e._loadP2PHandler()):(X.info("[RuntimeUA - init] P2P not supported"),"P2P Not Supported")}).then(function(e){X.info("[runtime ua - init] - status: ",e),t(!0)},function(e){X.error("ERROR: ",e),t(!0)})}catch(e){r(e)}})}},{key:"_loadP2PHandler",value:function(){var e=this;return new i.default(function(t){var r=C.runtimeUtils.runtimeDescriptor,n=r.p2pHandlerStub,i={isHandlerStub:!0,runtimeURL:e.runtimeURL};X.log("[RuntimeUA loadP2PHandler] P2PStubHandler: ",n),e.loader.loadStub(n,i).then(function(r){var n=e.runtimeURL+"/ua",i={type:"subscribe",from:n,to:"domain://msg-node."+e.domain+"/sm",body:{subscribe:[r.url],source:e.runtimeURL}};e.messageBus.addListener(n,function(e){X.log("[runtime ua - listener] - receive msg: ",e)}),e.messageBus.postMessage(i,function(e){X.log("[runtime ua - postMessage] - reply: ",e)}),X.info("[runtime ua - p2p installation] - success: ",r),t(!0)}).catch(function(e){X.info("[runtime ua - p2p installation] - fail: ",e),t(!1)})})}},{key:"_loadComponents",value:function(){var e=this;return new i.default(function(t,r){try{
+return(0,f.default)(RuntimeUA,[{key:"init",value:function(){var e=this;return new i.default(function(t,r){e.domain=e.runtimeConfiguration.domain;try{var n=e.runtimeCapabilities.getRuntimeCapabilities(),o=e.storages.runtime.get("runtime:URL"),a=e.storages.syncherManager.get("syncherManager:ObjectURLs"),u=e.storages.hypertyResources.get(),c=e.storages.runtime.get("p2pHandler:URL");i.default.all([o,n,a,u,c]).then(function(t){return e.runtimeURL=t[0]?t[0].runtimeURL:t[0],e.runtimeURL||(e.runtimeURL="runtime://"+e.domain+"/"+(0,P.generateGUID)(),e.storages.runtime.set("runtime:URL",1,{runtimeURL:e.runtimeURL})),e.capabilities=t[1],(0,s.default)(C.runtimeUtils.runtimeCapabilities.constraints,t[1]),e._dataObjectsStorage=new B.default(e.storages.syncherManager,t[2]||{}),e._hypertyResources=t[3]||{},e.p2pHandlerURL=t[4]?t[4].p2pHandlerURL:t[4],e.p2pHandlerURL||(e.p2pHandlerURL=e.runtimeURL+"/p2phandler/"+(0,P.generateGUID)(),Q.info("[RuntimeUA - init] P2PHandlerURL: ",e.p2pHandlerURL),e.storages.runtime.set("p2pHandler:URL",1,{p2pHandlerURL:e.p2pHandlerURL})),e._loadComponents()}).then(function(t){return e._hypertyResourcesStorage=new G.default(e.runtimeURL,e.messageBus,e.storages.hypertyResources,e._hypertyResources),e.p2p?(Q.info("[RuntimeUA - init] load p2pHandler: ",t),e._loadP2PHandler()):(Q.info("[RuntimeUA - init] P2P not supported"),"P2P Not Supported")}).then(function(e){Q.info("[runtime ua - init] - status: ",e),t(!0)},function(e){Q.error("ERROR: ",e),t(!0)})}catch(e){r(e)}})}},{key:"_loadP2PHandler",value:function(){var e=this;return new i.default(function(t){var r=C.runtimeUtils.runtimeDescriptor,n=r.p2pHandlerStub,i={isHandlerStub:!0,runtimeURL:e.runtimeURL};Q.log("[RuntimeUA loadP2PHandler] P2PStubHandler: ",n),e.loader.loadStub(n,i).then(function(r){var n=e.runtimeURL+"/ua",i={type:"subscribe",from:n,to:"domain://msg-node."+e.domain+"/sm",body:{subscribe:[r.url],source:e.runtimeURL}};e.messageBus.addListener(n,function(e){Q.log("[runtime ua - listener] - receive msg: ",e)}),e.messageBus.postMessage(i,function(e){Q.log("[runtime ua - postMessage] - reply: ",e)}),Q.info("[runtime ua - p2p installation] - success: ",r),t(!0)}).catch(function(e){Q.info("[runtime ua - p2p installation] - fail: ",e),t(!1)})})}},{key:"_loadComponents",value:function(){var e=this;return new i.default(function(t,r){try{
 // Prepare the on instance to handle with the fallbacks and runtimeCatalogue;
 e.descriptorInstance=new D.default(e.runtimeURL,e.runtimeCatalogue,e.runtimeConfiguration),
 // Prepare the loader to load the hyperties, protostubs and idpproxy;
@@ -2620,15 +3214,15 @@ e.messageBus=new S.default(e.registry),
 // Prepare the address allocation instance;
 e.addressAllocation=new M.default(e.runtimeURL,e.messageBus,e.registry),
 // Instantiate the Policy Engine
-e.policyEngine=new R.default(new Q.default(e.runtimeURL,e.identityModule,e.registry,e.storages.policy,e.runtimeCapabilities)),
+e.policyEngine=new R.default(new $.default(e.runtimeURL,e.identityModule,e.registry,e.storages.policy,e.runtimeCapabilities)),
 // Instantiate Discovery
-e.coreDiscovery=new H.default(e.runtimeURL,e.messageBus,e.graphConnector,e.runtimeFactory,e.registry),
+e.coreDiscovery=new q.default(e.runtimeURL,e.messageBus,e.graphConnector,e.runtimeFactory,e.registry),
 // Instantiate the IdentityManager
 e.identityManager=new m.default(e.identityModule),
 // initialise the CryptoManager
 L.default.init(e.runtimeURL,e.runtimeCapabilities,e.storages.cryptoManager,e._dataObjectsStorage,e.registry,e.coreDiscovery,e.identityModule,e.runtimeFactory),
 // Instantiate the Graph Connector
-e.graphConnector=new N.default(e.runtimeURL,e.messageBus,e.storageManager),e.handlers=new T.default(e.policyEngine,e.identityManager,L.default),e.messageBus.pipelineOut.handlers=[e.handlers.idmHandler,e.handlers.pepOutHandler,e.handlers.encryptHandler],e.messageBus.pipelineIn.handlers=[e.handlers.decryptHandler,e.handlers.pepInHandler],
+e.graphConnector=null,e.handlers=new T.default(e.policyEngine,e.identityManager,L.default),e.messageBus.pipelineOut.handlers=[e.handlers.idmHandler,e.handlers.pepOutHandler,e.handlers.encryptHandler],e.messageBus.pipelineIn.handlers=[e.handlers.decryptHandler,e.handlers.pepInHandler],
 // Add to App Sandbox the listener;
 n.addListener("*",function(t){e.messageBus.postMessage(t)}),L.default.messageBus=e.messageBus,
 // Register messageBus on Registry
@@ -2645,7 +3239,7 @@ e.identityModule.coreDiscovery=e.coreDiscovery,
 // and set the message bus to the factory
 e.runtimeFactory.messageBus=e.messageBus,
 // Instanciate the SyncherManager;
-e.syncherManager=new Y.default(e.runtimeURL,e.messageBus,e.registry,e.runtimeCatalogue,e.storages.syncherManager,null,e._dataObjectsStorage,e.identityModule),
+e.syncherManager=new W.default(e.runtimeURL,e.messageBus,e.registry,e.runtimeCatalogue,e.storages.syncherManager,null,e._dataObjectsStorage,e.identityModule),
 // Set into loader the needed components;
 e.loader.runtimeURL=e.runtimeURL,e.loader.messageBus=e.messageBus,e.loader.registry=e.registry,e.loader.runtimeCatalogue=e.runtimeCatalogue,e.loader.runtimeFactory=e.runtimeFactory,
 //Instantiate Discovery Lib for notification testing
@@ -2661,11 +3255,11 @@ e.loader.runtimeURL=e.runtimeURL,e.loader.messageBus=e.messageBus,e.loader.regis
 //   });
 // }, 2000);
 // Instanciate the SubscriptionManager;
-e.subscriptionManager=new J.default(e.runtimeURL,e.messageBus,e.storages.subscriptions);
+e.subscriptionManager=new z.default(e.runtimeURL,e.messageBus,e.storages.subscriptions);
 // this.subscriptionManager.init().then(()=>{
 //   resolve(true);
 // });
-var o=[];o.push(e.subscriptionManager.init()),o.push(e.identityModule.init()),o.push(L.default.loadSessionKeys()),i.default.all(o).then(function(e){3===e.length?t(!0):r("[RuntimeUA._loadComponents] Error ] ",e)}).catch(function(e){throw Error(e)})}catch(e){r(e)}})}},{key:"loadHyperty",value:function(e){var t=arguments.length>1&&void 0!==arguments[1]&&arguments[1],r=arguments[2];if(!e)throw new Error("Hyperty descriptor url parameter is needed");return this.loader.loadHyperty(e,t,r)}},{key:"loadStub",value:function(e){if(!e)throw new Error("ProtoStub descriptor url parameter is needed");return this.loader.loadStub(e)}},{key:"loadIdpProxy",value:function(e){if(X.log("ipdProxyCatalogueURL",e),!e)throw new Error("The IDP Proxy URL is a needed parameter, could be a DOMAIN or a URL");return this.loader.loadIdpProxy(e)}},{key:"close",value:function(){var e=this;return X.info("Unregister all hyperties"),new i.default(function(t,r){e.registry.unregisterAllHyperties().then(function(e){X.info("All the hyperties are unregisted with Success:",e),t(!0)}).catch(function(e){X.error("Failed to unregister the hyperties",e),r(!1)})})}}]),RuntimeUA}();t.default=Z,e.exports=t.default},/* 416 */
+var o=[];o.push(e.subscriptionManager.init()),o.push(e.identityModule.init()),o.push(L.default.loadSessionKeys()),i.default.all(o).then(function(e){3===e.length?t(!0):r("[RuntimeUA._loadComponents] Error ] ",e)}).catch(function(e){throw Error(e)})}catch(e){r(e)}})}},{key:"loadHyperty",value:function(e){var t=arguments.length>1&&void 0!==arguments[1]&&arguments[1],r=arguments[2];if(!e)throw new Error("Hyperty descriptor url parameter is needed");return this.loader.loadHyperty(e,t,r)}},{key:"loadStub",value:function(e){if(!e)throw new Error("ProtoStub descriptor url parameter is needed");return this.loader.loadStub(e)}},{key:"loadIdpProxy",value:function(e){if(Q.log("ipdProxyCatalogueURL",e),!e)throw new Error("The IDP Proxy URL is a needed parameter, could be a DOMAIN or a URL");return this.loader.loadIdpProxy(e)}},{key:"close",value:function(){var e=this;return Q.info("Unregister all hyperties"),new i.default(function(t,r){e.registry.unregisterAllHyperties().then(function(e){Q.info("All the hyperties are unregisted with Success:",e),t(!0)}).catch(function(e){Q.error("Failed to unregister the hyperties",e),r(!1)})})}}]),RuntimeUA}();t.default=X,e.exports=t.default},/* 416 */
 /***/
 function(e,t,r){r(182),r(128),r(190),r(425),r(432),r(433),e.exports=r(13).Promise},/* 417 */
 /***/
@@ -3494,7 +4088,7 @@ e.loadConfigurations()}/**
 return(0,u.default)(PEP,[{key:"addGUIListeners",value:function(){var e=this;e.context.messageBus.addListener(e.context.pepURL,function(t){var r=t.body.method,n=void 0;if("addToGroup"===r){var i=t.body.params.groupName,o=t.body.params.userEmail;n=e.context.addToGroup(i,o)}else if("createGroup"===r){var s=t.body.params.groupName;n=e.context.createGroup(s)}else if("addPolicy"===r){var a=t.body.params.source,u=t.body.params.key,c=t.body.params.policy,f=t.body.params.combiningAlgorithm;n=e.addPolicy(a,u,c,f)}else if("deleteGroup"===r){var l=t.body.params.groupName;n=e.context.deleteGroup(l)}else if("removePolicy"===r){var d=t.body.params.source,p=t.body.params.key;n=e.removePolicy(d,p)}else if("savePolicies"===r){var y=t.body.params.source;n=e.context.savePolicies(y)}else if("userPolicies"===r)n=e.context.userPolicies;else if("activeUserPolicy"===r){var h=t.body.params.userPolicy;h&&(e.context.activeUserPolicy=h),n=e.context.activeUserPolicy}else if("userPolicy"===r){var v=t.body.params.key;n=e.context.userPolicies[v]}else"saveActivePolicy"===r?n=e.context.saveActivePolicy():"getMyEmails"===r?n=e.context.getMyEmails():"getMyHyperties"===r?n=e.context.getMyHyperties():"groups"===r?n=e.context.groups:"getGroupsNames"===r&&(n=e.context.getGroupsNames());if("removeFromGroup"===r){var g=t.body.params.groupName,b=t.body.params.userEmail;n=e.context.removeFromGroup(g,b)}var m={type:"execute",value:n,code:200},_={id:t.id,type:"response",to:t.from,from:t.to,body:m};e.context.messageBus.postMessage(_)})}},{key:"addPolicy",value:function(e,t,r,n){if(!e)throw new Error("source is not defined");if(!t)throw new Error("key is not defined");switch(void 0===r?r=new v.default(t,[],[],n):r instanceof v.default||(r=new v.default(r.key,r.rules,r.actions,r.combiningAlgorithm)),e){case"SERVICE_PROVIDER":this.context.savePolicies(e,r,t);break;case"USER":this.context.userPolicies[t]=r,this.context.savePolicies(e);break;default:throw Error("Unknown policy source: "+e)}}},{key:"authorise",value:function(e,t){var r=this;
 // log.log('[Policy.PEP Authorise] ', message);
 // log.log(message);
-if(!e)throw new Error("message is not defined");if(!e.from)throw new Error("message.from is not defined");if(!e.to)throw new Error("message.to is not defined");if(!e.type)throw new Error("message.type is not defined");return e.body=e.body||{},new i.default(function(n,i){e.body=e.body||{};var o=r,s=o.pdp.evaluatePolicies(e,t);"Not Applicable"===s&&(s=o.context.defaultBehaviour,e.body.auth=!1),o.actionsService.enforcePolicies(e,t).then(function(t){for(var r in t)if(e=t[r],s)e.body.auth=void 0===e.body.auth||e.body.auth,n(e);else{var o={body:{code:403,description:"Blocked by policy"},from:e.to,to:e.from,type:"response"};i(o)}},function(e){i(e)})})}},{key:"authoriseSync",value:function(e){var t=void 0;return e.body=e.body||{},t=this.pdp.evaluatePolicies(e,!0),"Not Applicable"===t&&(t=this.context.defaultBehaviour),t}},{key:"removePolicy",value:function(e,t){if(!e)throw new Error("source is not defined");if("*"!==e&&!t)throw new Error("key is not defined");switch(e){case"*":this.context.serviceProviderPolicy={},this.context.userPolicies={},this.context.activeUserPolicy=void 0,this.context.savePolicies("USER"),this.context.savePolicies("SERVICE_PROVIDER"),this.context.saveActivePolicy();break;case"SERVICE_PROVIDER":delete this.context.serviceProviderPolicy[t],this.context.savePolicies();break;case"USER":delete this.context.userPolicies[t],t===this.context.activeUserPolicy&&(this.context.activeUserPolicy=void 0,this.context.saveActivePolicy()),this.context.savePolicies("USER");break;default:throw Error("Unknown policy source: "+e)}}},{key:"messageBus",get:function(){return this.context.messageBus},set:function(e){var t=this;t.context.messageBus=e,t.addGUIListeners()}}]),PEP}());t.default=g,e.exports=t.default},/* 478 */
+if(!e)throw new Error("message is not defined");if(!e.from)throw new Error("message.from is not defined");if(!e.to)throw new Error("message.to is not defined");if(!e.type)throw new Error("message.type is not defined");return e.body=e.body||{},new i.default(function(n,i){e.body=e.body||{};var o=r,s=o.pdp.evaluatePolicies(e,t);"Not Applicable"===s&&(s=o.context.defaultBehaviour,e.body.auth=!1),o.actionsService.enforcePolicies(e,t).then(function(t){for(var r in t)if(e=t[r],s)e.body.auth=void 0===e.body.auth||e.body.auth,n(e);else{var o={body:{code:403,description:"Blocked by policy"},from:e.to,to:e.from,type:"response"};i(o)}},function(e){i(e)})})}},{key:"removePolicy",value:function(e,t){if(!e)throw new Error("source is not defined");if("*"!==e&&!t)throw new Error("key is not defined");switch(e){case"*":this.context.serviceProviderPolicy={},this.context.userPolicies={},this.context.activeUserPolicy=void 0,this.context.savePolicies("USER"),this.context.savePolicies("SERVICE_PROVIDER"),this.context.saveActivePolicy();break;case"SERVICE_PROVIDER":delete this.context.serviceProviderPolicy[t],this.context.savePolicies();break;case"USER":delete this.context.userPolicies[t],t===this.context.activeUserPolicy&&(this.context.activeUserPolicy=void 0,this.context.saveActivePolicy()),this.context.savePolicies("USER");break;default:throw Error("Unknown policy source: "+e)}}},{key:"messageBus",get:function(){return this.context.messageBus},set:function(e){var t=this;t.context.messageBus=e,t.addGUIListeners()}}]),PEP}());t.default=g,e.exports=t.default},/* 478 */
 /***/
 function(e,t,r){"use strict";function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0});var n=r(9),i=_interopRequireDefault(n),o=r(1),s=_interopRequireDefault(o),a=r(2),u=_interopRequireDefault(a),c=function(){function ActionsService(e){(0,s.default)(this,ActionsService),this.context=e}return(0,u.default)(ActionsService,[{key:"enforcePolicies",value:function(e,t){var r=this;return new i.default(function(n,i){var o=r.context.getPolicies(e,t);void 0!==o?void 0!==o.serviceProviderPolicy?o.serviceProviderPolicy.enforceActions(r.context,e).then(function(e){n(e)},function(e){i(e)}):void 0!==o.userPolicy?o.userPolicy.enforceActions(r.context,e).then(function(e){n(e)},function(e){i(e)}):n([e]):n([e])})}},{key:"forwardToID",value:function(e,t){var r=this;if(!r.context.runtimeRegistry)throw new Error("forward message to given ID is unsupported in this environment");return new i.default(function(n,i){if(r.context.runtimeRegistry.hypertiesList[0].hypertyURL===e.to){"runtime"!==e.to.split("://")[0]?r.context.runtimeRegistry.discoverHypertyPerUser(t).then(function(t){e.to=t.hypertyURL,e.body.via=void 0,n(e),r.context.runtimeRegistry._messageBus.postMessage(e)},function(e){i(e)}):n(e)}else n(e)})}},{key:"forwardToHyperty",value:function(e,t){var r=this;if(!r.context.runtimeRegistry)throw new Error("forward message to given ID is unsupported in this environment");return new i.default(function(n){if(r.context.runtimeRegistry.hypertiesList[0].hypertyURL===e.to){"runtime"!==e.to.split("://")[0]?(e.to=t,e.body.via=void 0,n(e),r.context.runtimeRegistry._messageBus.postMessage(e)):n(e)}else n(e)})}},{key:"sendAutomaticMessage",value:function(e,t){var r=this;return new i.default(function(n){var i={from:e.to,to:e.from,body:{value:t},type:e.type};n(e),r.context.runtimeRegistry._messageBus.postMessage(i)})}}]),ActionsService}();t.default=c,e.exports=t.default},/* 479 */
 /***/
