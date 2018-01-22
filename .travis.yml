@@ -29,5 +29,5 @@ before_install:
 
 install:
   - npm install
-  - npm run start:all &
-  - sleep 60
+  - npm run start:all
+  - sleep 200
