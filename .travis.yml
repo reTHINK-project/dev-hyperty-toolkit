@@ -8,6 +8,8 @@ node_js:
 services:
   - docker
 
+test: karma start
+
 before_install:
   - sudo setcap 'cap_net_bind_service=+ep' `which node`
   - export CHROME_BIN=chromium-browser
@@ -27,5 +29,5 @@ before_install:
 
 install:
   - npm install
-  - npm run start:all
-  - sleep 60
+  - npm run start:all &
+  - sleep 200
