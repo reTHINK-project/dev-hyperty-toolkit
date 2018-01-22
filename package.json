@@ -1,6 +1,6 @@
 {
   "name": "dev-hyperty-toolkit",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Hyperty Developer Setup, contains all the initial configuration to develop hyperties",
   "main": "index.js",
   "scripts": {
@@ -31,7 +31,7 @@
   "dependencies": {
     "JSONStream": "^1.3.2",
     "express": "^4.16.2",
-    "runtime-browser": "github:rethink-project/dev-runtime-browser#v0.8.0",
+    "runtime-browser": "github:rethink-project/dev-runtime-browser#v0.8.1",
     "runtime-core": "github:rethink-project/dev-runtime-core#v0.11.1",
     "service-framework": "github:rethink-project/dev-service-framework#v0.8.0"
   },
