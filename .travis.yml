@@ -7,7 +7,7 @@ node_js:
 
 services:
   - docker
-  
+
 test: karma start
 
 before_install:
@@ -19,6 +19,13 @@ before_install:
   - export HYPERTY_REPO=./dev-hyperty
   - git clone --branch=develop https://github.com/reTHINK-project/dev-protostubs.git
   - export PROTOSTUB_REPO=./dev-protostubs
+  - cd dev-hyperty
+  - npm run install:all
+  - sleep 200
+  - cd ../dev-protostubs
+  - npm run install:all
+  - sleep 200
+  - cd ..
 
 install:
   - npm install
