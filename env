@@ -1,8 +1,8 @@
 DEVELOPMENT=true
-RUNTIME_URL=hyperty-catalogue://catalogue.rethink.localhost.com/.well-known/runtime/Runtime
-DOMAIN=rethink.localhost.com
-INDEX_URL=https://rethink.localhost.com/.well-known/runtime/index.html
-SANDBOX_URL=https://rethink.localhost.com/.well-known/runtime/sandbox.html
+RUNTIME_URL=hyperty-catalogue://catalogue.localhost/.well-known/runtime/Runtime
+DOMAIN=localhost
+INDEX_URL=https://localhost/.well-known/runtime/index.html
+SANDBOX_URL=https://localhost/.well-known/runtime/sandbox.html
 
 HYPERTY_REPO=../dev-hyperty
 HYPERTY_TEMPLATES_PATH=examples
