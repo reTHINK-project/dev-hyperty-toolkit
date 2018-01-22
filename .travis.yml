@@ -7,6 +7,8 @@ node_js:
 
 services:
   - docker
+  
+test: karma start
 
 before_install:
   - sudo setcap 'cap_net_bind_service=+ep' `which node`
