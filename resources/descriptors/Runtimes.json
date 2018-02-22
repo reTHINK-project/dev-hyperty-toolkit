@@ -13,8 +13,8 @@
     "cguid": "3bc366f2d0ba3d681e7a3899917c5d3de",
     "type": "Runtimes",
     "runtimeType": "browser",
-    "p2pHandlerStub": "hyperty-catalogue://catalogue.rethink.localhost.com/.well-known/protocolstub/P2PHandlerProtoStub",
-    "p2pRequesterStub": "hyperty-catalogue://catalogue.rethink.localhost.com/.well-known/protocolstub/P2PRequesterProtoStub",
+    "p2pHandlerStub": "hyperty-catalogue://catalogue.localhost/.well-known/protocolstub/P2PHandlerProtoStub",
+    "p2pRequesterStub": "hyperty-catalogue://catalogue.localhost/.well-known/protocolstub/P2PRequesterProtoStub",
     "constraints": {
       "browser": true,
       "mic": true,
