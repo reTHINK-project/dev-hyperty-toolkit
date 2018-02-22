@@ -111,6 +111,10 @@ function loadHyperty(event) {
   runtimeLoader.requireHyperty(hypertyPath, true).then((hyperty) => {
     hypertyDeployed(hyperty);
     loading = false;
+    console.log('hyperty->>>>>', hypertyPath, hyperty);
+    if (hyperty.name === 'UserKwhObserver' || hyperty.name === 'LocationReporterDSM') {
+      runtimeLoader.requireProtostub('vertx-app');
+    }
   }).catch((reason) => {
     hypertyFail(reason);
     loading = false;
