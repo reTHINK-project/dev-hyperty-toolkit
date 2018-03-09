@@ -113,7 +113,7 @@ function loadHyperty(event) {
     loading = false;
     console.log('hyperty->>>>>', hypertyPath, hyperty);
     if (hyperty.name === 'UserKwhObserver' || hyperty.name === 'LocationReporterDSM') {
-      runtimeLoader.requireProtostub('vertx-app');
+      runtimeLoader.requireProtostub('sharing-cities-dsm');
     }
   }).catch((reason) => {
     hypertyFail(reason);
