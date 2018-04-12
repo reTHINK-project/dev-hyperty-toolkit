@@ -35,7 +35,6 @@ rethink.install(config).then(function(result) {
 
   console.log('after rethink install', result);
   runtimeLoader = result;
-  runtimeLoader.requireProtostub('sharing-cities-dsm');
 
   return getListOfHyperties(domain);
 
@@ -111,12 +110,9 @@ function loadHyperty(event) {
   addLoader($el);
 
   runtimeLoader.requireHyperty(hypertyPath, true).then((hyperty) => {
-    hypertyDeployed(hyperty);
+
+    hypertyDeployed(hyperty, runtimeLoader);
     loading = false;
-    console.log('hyperty->>>>>', hypertyPath, hyperty);
-    //if (hyperty.name === 'UserKwhObserver' || hyperty.name === 'LocationReporterDSM' ||  hyperty.name === 'WalletDSM') {
-    //  runtimeLoader.requireProtostub('sharing-cities-dsm');
-    //}
   }).catch((reason) => {
     hypertyFail(reason);
     loading = false;
