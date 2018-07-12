@@ -1,15 +1,15 @@
 {
   "name": "dev-hyperty-toolkit",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "description": "Hyperty Developer Setup, contains all the initial configuration to develop hyperties",
   "main": "index.js",
   "scripts": {
     "test": "karma start",
     "test:mocha": "nyc --require babel-register --require babel-polyfill mocha",
     "start": "cross-env ENVIRONMENT=all gulp serve",
-    "start:prod": "cross-env ENVIRONMENT=all MODE=prod gulp production",
+    "start:prod": "cross-env ENVIRONMENT=browser MODE=prod gulp serve",
     "server": "cross-env ENVIRONMENT=core MODE=dev gulp server",
-    "start:dev": "cross-env ENVIRONMENT=core MODE=dev gulp serve",
+    "start:dev": "cross-env ENVIRONMENT=core MODE=prod gulp serve",
     "start:browser": "cross-env ENVIRONMENT=browser MODE=dev gulp serve",
     "start:node": "cross-env ENVIRONMENT=node MODE=dev gulp serve",
     "start:all": "cross-env ENVIRONMENT=all MODE=dev gulp serve",
