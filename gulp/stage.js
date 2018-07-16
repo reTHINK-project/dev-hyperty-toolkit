@@ -7,7 +7,6 @@ var getStage = function() {
   if (process.env.hasOwnProperty('MODE')) {
     stage = process.env.MODE === 'dev' || process.env.MODE === 'develop' || process.env.MODE === 'development' ? 'develop' : 'production';
   }
-
   return stage;
 };
 
