@@ -1,5 +1,5 @@
 // version: 0.12.0
-// date: Wed Jul 18 2018 10:13:19 GMT+0100 (Western European Summer Time)
+// date: Wed Jul 18 2018 14:13:22 GMT+0100 (Western European Summer Time)
 // licence: 
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
@@ -1385,7 +1385,7 @@ S.setLevel(3),
 // SyncherManager
 O.setLevel(3),
 // IdentityManager
-P.setLevel(3),
+P.setLevel(0),
 // CryptoManager
 M.setLevel(3),
 // Pipeline
@@ -2889,7 +2889,7 @@ o.storageManager.get("registry:HypertyURLs").then(function(i){
 o._getResourcesAndSchemes(r).then(function(l){a=l,i||(i={}),i[a.resources+a.dataSchema+a.name]=n.address,o.storageManager.set("registry:HypertyURLs",0,i).then(function(){
 //check whether the received sanbox e ApplicationSandbox or a normal sandbox
 "app"===e.type?o.sandboxesList.appSandbox[n.address[0]]=e:"normal"===e.type?o.sandboxesList.sandbox[n.address[0]]=e:c("Wrong SandboxType");var i=void 0,l=void 0;0!==(0,s.default)(o.p2pHandlerStub).length&&(i=o.p2pHandlerStub[o.runtimeURL].url,l=h.runtimeUtils.runtimeDescriptor.p2pRequesterStub);var d=new _.default(o.identifier,o.registryURL,t,r,n.address[0],f,"guid",o.runtimeURL,"ctx",i,l,a.dataSchema,a.resources);o.hypertiesList.push(d);/*--- start here move p2p and domain registry related features to a separated function.-------..*/
-var p=!0;r.hasOwnProperty("configuration")&&r.configuration.hasOwnProperty("domain_registration")&&(p=r.configuration.domain_registration),p?o._domainRegistration.registerHyperty(d,n.newAddress).then(function(e){u(e)}):u({url:d.hypertyURL})}).catch(function(e){
+var p=!0;r.hasOwnProperty("_configuration")&&r.configuration.hasOwnProperty("domain_registration")&&(p=r.configuration.domain_registration),p?o._domainRegistration.registerHyperty(d,n.newAddress).then(function(e){u(e)}):u({url:d.hypertyURL})}).catch(function(e){
 // log.log('[Registry registerHyperty] Error: ', reason);
 c(e)})})})},function(e){c("[Registry registerHyperty] ",e)})})}},{key:"unregisterHyperty",value:function(e){var t=this;return new u.default(function(r,n){var i=!1,o=0;for(o=0;o<t.hypertiesList.length;o++){var s=t.hypertiesList[o];if(void 0!==s&&s.hypertyURL===e){i=!0;break}}!1===i?n("Hyperty not found"):(delete t.hypertiesList[o],r("Hyperty successfully deleted"))})}},{key:"discoverProtostub",value:function(e){if(!e)throw new Error("Parameter url needed");var t=this,r=(0,P.divideURL)(e),n=r.domain;if(t.protostubsList.hasOwnProperty(n)&&t.protostubsList[n].status===L.LIVE)return t.protostubsList[n];throw t.protostubsList[n]={status:L.DEPLOYING},new Error("[Registry - discoverProtoStub ] Message Node Protostub Not Found. Creating one")}},{key:"discoverP2PStub",value:function(e){var t=this;if(e){if(t.p2pRequesterStub.hasOwnProperty(e)&&t.p2pRequesterStub[e].status===L.LIVE)return t.p2pRequesterStub[e];throw t.p2pRequesterStub[e]={status:L.CREATED},new Error("[Registry - discoverP2PStub ] P2P Requester Stub Not Found. Creating one")}if(t.p2pHandlerStub.hasOwnProperty(t.runtimeURL))return t.p2pHandlerStub[t.runtimeURL];throw t.p2pHandlerStub[t.runtimeURL]={status:L.CREATED},new Error("[Registry - discoverP2PStub ] P2P Handler Stub Not Found.")}},{key:"registerStub",value:function(e,t,r,n,o){var s=this,a=o;return new u.default(function(u,c){var f=void 0;
 //check if messageBus is registered in registry or not
