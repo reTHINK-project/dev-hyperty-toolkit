@@ -7,7 +7,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "31.10",
+    "version": "31.60",
     "description": "IDPProxy for Facebook idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -30,7 +30,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "32.60",
+    "version": "33.10",
     "description": "IDPProxy for google idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -54,7 +54,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "32.60",
+    "version": "33.10",
     "description": "IDPProxy for node idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -78,7 +78,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "32.00",
+    "version": "32.50",
     "description": "IDPProxy for microsoft idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -101,7 +101,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "32.60",
+    "version": "33.10",
     "description": "IDPProxy for browser idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -125,7 +125,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "32.60",
+    "version": "33.10",
     "description": "IDPProxy for node idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -148,7 +148,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "31.00",
+    "version": "31.50",
     "description": "IDPProxy rethink-project.eu description",
     "language": "javascript",
     "type": "IDPProxys",
@@ -173,7 +173,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "31.00",
+    "version": "31.50",
     "description": "IDPProxy slack description",
     "language": "javascript",
     "type": "IDPProxys",
