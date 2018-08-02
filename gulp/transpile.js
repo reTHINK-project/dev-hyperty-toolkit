@@ -118,12 +118,21 @@ const webPackPlugins = [
 function transpileBrowser(args, filename, opts, chunk, cb) {
   var fileObject = path.parse(chunk.path);
   var stage = getStage();
+  var varPlugins = stage === 'develop' ? [] : webPackPlugins;
+  var varCache = stage === 'develop' ? false : true;
+  var varDevtool = stage === 'develop' ? 'eval-source-map' : 'none';
+
+  if (filename == 'VertxAppProtoStub.ps.js') {
+    varPlugins = [];
+    varCache = false;
+    varDevtool = 'eval-source-map';
+  }
 
   return gulp.src(chunk.path)
     .pipe(webpackStream({
-      plugins: stage === 'develop' ? [] : webPackPlugins,
-      cache: stage === 'develop' ? false : true,
-      devtool: stage === 'develop' ? 'eval-source-map' : 'none',
+      plugins: varPlugins,
+      cache: varCache,
+      devtool: varDevtool,
       output: {
         path: path.join(opts.destination),
         library: opts.standalone,

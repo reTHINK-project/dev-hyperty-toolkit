@@ -33,6 +33,7 @@ if (!rethink) {
 
 rethink.install(config).then(function(result) {
 
+  console.log('after rethink install', result);
   runtimeLoader = result;
 
   return getListOfHyperties(domain);
@@ -109,7 +110,8 @@ function loadHyperty(event) {
   addLoader($el);
 
   runtimeLoader.requireHyperty(hypertyPath, true).then((hyperty) => {
-    hypertyDeployed(hyperty);
+
+    hypertyDeployed(hyperty, runtimeLoader);
     loading = false;
   }).catch((reason) => {
     hypertyFail(reason);

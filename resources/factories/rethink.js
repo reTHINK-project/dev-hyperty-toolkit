@@ -83,6 +83,30 @@ let runtimeProxy = {
         }
       });
     });
+  },
+  reset: () => {
+    let from = 'app:reset';
+
+    return new Promise(function(resolve, reject) {
+
+      let msg = {
+        from: from,
+        to: 'core:reset',
+        body: {
+        }
+      };
+
+      minibus._onMessage(msg);
+      minibus.addListener(from, function(msg) {
+        if (!msg.body.hasOwnProperty('code')) {
+
+          resolve(msg.body.value);
+
+        } else {
+          reject(msg.body.value);
+        }
+      });
+    });
   }
 };
 
@@ -153,6 +177,26 @@ const rethink = {
 
             //TODO: Work the message errors, probably use message factory
             runtime.loadStub(msg.body.value.domain).then(function(result) {
+              resultMsg.body.value = result;
+              minibus._onMessage(resultMsg);
+            }).catch(function(reason) {
+              resultMsg.body.value = reason;
+              resultMsg.body.code = 400;
+              minibus._onMessage(resultMsg);
+            });
+
+          });
+
+          minibus.addListener('core:reset', function(msg) {
+            console.log('Reset Core Runtime:', msg);
+
+            let resultMsg = {};
+            resultMsg.from = msg.to;
+            resultMsg.to = msg.from;
+            resultMsg.body = {};
+
+            //TODO: Work the message errors, probably use message factory
+            runtime.reset().then(function(result) {
               resultMsg.body.value = result;
               minibus._onMessage(resultMsg);
             }).catch(function(reason) {
