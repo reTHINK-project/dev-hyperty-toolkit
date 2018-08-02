@@ -23,17 +23,17 @@ class AppSandboxBrowser extends Sandbox {
     };
 
     _this._sbr = new SandboxRegistry(_this._bus);
-    _this._sbr._create = (url, sourceCode, config) => {
+    _this._sbr._create = (url, sourceCode, config, factory) => {
       console.log('SandboxRegistry._create ', url, config);
       window.eval(sourceCode);
 
       let component;
       if (typeof activate === 'function') {
-        component = activate(url, this._bus, config);
+        component = activate(url, this._bus, config, factory);
       }
 
       if (typeof activate.default === 'function') {
-        component = activate.default(url, this._bus, config);
+        component = activate.default(url, this._bus, config, factory);
       }
 
       //for testing, this make components accessible from browser console

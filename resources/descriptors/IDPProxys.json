@@ -7,7 +7,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "38.10",
+    "version": "0.10",
     "description": "IDPProxy for Facebook idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -30,7 +30,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "40.30",
+    "version": "0.10",
     "description": "IDPProxy for google idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -38,13 +38,13 @@
     "constraints": {
       "browser": true
     },
+    "interworking": true,
     "objectName": "google.com",
     "configuration": {},
     "messageSchemas": [],
     "dataObjects": [],
     "signature": "",
-    "accessControlPolicy": "somePolicy",
-    "interworking": true
+    "accessControlPolicy": "somePolicy"
   },
   "NodejsProxyStub": {
     "sourcePackage": {
@@ -54,7 +54,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "40.30",
+    "version": "0.10",
     "description": "IDPProxy for node idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -78,7 +78,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "39.00",
+    "version": "0.10",
     "description": "IDPProxy for microsoft idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -101,7 +101,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "39.60",
+    "version": "0.10",
     "description": "IDPProxy for browser idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -125,7 +125,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "39.60",
+    "version": "0.10",
     "description": "IDPProxy for node idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -148,7 +148,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "38.00",
+    "version": "0.10",
     "description": "IDPProxy rethink-project.eu description",
     "language": "javascript",
     "type": "IDPProxys",
@@ -173,7 +173,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "37.90",
+    "version": "0.10",
     "description": "IDPProxy slack description",
     "language": "javascript",
     "type": "IDPProxys",
