@@ -3,9 +3,9 @@ import SandboxBrowser from '../sandboxes/SandboxBrowser';
 import AppSandboxBrowser from '../sandboxes/AppSandboxBrowser';
 
 import Request from '../browser/Request';
-import {RuntimeCatalogue} from 'service-framework/dist/RuntimeCatalogue';
-import PersistenceManager from 'service-framework/dist/PersistenceManager';
-import StorageManager from 'service-framework/dist/StorageManager';
+//import {RuntimeCatalogue} from 'service-framework/dist/RuntimeCatalogue';
+//import PersistenceManager from 'service-framework/dist/PersistenceManager';
+import StorageManager from 'runtime-core/dist/StorageManager';
 
 import RuntimeCapabilities from './RuntimeCapabilities';
 
@@ -88,7 +88,7 @@ const runtimeFactory = Object.create({
     return this.storeManager[name];
   },
 
-  persistenceManager() {
+/*  persistenceManager() {
     if (!this.localStorage) {
       window.localStorage;
       this.localStorage = new PersistenceManager(localStorage);
@@ -104,7 +104,7 @@ const runtimeFactory = Object.create({
     }
 
     return this.catalogue;
-  },
+  },*/
 
   runtimeCapabilities() {
 
