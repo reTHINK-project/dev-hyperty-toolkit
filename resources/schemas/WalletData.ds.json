@@ -3,7 +3,7 @@
 
 	"id": "WalletData",
 	"type": "object",
-	"required": ["scheme", "address", "status", "identity", "created", "balance", "ranking", "bonusCredit", "transactions"],
+	"required": ["scheme", "address", "status", "identity", "created", "balance", "ranking", "bonus-credit", "transactions"],
 	"properties": {
 		"scheme": {
 			"constant": "walletData"
@@ -30,7 +30,7 @@
 		"ranking": {
 			"type": "integer"
 		},
-		"bonusCredit": {
+		"bonus-credit": {
 			"type": "integer"
 		},
 		"transactions": {
