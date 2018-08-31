@@ -219,7 +219,7 @@ gulp.task('service', function() {
 
   }
 
-  gulp.watch([process.cwd() + '/node_modules/service-framework/**/*.*', process.cwd() + '/node_modules/runtime-browser/**/*.*'], () => {
+  gulp.watch([process.cwd() + '/node_modules/runtime-core/**/*.*', process.cwd() + '/node_modules/runtime-browser/**/*.*'], () => {
     executeOnce();
   });
 
