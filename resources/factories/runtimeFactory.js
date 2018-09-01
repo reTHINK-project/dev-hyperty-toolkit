@@ -12,6 +12,10 @@ import RuntimeCapabilities from './RuntimeCapabilities';
 // import StorageManagerFake from './StorageManagerFake';
 
 import Dexie from 'dexie';
+import 'dexie-observable';
+import 'dexie-syncable';
+
+import SyncClient from 'sync-client';
 
 const runtimeFactory = Object.create({
 
@@ -64,7 +68,7 @@ const runtimeFactory = Object.create({
     return atob(b64);
   },
 
-  storageManager(name, schemas) {
+  storageManager(name, schemas, remote) {
 
     if (!this.databases) { this.databases = {}; }
     if (!this.storeManager) { this.storeManager = {}; }
@@ -78,12 +82,34 @@ const runtimeFactory = Object.create({
     // Using the implementation of Service Framework
     // Dexie is the IndexDB Wrapper
     if (!this.databases.hasOwnProperty(name)) {
-      this.databases[name] = new Dexie(name);
+
+      let stores =  {};
+
+      if (schemas) {
+        stores = schemas;
+      } else {
+        stores[storageName] = 'key,version,value';
+      }
+
+      if (!remote) {
+        this.databases[name] =  new Dexie(name);
+        this.databases[name].version(version).stores(stores);
+      } else {
+
+        let versions = {
+          version: 1,
+          stores: stores
+        };
+
+        this.databases[name] =  new SyncClient(name, versions);
+      } 
     }
 
     if (!this.storeManager.hasOwnProperty(name)) {
       this.storeManager[name] = new StorageManager(this.databases[name], name, schemas);
     }
+
+    if (remote) this.storeManager[name].remote = remote;
 
     return this.storeManager[name];
   },
