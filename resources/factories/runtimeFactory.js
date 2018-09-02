@@ -68,7 +68,7 @@ const runtimeFactory = Object.create({
     return atob(b64);
   },
 
-  storageManager(name, schemas, remote) {
+  storageManager(name, schemas, remote = false) {
 
     if (!this.databases) { this.databases = {}; }
     if (!this.storeManager) { this.storeManager = {}; }
@@ -93,20 +93,20 @@ const runtimeFactory = Object.create({
 
       if (!remote) {
         this.databases[name] =  new Dexie(name);
-        this.databases[name].version(version).stores(stores);
+        this.databases[name].version(1).stores(stores);
       } else {
 
-        let versions = {
+        let versions = [{
           version: 1,
           stores: stores
-        };
+        }];
 
         this.databases[name] =  new SyncClient(name, versions);
       } 
     }
 
     if (!this.storeManager.hasOwnProperty(name)) {
-      this.storeManager[name] = new StorageManager(this.databases[name], name, schemas);
+      this.storeManager[name] = new StorageManager(this.databases[name], name, schemas, 1, remote);
     }
 
     if (remote) this.storeManager[name].remote = remote;
