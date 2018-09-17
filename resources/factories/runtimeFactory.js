@@ -92,7 +92,7 @@ const runtimeFactory = Object.create({
       }
 
       if (!remote) {
-        this.databases[name] =  new Dexie(name);
+        this.databases[name] =  new Dexie(name, {addons:[]});
         this.databases[name].version(1).stores(stores);
       } else {
 
