@@ -33,7 +33,7 @@
     "express": "^4.16.3",
     "runtime-browser": "github:rethink-project/dev-runtime-browser#develop",
     "runtime-core": "github:rethink-project/dev-runtime-core#develop",
-    "sync-client": "^1.0.0-beta.11"
+    "sync-client": "github:rethink-project/sync-client#develop"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
