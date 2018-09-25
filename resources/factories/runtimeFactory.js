@@ -68,7 +68,7 @@ const runtimeFactory = Object.create({
     return atob(b64);
   },
 
-  storageManager(name, schemas, remote = false) {
+  storageManager(name, schemas, runtimeUA, remote = false) {
 
     if (!this.databases) { this.databases = {}; }
     if (!this.storeManager) { this.storeManager = {}; }
@@ -106,7 +106,7 @@ const runtimeFactory = Object.create({
     }
 
     if (!this.storeManager.hasOwnProperty(name)) {
-      this.storeManager[name] = new StorageManager(this.databases[name], name, schemas, 1, remote);
+      this.storeManager[name] = new StorageManager(this.databases[name], name, schemas, runtimeUA, 1, remote);
     }
 
     if (remote) this.storeManager[name].remote = remote;
