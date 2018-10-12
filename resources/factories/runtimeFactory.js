@@ -88,7 +88,7 @@ const runtimeFactory = Object.create({
       if (schemas) {
         stores = schemas;
       } else {
-        stores[storageName] = 'key,version,value';
+        stores[name] = 'key,version,value';
       }
 
       if (!remote) {
