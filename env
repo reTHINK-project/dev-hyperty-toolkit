@@ -7,6 +7,6 @@ SANDBOX_URL=https://localhost/.well-known/runtime/sandbox.html
 HYPERTY_REPO=../dev-hyperty
 HYPERTY_TEMPLATES_PATH=examples
 HYPERTY_SOURCECODE_PATH=src
-HYPERTY_INCLUDES=hello-world, wallet, user-activity, location, learning, connector, dtwebrtc, simple-chat, observer-kwh, user-availability
+HYPERTY_INCLUDES=hello-world, wallet, user-activity, location, learning, connector, dtwebrtc, simple-chat, observer-kwh, user-availability, group-chat-manager
 PROTOSTUB_REPO=../dev-protostubs
 PROTOSTUB_SOURCECODE_PATH=src
