@@ -1,5 +1,5 @@
-// version: 0.13.1
-// date: Thu Oct 25 2018 19:20:31 GMT+0100 (GMT Daylight Time)
+// version: 0.14.0
+// date: Sun Oct 28 2018 22:19:42 GMT+0000 (GMT Standard Time)
 // licence: 
 /**
 * Copyright 2016 PT Inovação e Sistemas SA
