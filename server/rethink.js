@@ -3,7 +3,11 @@
 
 // All the environments
 //import rethinkCore from '../resources/factories/rethink';
-import rethinkCore from 'runtime-core/dist/rethink';
+//import rethinkCore from 'runtime-core/dist/rethink';
+
+//import {rethink} from 'runtime-core/dist/rethink';
+
+import {rethink as rethinkCore} from 'runtime-core/dist/rethink';
 import rethinkBrowser from 'runtime-browser/bin/rethink';
 
 import browserConfig from '../config.json';
