@@ -3,7 +3,7 @@
 
 // All the environments
 //import rethinkCore from '../resources/factories/rethink';
-import rethink from 'runtime-core/dist/rethink';
+import rethinkCore from 'runtime-core/dist/rethink';
 import rethinkBrowser from 'runtime-browser/bin/rethink';
 
 import browserConfig from '../config.json';
@@ -13,7 +13,7 @@ import { hypertyDeployed, hypertyFail } from 'app';
 window.KJUR = {};
 
 console.info('environment config:', browserConfig);
-let rethink = browserConfig.ENVIRONMENT === 'core' || browserConfig.ENVIRONMENT === 'all' ? rethink : rethinkBrowser;
+let rethink = browserConfig.ENVIRONMENT === 'core' || browserConfig.ENVIRONMENT === 'all' ? rethinkCore : rethinkBrowser;
 
 let domain = browserConfig.DOMAIN;
 let config = {
