@@ -7,7 +7,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.30",
+    "version": "1.40",
     "description": "IDPProxy for EDP Distribuição IDP",
     "language": "javascript",
     "type": "IDPProxys",
@@ -31,7 +31,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.30",
+    "version": "1.40",
     "description": "IDPProxy for Facebook idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -54,7 +54,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.30",
+    "version": "1.40",
     "description": "IDPProxy for google idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -78,7 +78,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.30",
+    "version": "1.40",
     "description": "IDPProxy for node idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -102,7 +102,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.30",
+    "version": "1.40",
     "description": "IDPProxy for microsoft idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -125,7 +125,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.30",
+    "version": "1.40",
     "description": "IDPProxy for Mobi.e plataform",
     "language": "javascript",
     "type": "IDPProxys",
@@ -149,7 +149,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.30",
+    "version": "1.40",
     "description": "IDPProxy for browser idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -173,7 +173,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.30",
+    "version": "1.40",
     "description": "IDPProxy for node idp",
     "language": "javascript",
     "type": "IDPProxys",
@@ -196,7 +196,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.30",
+    "version": "1.40",
     "description": "IDPProxy rethink-project.eu description",
     "language": "javascript",
     "type": "IDPProxys",
@@ -221,7 +221,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "1.30",
+    "version": "1.40",
     "description": "IDPProxy slack description",
     "language": "javascript",
     "type": "IDPProxys",
