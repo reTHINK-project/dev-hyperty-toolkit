@@ -105,16 +105,16 @@ function loadHyperty(event) {
   if (loading) return;
   loading = true;
 
-  let hypertyName = $(event.currentTarget).attr('data-name');
+  let hypertyName = 'hello-world/' + $(event.currentTarget).attr('data-name');
   console.log('Hyperty Name:', hypertyName);
 
-  let hypertyPath = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/hyperty/' + hypertyName;
+//  let hypertyPath = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/hyperty/' + hypertyName;
 
   let $el = $('.main-content .notification');
   $el.empty();
   addLoader($el);
 
-  runtimeLoader.requireHyperty(hypertyPath, true).then((hyperty) => {
+  runtimeLoader.requireHyperty(hypertyName, true).then((hyperty) => {
 
     hypertyDeployed(hyperty, runtimeLoader);
     loading = false;
