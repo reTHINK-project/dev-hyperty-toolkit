@@ -31,7 +31,7 @@
   "dependencies": {
     "JSONStream": "^1.3.5",
     "express": "^4.16.4",
-    "runtime-browser": "github:rethink-project/dev-runtime-browser#offline",
+    "runtime-browser": "github:rethink-project/dev-runtime-browser#develop",
     "runtime-core": "github:rethink-project/dev-runtime-core#nosandbox",
     "sync-client": "github:rethink-project/sync_client#develop"
   },
