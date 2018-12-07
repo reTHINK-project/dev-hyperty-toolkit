@@ -122,6 +122,8 @@ function loadHyperty(event) {
 
     let instance = new hyperty();
 
+    console.log('DESCRIPTOR imported:', instance.descriptor);
+
     instance.hello();
 
 //    hypertyDeployed(hyperty, runtimeLoader);
