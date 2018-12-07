@@ -114,20 +114,21 @@ function loadHyperty(event) {
   $el.empty();
   addLoader($el);
 
+  import( '../../dev-hyperty/dist/' + hypertyName +'.hy')
+  .then((hypertyModule) => {
+    runtimeLoader.requireHyperty(hypertyModule, true).then((hyperty)=>{
+      console.log('Hyperty imported:', hyperty);
 
-//  runtimeLoader.requireHyperty(hypertyName, true)
-  import('../../dev-hyperty/dist/' + hypertyName +'.hy')
-  .then((hyperty) => {
-    console.log('Hyperty imported:', hyperty);
-
-    let instance = new hyperty();
-
-    console.log('DESCRIPTOR imported:', instance.descriptor);
-
-    instance.hello();
-
-//    hypertyDeployed(hyperty, runtimeLoader);
-    loading = false;
+  //    let instance = new hyperty();
+  
+//      console.log('DESCRIPTOR imported:', hypertyDescriptor);
+  
+  //    instance.hello();
+  
+      hypertyDeployed(hyperty, runtimeLoader);
+      loading = false;
+  
+    })
   }).catch((reason) => {
     hypertyFail(reason);
     loading = false;

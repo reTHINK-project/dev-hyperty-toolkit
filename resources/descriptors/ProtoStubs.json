@@ -7,7 +7,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "3.20",
+    "version": "3.30",
     "description": "Protostub of Google",
     "language": "javascript",
     "cguid": "406d1b76ae0394c37d6e7d0037a91cb7c",
@@ -34,7 +34,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "3.10",
+    "version": "3.20",
     "description": "Description of IMSIWProtoStub",
     "language": "javascript",
     "cguid": "42deef6d806460071a3a260ea4b6291ae",
@@ -63,7 +63,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "3.10",
+    "version": "3.20",
     "description": "P2P Handler Protostub ",
     "language": "javascript",
     "cguid": "4456240d0c888e2293cdc568a7224b7c0",
@@ -112,7 +112,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "3.10",
+    "version": "3.20",
     "description": "P2P Requester Protostub ",
     "language": "javascript",
     "cguid": "4bcb9977c1c46c13278273a67b5fe7aab",
@@ -161,7 +161,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "3.10",
+    "version": "3.20",
     "description": "Protostub to exchange messages with slack",
     "language": "javascript",
     "cguid": "46968ae37faa364f9cc07983229b5a641",
@@ -185,7 +185,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "3.10",
+    "version": "3.20",
     "description": "Protostub to exchange messages with vertx",
     "language": "javascript",
     "cguid": "459ddec3ec1a17767da034fbe0988f1f9",
@@ -210,7 +210,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "3.10",
+    "version": "3.20",
     "description": "Protostub to exchange messages with vertx",
     "language": "javascript",
     "cguid": "41338ea57960781be06f8cf3c78cbf70f",
@@ -235,7 +235,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "4.00",
+    "version": "4.10",
     "description": "Protostub to exchange messages with vertx",
     "language": "javascript",
     "cguid": "46c0d57ffd1f5fe7888e6ba971acb4e79",
