@@ -105,7 +105,7 @@ function loadHyperty(event) {
   if (loading) return;
   loading = true;
 
-  let hypertyName = 'hello-world/' + $(event.currentTarget).attr('data-name');
+  let hypertyName = $(event.currentTarget).attr('data-name');
   console.log('Hyperty Name:', hypertyName);
 
 //  let hypertyPath = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/hyperty/' + hypertyName;
@@ -114,9 +114,17 @@ function loadHyperty(event) {
   $el.empty();
   addLoader($el);
 
-  runtimeLoader.requireHyperty(hypertyName, true).then((hyperty) => {
 
-    hypertyDeployed(hyperty, runtimeLoader);
+//  runtimeLoader.requireHyperty(hypertyName, true)
+  import('../../dev-hyperty/dist/' + hypertyName +'.hy')
+  .then((hyperty) => {
+    console.log('Hyperty imported:', hyperty);
+
+    let instance = new hyperty();
+
+    instance.hello();
+
+//    hypertyDeployed(hyperty, runtimeLoader);
     loading = false;
   }).catch((reason) => {
     hypertyFail(reason);

@@ -26,7 +26,7 @@ function convertHyperty() {
         gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
       })
       .pipe(transpile({
-        destination: path.join(dir, 'dist'),
+        destination: path.join(dir, '../../dist'),
         standalone: 'activate',
         debug: false
       }))
