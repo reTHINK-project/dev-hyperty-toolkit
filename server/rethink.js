@@ -119,12 +119,7 @@ function loadHyperty(event) {
     runtimeLoader.requireHyperty(hypertyModule, true).then((hyperty)=>{
       console.log('Hyperty imported:', hyperty);
 
-  //    let instance = new hyperty();
-  
-//      console.log('DESCRIPTOR imported:', hypertyDescriptor);
-  
-  //    instance.hello();
-  
+ 
       hypertyDeployed(hyperty, runtimeLoader);
       loading = false;
   
