@@ -8,7 +8,7 @@ HYPERTY_REPO=../dev-hyperty
 HYPERTY_TEMPLATES_PATH=examples
 HYPERTY_SOURCECODE_PATH=src
 
-HYPERTY_INCLUDES=hello-world
+HYPERTY_INCLUDES=hello-world, wallet, user-activity, location, learning, connector, dtwebrtc, group-chat-manager, observer-kwh, user-availability, device-manager, simple-chat
 
 PROTOSTUB_REPO=../dev-protostubs
 PROTOSTUB_SOURCECODE_PATH=src
