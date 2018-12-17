@@ -3,13 +3,9 @@ import SandboxBrowser from '../sandboxes/SandboxBrowser';
 import AppSandboxBrowser from '../sandboxes/AppSandboxBrowser';
 
 import Request from '../browser/Request';
-//import {RuntimeCatalogue} from 'service-framework/dist/RuntimeCatalogue';
-//import PersistenceManager from 'service-framework/dist/PersistenceManager';
 import StorageManager from 'runtime-core/dist/StorageManager';
 
 import RuntimeCapabilities from './RuntimeCapabilities';
-
-// import StorageManagerFake from './StorageManagerFake';
 
 import Dexie from 'dexie';
 import 'dexie-observable';
