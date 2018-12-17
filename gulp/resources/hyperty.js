@@ -17,14 +17,16 @@ function convertHyperty() {
   return through.obj(function(chunk, enc, done) {
 
     var fileObject = path.parse(chunk.path);
+    var dir = path.dirname(chunk.path);
 
     return gulp.src([chunk.path])
       .on('end', function() {
         gutil.log('-----------------------------------------------------------');
+        gutil.log('Converting at ' + dir );
         gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
       })
       .pipe(transpile({
-        destination: path.join(process.cwd(), 'resources'),
+        destination: path.join(dir, '../../dist'),
         standalone: 'activate',
         debug: false
       }))
