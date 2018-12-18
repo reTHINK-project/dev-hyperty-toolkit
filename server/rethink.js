@@ -114,7 +114,7 @@ function loadHyperty(event) {
   $el.empty();
   addLoader($el);
 
-  import( '../../dev-hyperty/dist/' + hypertyName +'.hy')
+  import( '../resources/' + hypertyName +'.hy')
   .then((hypertyModule) => {
     runtimeLoader.requireHyperty(hypertyModule, true).then((hyperty)=>{
       console.log('Hyperty imported:', hyperty);

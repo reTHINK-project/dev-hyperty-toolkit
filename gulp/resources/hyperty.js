@@ -28,7 +28,14 @@ function convertHyperty() {
       .pipe(transpile({
         destination: path.join(dir, '../../dist'),
         standalone: 'activate',
-        debug: false
+        debug: true
+      }))
+      .on('end', function() {
+      })
+      .pipe(transpile({
+        destination: path.join(process.cwd(), 'resources'),
+        standalone: 'activate',
+        debug: true
       }))
       .pipe(resource())
       .resume()
