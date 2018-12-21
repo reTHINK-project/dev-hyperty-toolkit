@@ -2,7 +2,12 @@
 // jshint varstmt: true
 
 // All the environments
-import rethinkCore from '../resources/factories/rethink';
+//import rethinkCore from '../resources/factories/rethink';
+//import rethinkCore from 'runtime-core/dist/rethink';
+
+//import {rethink} from 'runtime-core/dist/rethink';
+
+import {rethink as rethinkCore} from 'runtime-core/dist/rethink';
 import rethinkBrowser from 'runtime-browser/bin/rethink';
 
 import browserConfig from '../config.json';
@@ -103,16 +108,23 @@ function loadHyperty(event) {
   let hypertyName = $(event.currentTarget).attr('data-name');
   console.log('Hyperty Name:', hypertyName);
 
-  let hypertyPath = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/hyperty/' + hypertyName;
+//  let hypertyPath = 'hyperty-catalogue://catalogue.' + domain + '/.well-known/hyperty/' + hypertyName;
 
   let $el = $('.main-content .notification');
   $el.empty();
   addLoader($el);
 
-  runtimeLoader.requireHyperty(hypertyPath, true).then((hyperty) => {
+//  import( '../../dev-hyperty/dist/' + hypertyName +'.hy')
+  import( '../resources/hyperties/' + hypertyName +'.hy')
+  .then((hypertyModule) => {
+    runtimeLoader.requireHyperty(hypertyModule, true).then((hyperty)=>{
+      console.log('Hyperty imported:', hyperty);
 
-    hypertyDeployed(hyperty, runtimeLoader);
-    loading = false;
+ 
+      hypertyDeployed(hyperty, runtimeLoader);
+      loading = false;
+  
+    })
   }).catch((reason) => {
     hypertyFail(reason);
     loading = false;
