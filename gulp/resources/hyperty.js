@@ -33,15 +33,7 @@ function convertHyperty() {
         standalone: 'activate',
         debug: true
       }))
-      .on('end', function() {
-        gutil.log('Converting at ' + hypertyBaseDir + hypertyTargetDir);
-        gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
-      })
-      .pipe(transpile({
-        destination: path.join(hypertyBaseDir, hypertyTargetDir),
-        standalone: 'activate',
-        debug: true
-      }))
+      .pipe( copyFiles(path.join(toolkitBasetDir, toolkitTargetDir, fileObject.name + '.js'), path.join(hypertyBaseDir, hypertyTargetDir)) )
       .pipe(resource())
       .resume()
       .on('end', function() {
@@ -53,6 +45,17 @@ function convertHyperty() {
   });
 
 }
+
+function copyFiles(source, output) {
+  gutil.log('Hyperty: copyFiles from ', source, ' to ', output);
+  return through.obj(function(chunk, enc, done) {
+    gutil.log('Hyperty: starting copyFiles from ', source, ' to ', output);
+    return gulp.src(source).pipe(gulp.dest(output)).on('end', function() {
+      gutil.log('Converted Hyperty', source, ' was copied to ', output);
+      done();
+    });
+  })
+ }
 
 function filterHyperties(environment) {
 
