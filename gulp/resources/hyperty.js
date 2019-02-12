@@ -33,8 +33,8 @@ function convertHyperty() {
         standalone: 'activate',
         debug: true
       }))
-      .pipe( copyFiles(path.join(toolkitBasetDir, toolkitTargetDir, fileObject.name + '.js'), path.join(hypertyBaseDir, hypertyTargetDir)) )
       .pipe(resource())
+      .pipe( copyFiles(path.join(toolkitBasetDir, toolkitTargetDir, fileObject.name + '.js'), path.join(hypertyBaseDir, hypertyTargetDir)) )
       .resume()
       .on('end', function() {
         gutil.log('Hyperty', fileObject.name, ' was converted and encoded');
@@ -47,9 +47,7 @@ function convertHyperty() {
 }
 
 function copyFiles(source, output) {
-  gutil.log('Hyperty: copyFiles from ', source, ' to ', output);
   return through.obj(function(chunk, enc, done) {
-    gutil.log('Hyperty: starting copyFiles from ', source, ' to ', output);
     return gulp.src(source).pipe(gulp.dest(output)).on('end', function() {
       gutil.log('Converted Hyperty', source, ' was copied to ', output);
       done();
