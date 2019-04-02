@@ -14,7 +14,7 @@ class IdentitiesGUI {
     _this._messageBus.addListener(guiURL, msg => {
       let funcName = msg.body.method;
 
-      if (funcName === 'openPopup') {
+      if (funcName === 'login') {
         let urlreceived = msg.body.params.urlreceived;
         _this._openPopup(urlreceived).then((returnedValue) => {
           let value = {type: 'execute', value: returnedValue, code: 200};
