@@ -13,6 +13,7 @@ import rethinkBrowser from 'runtime-browser/bin/rethink';
 import browserConfig from '../config.json';
 
 import { hypertyDeployed, hypertyFail } from 'app';
+import $ from 'jquery';
 
 window.KJUR = {};
 
@@ -42,6 +43,7 @@ rethink.install(config).then(function(result) {
   runtimeLoader = result;
 
   return getListOfHyperties(domain);
+
 
 }).then(function(hyperties) {
 
@@ -75,27 +77,34 @@ function getListOfHyperties(domain) {
   let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty';
 
   return new Promise(function(resolve, reject) {
-    $.ajax({
+    fetch(hypertiesURL).then(function(result) {
+/*    $.ajax({
       url: hypertiesURL,
-      success: function(result) {
-        let response = [];
-        if (typeof result === 'object') {
-          result.forEach(function(key) {
+      success: function(result) {*/
+
+
+        console.log(result);
+
+        result.json().then(function (hyperties) {
+          console.log(hyperties);
+/*          let response = [];
+        if (typeof hyperties === 'object') {
+          hyperties.forEach(function(key) {
             response.push(key);
           });
-        } else if (typeof result === 'string') {
-          response = JSON.parse(result);
-        }
+        } else if (typeof hyperties === 'string') {
+          response = JSON.parse(hyperties);
+        }*/
 
-        response.sort();
-        resolve(response);
-      },
-      fail: function(reason) {
+        hyperties.sort();
+        resolve(hyperties);
+
+        })
+      },function(reason) {
+//      fail: function(reason) {
         reject(reason);
-        notification(reason, 'warn');
-      }
-
-    });
+//        notification(reason, 'warn');
+      });
   });
 }
 
