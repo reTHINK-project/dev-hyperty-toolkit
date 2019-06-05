@@ -35,7 +35,8 @@
     "jquery": "^3.4.1",
     "runtime-browser": "github:rethink-project/dev-runtime-browser#develop",
     "runtime-core": "github:rethink-project/dev-runtime-core#develop",
-    "sync-client": "github:rethink-project/sync_client#develop"
+    "sync-client": "github:rethink-project/sync_client#develop",
+    "systemjs": "^3.1.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",

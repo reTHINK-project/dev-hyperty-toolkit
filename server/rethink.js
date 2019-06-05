@@ -13,7 +13,9 @@ import rethinkBrowser from 'runtime-browser/bin/rethink';
 import browserConfig from '../config.json';
 
 import { hypertyDeployed, hypertyFail } from 'app';
-import $ from 'jquery';
+//import $ from 'jquery';
+//jQuery.noConflict();
+
 
 window.KJUR = {};
 
