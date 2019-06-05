@@ -2,6 +2,7 @@ var fs = require('fs');
 var gulp = require('gulp');
 var path = require('path');
 var through = require('through2');
+var stubTargetDir = '../../dist';
 
 var gutil = require('gulp-util');
 
@@ -17,14 +18,16 @@ function convertProtoStub() {
   return through.obj(function(chunk, enc, done) {
 
     var fileObject = path.parse(chunk.path);
+    var stubBaseDir = path.dirname(chunk.path);
 
-    return gulp.src([chunk.path])
+    if (fileObject.base.includes('.idp')) {
+      return gulp.src([chunk.path])
       .on('end', function() {
         gutil.log('-----------------------------------------------------------');
         gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
       })
       .pipe(transpile({
-        destination: path.join(process.cwd(), 'resources'),
+        destination: path.join(process.cwd(), 'resources', 'well-known','idp-proxy'),
         standalone: 'activate',
         debug: false
       }))
@@ -35,6 +38,26 @@ function convertProtoStub() {
         gutil.log('-----------------------------------------------------------');
         done();
       });
+    } else {
+      return gulp.src([chunk.path])
+      .on('end', function() {
+        gutil.log('-----------------------------------------------------------');
+        gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
+      })
+      .pipe(transpile({
+        destination: path.join(process.cwd(), 'resources', 'well-known','protocolstub'),
+        standalone: 'activate',
+        debug: false
+      }))
+      .pipe(resource())
+      .resume()
+      .on('end', function() {
+        gutil.log('Protostub', fileObject.name, ' was converted and encoded');
+        gutil.log('-----------------------------------------------------------');
+        done();
+      });
+
+    }
 
   });
 
