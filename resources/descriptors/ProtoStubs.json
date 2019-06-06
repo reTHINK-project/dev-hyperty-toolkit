@@ -7,7 +7,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "12.20",
+    "version": "12.90",
     "description": "Protostub of Google",
     "language": "javascript",
     "cguid": "406d1b76ae0394c37d6e7d0037a91cb7c",
@@ -34,7 +34,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "12.20",
+    "version": "12.90",
     "description": "Description of IMSIWProtoStub",
     "language": "javascript",
     "cguid": "42deef6d806460071a3a260ea4b6291ae",
@@ -63,7 +63,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "12.20",
+    "version": "12.90",
     "description": "P2P Handler Protostub ",
     "language": "javascript",
     "cguid": "4456240d0c888e2293cdc568a7224b7c0",
@@ -112,7 +112,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "12.20",
+    "version": "12.90",
     "description": "P2P Requester Protostub ",
     "language": "javascript",
     "cguid": "4bcb9977c1c46c13278273a67b5fe7aab",
@@ -161,7 +161,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "12.20",
+    "version": "12.90",
     "description": "Protostub to exchange messages with slack",
     "language": "javascript",
     "cguid": "46968ae37faa364f9cc07983229b5a641",
@@ -185,7 +185,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "14.20",
+    "version": "14.90",
     "description": "Protostub to exchange messages with vertx",
     "language": "javascript",
     "cguid": "459ddec3ec1a17767da034fbe0988f1f9",
@@ -211,7 +211,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "14.20",
+    "version": "14.90",
     "description": "Protostub to exchange messages with vertx",
     "language": "javascript",
     "cguid": "41338ea57960781be06f8cf3c78cbf70f",
@@ -236,7 +236,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "14.70",
+    "version": "15.40",
     "description": "Protostub to exchange messages with vertx",
     "language": "javascript",
     "cguid": "46c0d57ffd1f5fe7888e6ba971acb4e79",
@@ -275,7 +275,7 @@
       "signature": ""
     },
     "sourcePackageURL": "/sourcePackage",
-    "version": "10.10",
+    "version": "10.80",
     "description": "Protostub of Strava",
     "language": "javascript",
     "cguid": "44995c04510b283b19af39626f5f6c39b",
@@ -289,6 +289,27 @@
       "sessions_query_interval": 300000,
       "domain": "localhost"
     },
+    "messageSchemas": [],
+    "dataObjects": [],
+    "signature": "",
+    "accessControlPolicy": "somePolicy"
+  },
+  "default": {
+    "sourcePackage": {
+      "sourceCode": "IWZ1bmN0aW9uKGUsdCl7Im9iamVjdCI9PXR5cGVvZiBleHBvcnRzJiYib2JqZWN0Ij09dHlwZW9mIG1vZHVsZT9tb2R1bGUuZXhwb3J0cz10KCk6ImZ1bmN0aW9uIj09dHlwZW9mIGRlZmluZSYmZGVmaW5lLmFtZD9kZWZpbmUoImFjdGl2YXRlIixbXSx0KToib2JqZWN0Ij09dHlwZW9mIGV4cG9ydHM/ZXhwb3J0cy5hY3RpdmF0ZT10KCk6ZS5hY3RpdmF0ZT10KCl9KCJ1bmRlZmluZWQiIT10eXBlb2Ygc2VsZj9zZWxmOnRoaXMsZnVuY3Rpb24oKXtyZXR1cm4gZnVuY3Rpb24oZSl7dmFyIHQ9e307ZnVuY3Rpb24gbihvKXtpZih0W29dKXJldHVybiB0W29dLmV4cG9ydHM7dmFyIGk9dFtvXT17aTpvLGw6ITEsZXhwb3J0czp7fX07cmV0dXJuIGVbb10uY2FsbChpLmV4cG9ydHMsaSxpLmV4cG9ydHMsbiksaS5sPSEwLGkuZXhwb3J0c31yZXR1cm4gbi5tPWUsbi5jPXQsbi5kPWZ1bmN0aW9uKGUsdCxvKXtuLm8oZSx0KXx8T2JqZWN0LmRlZmluZVByb3BlcnR5KGUsdCx7Y29uZmlndXJhYmxlOiExLGVudW1lcmFibGU6ITAsZ2V0Om99KX0sbi5uPWZ1bmN0aW9uKGUpe3ZhciB0PWUmJmUuX19lc01vZHVsZT9mdW5jdGlvbigpe3JldHVybiBlLmRlZmF1bHR9OmZ1bmN0aW9uKCl7cmV0dXJuIGV9O3JldHVybiBuLmQodCwiYSIsdCksdH0sbi5vPWZ1bmN0aW9uKGUsdCl7cmV0dXJuIE9iamVjdC5wcm90b3R5cGUuaGFzT3duUHJvcGVydHkuY2FsbChlLHQpfSxuLnA9IiIsbihuLnM9MCl9KFtmdW5jdGlvbihlLHQsbil7InVzZSBzdHJpY3QiO2Z1bmN0aW9uIG8oZSx0KXtmb3IodmFyIG49MDtuPHQubGVuZ3RoO24rKyl7dmFyIG89dFtuXTtvLmVudW1lcmFibGU9by5lbnVtZXJhYmxlfHwhMSxvLmNvbmZpZ3VyYWJsZT0hMCwidmFsdWUiaW4gbyYmKG8ud3JpdGFibGU9ITApLE9iamVjdC5kZWZpbmVQcm9wZXJ0eShlLG8ua2V5LG8pfX1PYmplY3QuZGVmaW5lUHJvcGVydHkodCwiX19lc01vZHVsZSIse3ZhbHVlOiEwfSk7dmFyIGk9e25hbWU6IlZlcnR4UHJvdG9TdHViIixsYW5ndWFnZToiamF2YXNjcmlwdCIsZGVzY3JpcHRpb246IlByb3Rvc3R1YiB0byBleGNoYW5nZSBtZXNzYWdlcyB3aXRoIHZlcnR4IixzaWduYXR1cmU6IiIsY29uZmlndXJhdGlvbjp7dXJsOiJ3c3M6Ly9tc2ctbm9kZS5yZXRoaW5rLWRldi5hbHRpY2VsYWJzLmNvbS9sb2NhbGhvc3Qvd3MiLG1heEJ1ZmZlcjoxZTZ9LGNvbnN0cmFpbnRzOnticm93c2VyOiEwfSxpbnRlcndvcmtpbmc6ITEsb2JqZWN0TmFtZToiZGVmYXVsdCJ9LHM9ZnVuY3Rpb24oKXtmdW5jdGlvbiBlKCl7IWZ1bmN0aW9uKGUsdCl7aWYoIShlIGluc3RhbmNlb2YgdCkpdGhyb3cgbmV3IFR5cGVFcnJvcigiQ2Fubm90IGNhbGwgYSBjbGFzcyBhcyBhIGZ1bmN0aW9uIil9KHRoaXMsZSl9cmV0dXJuIGZ1bmN0aW9uKGUsdCxuKXt0JiZvKGUucHJvdG90eXBlLHQpLG4mJm8oZSxuKX0oZSxbe2tleToiX3N0YXJ0Iix2YWx1ZTpmdW5jdGlvbihlLHQsbil7dmFyIG89dGhpcztpZighZSl0aHJvdyBuZXcgRXJyb3IoIlRoZSBydW50aW1lUHJvdG9TdHViVVJMIGlzIGEgbmVlZGVkIHBhcmFtZXRlciIpO2lmKCF0KXRocm93IG5ldyBFcnJvcigiVGhlIGJ1cyBpcyBhIG5lZWRlZCBwYXJhbWV0ZXIiKTtpZighbil0aHJvdyBuZXcgRXJyb3IoIlRoZSBjb25maWcgaXMgYSBuZWVkZWQgcGFyYW1ldGVyIik7aWYoIW4udXJsKXRocm93IG5ldyBFcnJvcigiVGhlIGNvbmZpZy51cmwgaXMgYSBuZWVkZWQgcGFyYW1ldGVyIik7aWYoIW4ucnVudGltZVVSTCl0aHJvdyBuZXcgRXJyb3IoIlRoZSBjb25maWcucnVudGltZVVSTCBpcyBhIG5lZWRlZCBwYXJhbWV0ZXIiKTt2YXIgaT10aGlzO3RoaXMuX2lkPTAsdGhpcy5fY29udGludW91c09wZW49ITAsdGhpcy5fcnVudGltZVByb3RvU3R1YlVSTD1lLHRoaXMuX2J1cz10LHRoaXMuX2NvbmZpZz1uLHRoaXMuX3J1bnRpbWVTZXNzaW9uVVJMPW4ucnVudGltZVVSTCx0aGlzLl9tYXhCdWZmZXI9bi5tYXhCdWZmZXIsdGhpcy5fcmVPcGVuPSExLHQuYWRkTGlzdGVuZXIoIioiLGZ1bmN0aW9uKGUpe2NvbnNvbGUubG9nKCJbVmVydHhQcm90b1N0dWJdIG91dGdvaW5nIG1lc3NhZ2U6ICIsZSksaS5fb3BlbihmdW5jdGlvbigpe2kuX2ZpbHRlcihlKSYmKGUuYm9keS52aWE9by5fcnVudGltZVNlc3Npb25VUkwsY29uc29sZS5sb2coIltWZXJ0eFByb3RvU3R1YjogUHJvdG9TdHViIC0+IE1OXSIsZSksaS5fc2VuZERhdGEoZnVuY3Rpb24oKXtpLl9zb2NrLnNlbmQoSlNPTi5zdHJpbmdpZnkoZSkpfSksY29uc29sZS5sb2coIltWZXJ0eFByb3RvU3R1Yl0gc29jay5yZWFkeVN0YXRlICIsaS5fc29jay5yZWFkeVN0YXRlKSxjb25zb2xlLmxvZygiW1ZlcnR4UHJvdG9TdHViXSBzb2NrLmJ1ZmZlcmVkQW1vdW50ICIsaS5fc29jay5idWZmZXJlZEFtb3VudCkpfSl9KSxpLl9zZW5kU3RhdHVzKCJjcmVhdGVkIiksaS5fb3BlbihmdW5jdGlvbigpe30pfX0se2tleToiY29ubmVjdCIsdmFsdWU6ZnVuY3Rpb24oKXt0aGlzLl9jb250aW51b3VzT3Blbj0hMCx0aGlzLl9vcGVuKGZ1bmN0aW9uKCl7fSl9fSx7a2V5OiJkaXNjb25uZWN0Iix2YWx1ZTpmdW5jdGlvbigpe3RoaXMuX2NvbnRpbnVvdXNPcGVuPSExLHRoaXMuX3NvY2smJnRoaXMuX3NlbmRDbG9zZSgpfX0se2tleToiX3NlbmRPcGVuIix2YWx1ZTpmdW5jdGlvbihlKXt2YXIgdD10aGlzO3RoaXMuX3NlbmRTdGF0dXMoImluLXByb2dyZXNzIiksdC5faWQrKzt2YXIgbj17aWQ6dC5faWQsdHlwZToib3BlbiIsZnJvbTp0Ll9ydW50aW1lU2Vzc2lvblVSTCx0bzoibW46L3Nlc3Npb24ifTt0Ll9yZU9wZW4mJihuLnR5cGU9InJlLW9wZW4iKTt2YXIgbz0hMTt0Ll9zZXNzaW9uQ2FsbGJhY2s9ZnVuY3Rpb24oaSl7InJlc3BvbnNlIj09PWkudHlwZSZpLmlkPT09bi5pZCYmKG89ITAsMjAwPT09aS5ib2R5LmNvZGU/KGkuYm9keS5ydW50aW1lVG9rZW4mJih0Ll9yZU9wZW49ITAsdC5fcnVudGltZVNlc3Npb25VUkw9dC5fY29uZmlnLnJ1bnRpbWVVUkwrIi8iK2kuYm9keS5ydW50aW1lVG9rZW4pLHQuX3NlbmRTdGF0dXMoImxpdmUiKSxlKCkpOnQuX3NlbmRTdGF0dXMoImZhaWxlZCIsaS5ib2R5LmRlc2MpKX0sdC5fc29jay5zZW5kKEpTT04uc3RyaW5naWZ5KG4pKSxzZXRUaW1lb3V0KGZ1bmN0aW9uKCl7b3x8dC5fc2VuZFN0YXR1cygiZGlzY29ubmVjdGVkIiwiVGltZW91dCBmcm9tIG1uOi9zZXNzaW9uIil9LDNlMyl9fSx7a2V5OiJfc2VuZENsb3NlIix2YWx1ZTpmdW5jdGlvbigpe3RoaXMuX2lkKys7dmFyIGU9e2lkOnRoaXMuX2lkLHR5cGU6ImNsb3NlIixmcm9tOnRoaXMuX3J1bnRpbWVTZXNzaW9uVVJMLHRvOiJtbjovc2Vzc2lvbiJ9O3RoaXMuX3JlT3Blbj0hMSx0aGlzLl9ydW50aW1lU2Vzc2lvblVSTD10aGlzLl9jb25maWcuX3J1bnRpbWVVUkwsdGhpcy5fc29jay5zZW5kKEpTT04uc3RyaW5naWZ5KGUpKX19LHtrZXk6Il9zZW5kU3RhdHVzIix2YWx1ZTpmdW5jdGlvbihlLHQpe2NvbnNvbGUubG9nKCJbVmVydHhQcm90b3N0dWIgc3RhdHVzIGNoYW5nZWRdIHRvICIsZSksdGhpcy5fc3RhdGU9ZTt2YXIgbj17dHlwZToidXBkYXRlIixmcm9tOnRoaXMuX3J1bnRpbWVQcm90b1N0dWJVUkwsdG86dGhpcy5fcnVudGltZVByb3RvU3R1YlVSTCsiL3N0YXR1cyIsYm9keTp7dmFsdWU6ZX19O3QmJihuLmJvZHkuZGVzYz10KSx0aGlzLl9idXMucG9zdE1lc3NhZ2Uobil9fSx7a2V5OiJfd2FpdFJlYWR5Iix2YWx1ZTpmdW5jdGlvbihlKXt2YXIgdD10aGlzOzE9PT10Ll9zb2NrLnJlYWR5U3RhdGU/ZSgpOnNldFRpbWVvdXQoZnVuY3Rpb24oKXt0Ll93YWl0UmVhZHkoZSl9KX19LHtrZXk6Il9zZW5kRGF0YSIsdmFsdWU6ZnVuY3Rpb24oZSl7dmFyIHQ9dGhpczt0Ll9zb2NrLmJ1ZmZlcmVkQW1vdW50PHQuX21heEJ1ZmZlcj9lKCk6c2V0VGltZW91dChmdW5jdGlvbigpe2NvbnNvbGUud2FybigiW1ZlcnR4UHJvdG9TdHViLl9zZW5kRGF0YV0gQnVmZmVyIE92ZXJsb2FkZWQgIix0Ll9zb2NrLmJ1ZmZlcmVkQW1vdW50LCIgdHJ5aW5nIGFnYWluIC4uLiIpLHQuX3NlbmREYXRhKGUpfSl9fSx7a2V5OiJfZmlsdGVyIix2YWx1ZTpmdW5jdGlvbihlKXtyZXR1cm4gZS5ib2R5fHwoZS5ib2R5PXt9KSxjb25zb2xlLmxvZygiW1ZlcnR4UHJvdG9TdHViLl9maWx0ZXJdIG1zZyB2aWE6ICIsZS5ib2R5LnZpYSwiIHByb3Rvc3R1YlVybDogIix0aGlzLl9ydW50aW1lU2Vzc2lvblVSTCksIWUuYm9keS52aWF8fGUuYm9keS52aWEhPT10aGlzLl9ydW50aW1lU2Vzc2lvblVSTH19LHtrZXk6Il9kZWxpdmVyIix2YWx1ZTpmdW5jdGlvbihlKXtlLmJvZHl8fChlLmJvZHk9e30pLGUuYm9keS52aWE9dGhpcy5fcnVudGltZVNlc3Npb25VUkwsY29uc29sZS5sb2coIltWZXJ0eFByb3RvU3R1Yi5fZGVsaXZlcl0iLGUpLHRoaXMuX2J1cy5wb3N0TWVzc2FnZShlKX19LHtrZXk6Il9vcGVuIix2YWx1ZTpmdW5jdGlvbihlKXt2YXIgdD10aGlzO3RoaXMuX2NvbnRpbnVvdXNPcGVuJiYodC5fc29jaz90Ll93YWl0UmVhZHkoZSk6KCJ3cyI9PT10Ll9jb25maWcudXJsLnN1YnN0cmluZygwLDIpP3QuX3NvY2s9bmV3IFdlYlNvY2tldCh0Ll9jb25maWcudXJsKTp0Ll9zb2NrPW5ldyBTb2NrSlModC5fY29uZmlnLnVybCksdC5fc29jay5vbm9wZW49ZnVuY3Rpb24oKXt0Ll9zZW5kT3BlbihmdW5jdGlvbigpe2UoKX0pfSx0Ll9zb2NrLm9ubWVzc2FnZT1mdW5jdGlvbihlKXt2YXIgbj1KU09OLnBhcnNlKGUuZGF0YSk7Y29uc29sZS5sb2coIltWZXJ0eFByb3RvU3R1YjogTU4gLT4gU09DS0VUIE9OIE1FU1NBR0VdIixuKSwibW46L3Nlc3Npb24iPT09bi5mcm9tP3QuX3Nlc3Npb25DYWxsYmFjayYmdC5fc2Vzc2lvbkNhbGxiYWNrKG4pOnQuX2ZpbHRlcihuKSYmdC5fZGVsaXZlcihuKX0sdC5fc29jay5vbmNsb3NlPWZ1bmN0aW9uKG4pe3ZhciBvO289MWUzPT09bi5jb2RlPyJOb3JtYWwgY2xvc3VyZSwgbWVhbmluZyB0aGF0IHRoZSBwdXJwb3NlIGZvciB3aGljaCB0aGUgY29ubmVjdGlvbiB3YXMgZXN0YWJsaXNoZWQgaGFzIGJlZW4gZnVsZmlsbGVkLiI6MTAwMT09PW4uY29kZT8iQW4gZW5kcG9pbnQgaXMgJ2dvaW5nIGF3YXknLCBzdWNoIGFzIGEgc2VydmVyIGdvaW5nIGRvd24gb3IgYSBicm93c2VyIGhhdmluZyBuYXZpZ2F0ZWQgYXdheSBmcm9tIGEgcGFnZS4iOjEwMDI9PT1uLmNvZGU/IkFuIGVuZHBvaW50IGlzIHRlcm1pbmF0aW5nIHRoZSBjb25uZWN0aW9uIGR1ZSB0byBhIHByb3RvY29sIGVycm9yIjoxMDAzPT09bi5jb2RlPyJBbiBlbmRwb2ludCBpcyB0ZXJtaW5hdGluZyB0aGUgY29ubmVjdGlvbiBiZWNhdXNlIGl0IGhhcyByZWNlaXZlZCBhIHR5cGUgb2YgZGF0YSBpdCBjYW5ub3QgYWNjZXB0IChlLmcuLCBhbiBlbmRwb2ludCB0aGF0IHVuZGVyc3RhbmRzIG9ubHkgdGV4dCBkYXRhIE1BWSBzZW5kIHRoaXMgaWYgaXQgcmVjZWl2ZXMgYSBiaW5hcnkgbWVzc2FnZSkuIjoxMDA0PT09bi5jb2RlPyJSZXNlcnZlZC4gVGhlIHNwZWNpZmljIG1lYW5pbmcgbWlnaHQgYmUgZGVmaW5lZCBpbiB0aGUgZnV0dXJlLiI6MTAwNT09PW4uY29kZT8iTm8gc3RhdHVzIGNvZGUgd2FzIGFjdHVhbGx5IHByZXNlbnQuIjoxMDA2PT09bi5jb2RlPyJUaGUgY29ubmVjdGlvbiB3YXMgY2xvc2VkIGFibm9ybWFsbHksIGUuZy4sIHdpdGhvdXQgc2VuZGluZyBvciByZWNlaXZpbmcgYSBDbG9zZSBjb250cm9sIGZyYW1lIjoxMDA3PT09bi5jb2RlPyJBbiBlbmRwb2ludCBpcyB0ZXJtaW5hdGluZyB0aGUgY29ubmVjdGlvbiBiZWNhdXNlIGl0IGhhcyByZWNlaXZlZCBkYXRhIHdpdGhpbiBhIG1lc3NhZ2UgdGhhdCB3YXMgbm90IGNvbnNpc3RlbnQgd2l0aCB0aGUgdHlwZSBvZiB0aGUgbWVzc2FnZSAoZS5nLiwgbm9uLVVURi04IFtodHRwOi8vdG9vbHMuaWV0Zi5vcmcvaHRtbC9yZmMzNjI5XSBkYXRhIHdpdGhpbiBhIHRleHQgbWVzc2FnZSkuIjoxMDA4PT09bi5jb2RlPydBbiBlbmRwb2ludCBpcyB0ZXJtaW5hdGluZyB0aGUgY29ubmVjdGlvbiBiZWNhdXNlIGl0IGhhcyByZWNlaXZlZCBhIG1lc3NhZ2UgdGhhdCAidmlvbGF0ZXMgaXRzIHBvbGljeSIuIFRoaXMgcmVhc29uIGlzIGdpdmVuIGVpdGhlciBpZiB0aGVyZSBpcyBubyBvdGhlciBzdXRpYmxlIHJlYXNvbiwgb3IgaWYgdGhlcmUgaXMgYSBuZWVkIHRvIGhpZGUgc3BlY2lmaWMgZGV0YWlscyBhYm91dCB0aGUgcG9saWN5Lic6MTAwOT09PW4uY29kZT8iQW4gZW5kcG9pbnQgaXMgdGVybWluYXRpbmcgdGhlIGNvbm5lY3Rpb24gYmVjYXVzZSBpdCBoYXMgcmVjZWl2ZWQgYSBtZXNzYWdlIHRoYXQgaXMgdG9vIGJpZyBmb3IgaXQgdG8gcHJvY2Vzcy4iOjEwMTA9PT1uLmNvZGU/IkFuIGVuZHBvaW50IChjbGllbnQpIGlzIHRlcm1pbmF0aW5nIHRoZSBjb25uZWN0aW9uIGJlY2F1c2UgaXQgaGFzIGV4cGVjdGVkIHRoZSBzZXJ2ZXIgdG8gbmVnb3RpYXRlIG9uZSBvciBtb3JlIGV4dGVuc2lvbiwgYnV0IHRoZSBzZXJ2ZXIgZGlkbid0IHJldHVybiB0aGVtIGluIHRoZSByZXNwb25zZSBtZXNzYWdlIG9mIHRoZSBXZWJTb2NrZXQgaGFuZHNoYWtlLiA8YnIgLz4gU3BlY2lmaWNhbGx5LCB0aGUgZXh0ZW5zaW9ucyB0aGF0IGFyZSBuZWVkZWQgYXJlOiAiK24ucmVhc29uOjEwMTE9PT1uLmNvZGU/IkEgc2VydmVyIGlzIHRlcm1pbmF0aW5nIHRoZSBjb25uZWN0aW9uIGJlY2F1c2UgaXQgZW5jb3VudGVyZWQgYW4gdW5leHBlY3RlZCBjb25kaXRpb24gdGhhdCBwcmV2ZW50ZWQgaXQgZnJvbSBmdWxmaWxsaW5nIHRoZSByZXF1ZXN0LiI6MTAxNT09PW4uY29kZT8iVGhlIGNvbm5lY3Rpb24gd2FzIGNsb3NlZCBkdWUgdG8gYSBmYWlsdXJlIHRvIHBlcmZvcm0gYSBUTFMgaGFuZHNoYWtlIChlLmcuLCB0aGUgc2VydmVyIGNlcnRpZmljYXRlIGNhbid0IGJlIHZlcmlmaWVkKS4iOiJVbmtub3duIHJlYXNvbiIsZGVsZXRlIHQuX3NvY2ssY29uc29sZS5lcnJvcigiW1ZlcnR4UHJvdG9TdHViLm9uQ2xvc2VdICIsbyksdC5fc2VuZFN0YXR1cygiZGlzY29ubmVjdGVkIixvKSx0Ll9yZU9wZW49ITAsdC5fb3BlbihlKX0pKX19LHtrZXk6ImRlc2NyaXB0b3IiLGdldDpmdW5jdGlvbigpe3JldHVybiBpfX0se2tleToibmFtZSIsZ2V0OmZ1bmN0aW9uKCl7cmV0dXJuIGkubmFtZX19LHtrZXk6ImNvbmZpZyIsZ2V0OmZ1bmN0aW9uKCl7cmV0dXJuIHRoaXMuX2NvbmZpZ319LHtrZXk6InJ1bnRpbWVTZXNzaW9uIixnZXQ6ZnVuY3Rpb24oKXtyZXR1cm4gdGhpcy5fcnVudGltZVNlc3Npb25VUkx9fV0pLGV9KCk7dC5kZWZhdWx0PXN9XSkuZGVmYXVsdH0pOw==",
+      "sourceCodeClassname": "default",
+      "encoding": "base64",
+      "signature": ""
+    },
+    "sourcePackageURL": "/sourcePackage",
+    "version": "0.10",
+    "description": "",
+    "language": "Javascript",
+    "cguid": "4c21f969b5f03d33d43e04f8f136e7682",
+    "type": "ProtoStubs",
+    "constraints": {},
+    "objectName": "default",
+    "configuration": {},
     "messageSchemas": [],
     "dataObjects": [],
     "signature": "",

@@ -2,7 +2,6 @@ var fs = require('fs');
 var gulp = require('gulp');
 var path = require('path');
 var through = require('through2');
-var stubTargetDir = '../../dist';
 
 var gutil = require('gulp-util');
 
@@ -12,6 +11,7 @@ var readFiles = require('../utils').readFiles;
 var config = require('../toolkit.config');
 var transpile = require('../transpile');
 var resource = require('../resources');
+//var rename = require("gulp-rename");
 
 function convertProtoStub() {
 
@@ -19,15 +19,16 @@ function convertProtoStub() {
 
     var fileObject = path.parse(chunk.path);
     var stubBaseDir = path.dirname(chunk.path);
+    var stubTargetDir = '../../../dist';
+    var type = stubBaseDir.includes('idpproxy') ? 'idp-proxy' : 'protocolstub'; 
 
-    if (fileObject.base.includes('.idp')) {
-      return gulp.src([chunk.path])
+        return gulp.src([chunk.path])
       .on('end', function() {
         gutil.log('-----------------------------------------------------------');
         gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
       })
       .pipe(transpile({
-        destination: path.join(process.cwd(), 'resources', 'well-known','idp-proxy'),
+        destination: path.join(stubBaseDir, stubTargetDir, '.well-known',type),
         standalone: 'activate',
         debug: false
       }))
@@ -38,30 +39,12 @@ function convertProtoStub() {
         gutil.log('-----------------------------------------------------------');
         done();
       });
-    } else {
-      return gulp.src([chunk.path])
-      .on('end', function() {
-        gutil.log('-----------------------------------------------------------');
-        gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
-      })
-      .pipe(transpile({
-        destination: path.join(process.cwd(), 'resources', 'well-known','protocolstub'),
-        standalone: 'activate',
-        debug: false
-      }))
-      .pipe(resource())
-      .resume()
-      .on('end', function() {
-        gutil.log('Protostub', fileObject.name, ' was converted and encoded');
-        gutil.log('-----------------------------------------------------------');
-        done();
-      });
-
-    }
-
   });
 
 }
+
+
+
 
 function filterProtostubs(environment) {
 
