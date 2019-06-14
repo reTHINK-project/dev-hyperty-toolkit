@@ -3,7 +3,7 @@
 
 // All the environments
 //import rethinkCore from '../resources/factories/rethink';
-//import rethinkCore from 'runtime-core/dist/rethink';
+//import rethink from 'runtime-core/dist/rethink';
 
 //import {rethink} from 'runtime-core/dist/rethink';
 
