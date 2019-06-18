@@ -76,7 +76,7 @@ rethink.install(config).then(function(result) {
 
 function getListOfHyperties(domain) {
 
-  let hypertiesURL = 'https://' + domain + ':8080/.well-known/hyperty/all.json';
+  let hypertiesURL = 'https://' + domain + '/.well-known/hyperty/all.json';
 
   return new Promise(function(resolve, reject) {
     fetch(hypertiesURL).then(function(result) {
