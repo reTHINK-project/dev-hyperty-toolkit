@@ -76,7 +76,7 @@ rethink.install(config).then(function(result) {
 
 function getListOfHyperties(domain) {
 
-  let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty';
+  let hypertiesURL = 'https://' + domain + ':8080/.well-known/hyperty/all.json';
 
   return new Promise(function(resolve, reject) {
     fetch(hypertiesURL).then(function(result) {
@@ -85,11 +85,10 @@ function getListOfHyperties(domain) {
       success: function(result) {*/
 
 
-        console.log(result);
 
         result.json().then(function (hyperties) {
-          console.log(hyperties);
-/*          let response = [];
+          console.log('[toolkit.getListofHyperties] result', hyperties);
+          /*          let response = [];
         if (typeof hyperties === 'object') {
           hyperties.forEach(function(key) {
             response.push(key);
@@ -98,8 +97,8 @@ function getListOfHyperties(domain) {
           response = JSON.parse(hyperties);
         }*/
 
-        hyperties.sort();
-        resolve(hyperties);
+        hyperties["hyperties"].sort();
+        resolve(hyperties["hyperties"]);
 
         })
       },function(reason) {
