@@ -35,7 +35,7 @@
     "gulp-rename": "^1.4.0",
     "jquery": "^3.4.1",
     "runtime-browser": "github:rethink-project/dev-runtime-browser#develop",
-    "runtime-core": "github:rethink-project/dev-runtime-core#develop",
+    "runtime-core": "github:rethink-project/dev-runtime-core#systemjs",
     "sync-client": "github:rethink-project/sync_client#develop",
     "systemjs": "^3.1.6"
   },
