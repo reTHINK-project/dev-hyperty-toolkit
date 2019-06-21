@@ -30,9 +30,9 @@ coverage
 resources/tmp
 resources/bundle.js
 resources/*.hy.js
-resources/*.ps.js
+resources/*.js
 resources/*.ds.js
-resources/*.idp.js
+resources/*.js
 
 resources/descriptors/Hyperties.json
 resources/descriptors/DataSchemas.json

@@ -11,20 +11,24 @@ var readFiles = require('../utils').readFiles;
 var config = require('../toolkit.config');
 var transpile = require('../transpile');
 var resource = require('../resources');
+//var rename = require("gulp-rename");
 
 function convertProtoStub() {
 
   return through.obj(function(chunk, enc, done) {
 
     var fileObject = path.parse(chunk.path);
+    var stubBaseDir = path.dirname(chunk.path);
+    var stubTargetDir = '../../../dist';
+    var type = stubBaseDir.includes('idpproxy') ? 'idp-proxy' : 'protocolstub'; 
 
-    return gulp.src([chunk.path])
+        return gulp.src([chunk.path])
       .on('end', function() {
         gutil.log('-----------------------------------------------------------');
         gutil.log('Converting ' + fileObject.base + ' from ES6 to ES5');
       })
       .pipe(transpile({
-        destination: path.join(process.cwd(), 'resources'),
+        destination: path.join(stubBaseDir, stubTargetDir, '.well-known',type),
         standalone: 'activate',
         debug: false
       }))
@@ -35,10 +39,12 @@ function convertProtoStub() {
         gutil.log('-----------------------------------------------------------');
         done();
       });
-
   });
 
 }
+
+
+
 
 function filterProtostubs(environment) {
 

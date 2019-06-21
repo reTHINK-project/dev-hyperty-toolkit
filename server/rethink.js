@@ -3,7 +3,7 @@
 
 // All the environments
 //import rethinkCore from '../resources/factories/rethink';
-//import rethinkCore from 'runtime-core/dist/rethink';
+//import rethink from 'runtime-core/dist/rethink';
 
 //import {rethink} from 'runtime-core/dist/rethink';
 
@@ -13,6 +13,9 @@ import rethinkBrowser from 'runtime-browser/bin/rethink';
 import browserConfig from '../config.json';
 
 import { hypertyDeployed, hypertyFail } from 'app';
+//import $ from 'jquery';
+//jQuery.noConflict();
+
 
 window.KJUR = {};
 
@@ -43,6 +46,7 @@ rethink.install(config).then(function(result) {
 
   return getListOfHyperties(domain);
 
+
 }).then(function(hyperties) {
 
   let $dropDown = $('#hyperties-dropdown');
@@ -72,30 +76,36 @@ rethink.install(config).then(function(result) {
 
 function getListOfHyperties(domain) {
 
-  let hypertiesURL = 'https://catalogue.' + domain + '/.well-known/hyperty';
+  let hypertiesURL = 'https://' + domain + '/.well-known/hyperty/all.json';
 
   return new Promise(function(resolve, reject) {
-    $.ajax({
+    fetch(hypertiesURL).then(function(result) {
+/*    $.ajax({
       url: hypertiesURL,
-      success: function(result) {
-        let response = [];
-        if (typeof result === 'object') {
-          result.forEach(function(key) {
+      success: function(result) {*/
+
+
+
+        result.json().then(function (hyperties) {
+          console.log('[toolkit.getListofHyperties] result', hyperties);
+          /*          let response = [];
+        if (typeof hyperties === 'object') {
+          hyperties.forEach(function(key) {
             response.push(key);
           });
-        } else if (typeof result === 'string') {
-          response = JSON.parse(result);
-        }
+        } else if (typeof hyperties === 'string') {
+          response = JSON.parse(hyperties);
+        }*/
 
-        response.sort();
-        resolve(response);
-      },
-      fail: function(reason) {
+        hyperties["hyperties"].sort();
+        resolve(hyperties["hyperties"]);
+
+        })
+      },function(reason) {
+//      fail: function(reason) {
         reject(reason);
-        notification(reason, 'warn');
-      }
-
-    });
+//        notification(reason, 'warn');
+      });
   });
 }
 
